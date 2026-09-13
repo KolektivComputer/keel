@@ -1,0 +1,67 @@
+{
+  "name": "@kolektiv/keel-angular",
+  "version": "0.0.2-SNAPSHOT.4",
+  "description": "Keel Angular 19 bindings \u2014 signal page/form state, query/action injectables, link/form/head directives, and createPage.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://repo.yuri.capital/repository/keel-npm/"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./mount": {
+      "types": "./dist/mount.d.ts",
+      "import": "./dist/mount.js",
+      "default": "./dist/mount.js"
+    },
+    "./bootstrap": {
+      "types": "./dist/bootstrap.d.ts",
+      "import": "./dist/bootstrap.js",
+      "default": "./dist/bootstrap.js"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.js",
+      "default": "./dist/testing.js"
+    }
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "ngc -p tsconfig.build.json",
+    "prepare": "pnpm build",
+    "prepack": "node -e \"require('fs').copyFileSync(require('path').join('..','..','CHANGELOG.md'),'CHANGELOG.md')\"",
+    "test": "pnpm build && node --experimental-strip-types --conditions=browser --test --test-force-exit test/*.test.ts"
+  },
+  "peerDependencies": {
+    "@angular/common": "^19.0.0",
+    "@angular/core": "^19.0.0",
+    "@angular/platform-browser": "^19.0.0",
+    "@kolektiv/keel": "workspace:*",
+    "@tanstack/angular-query-experimental": "^5.0.0",
+    "rxjs": "^7.4.0",
+    "@tanstack/query-core": "^5.0.0"
+  },
+  "devDependencies": {
+    "@angular/common": "^19.2.0",
+    "@angular/compiler": "^19.2.0",
+    "@angular/compiler-cli": "^19.2.0",
+    "@angular/core": "^19.2.0",
+    "@angular/platform-browser": "^19.2.0",
+    "@kolektiv/keel": "workspace:*",
+    "@tanstack/angular-query-experimental": "^5.66.0",
+    "happy-dom": "^20.0.0",
+    "rxjs": "^7.8.0",
+    "typescript": "~5.8.3",
+    "@tanstack/query-core": "^5.66.0"
+  }
+}

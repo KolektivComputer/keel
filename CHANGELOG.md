@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@kolektiv/keel-lit`: Lit 3 binding with reactive page/form state,
   query/action controllers over TanStack, link/form/head elements or helpers,
   navigation/unload guards, `createPage`, and `bootstrap` (#47).
+- `@kolektiv/keel-angular`: Angular 19 binding with signal-based page/form
+  state, query/action injectables, link/form/head directives,
+  navigation/unload guards, `createPage`, and `bootstrap` (#48).
 
 ### Changed
 
