@@ -85,15 +85,26 @@ in; do not reformat unrelated code or add deps without a need.
 ## Publishing
 
 Maven publishing (`bash .github/scripts/publish-maven.sh`) always goes to
-`https://repo.yuri.capital/repository/keel-maven/`. Versions that end in
-`-SNAPSHOT` also go to `…/maven-snapshots/`; otherwise also to
-`…/maven-releases/`. Versions already present in the target repo are skipped,
-and conflicts from redeploys to `keel-maven` are tolerated.
+`https://repo.yuri.capital/repository/keel-maven/`. Versions that end
+exactly in `-SNAPSHOT` (canonical snapshots) also go to
+`…/maven-snapshots/`; numbered releases also go to `…/maven-releases/`.
+Unique pre-release versions such as `0.0.2-SNAPSHOT.1` are not canonical
+Maven snapshots — they do not end in `-SNAPSHOT` — and both of those hosted
+repos reject them, so they go to `keel-maven` only. Consumers configure
+exactly one Maven repository: `maven-releases` for numbered releases,
+`maven-snapshots` for canonical `-SNAPSHOT` builds, or `keel-maven` for the
+unique `X-SNAPSHOT.N` pre-release line. Versions already present in the
+target repo are skipped, and conflicts from redeploys to `keel-maven` are
+tolerated. `bash .github/scripts/verify-maven-resolution.sh <version>`
+anonymously checks that `core` and `ktor` resolve from the advertised repo;
+`.github/workflows/publish.yml` runs it after publishing.
 
 npm (`bash .github/scripts/publish-npm.sh`) publishes only to the hosted
-repo `https://repo.yuri.capital/repository/keel-npm/`. `npm-releases` and
-`npm-snapshots` are Nexus **groups** (read-only). Consumers resolve from
-one of those groups; add `keel-npm` as a group member in Nexus. Workflow:
+repo `https://repo.yuri.capital/repository/keel-npm/`, which is also the
+advertised consumer registry; the `npm-releases` / `npm-snapshots` group
+URLs are not available on this Nexus instance. Consumers point the
+`@kolektiv` scope at hosted `keel-npm`. `publish.yml` verifies resolution
+after publishing with `.github/scripts/verify-npm-resolution.sh`. Workflow:
 `.github/workflows/publish.yml` (tag `v*` or `workflow_dispatch`).
 
 **Credentials (never commit values).** Same Nexus login for Maven and npm:
@@ -112,8 +123,9 @@ one of those groups; add `keel-npm` as a group member in Nexus. Workflow:
 //repo.yuri.capital/repository/keel-npm/:always-auth=true
 ```
 
-Consumers add **either** the releases repo **or** the snapshots repo, not
-both, and not the grouped `keel-maven` / `keel-npm` URLs.
+Consumers add exactly **one** Maven repository — `maven-releases`,
+`maven-snapshots`, or `keel-maven` — never more than one. npm consumers
+point the `@kolektiv` scope at hosted `keel-npm`.
 
 ## Changelog and releases
 

@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `useNavigationGuard`, `useUnloadGuard`; async `onBefore`; `force`; `blocked`
   event; popstate-safe cancel/redirect) (#23).
 
+### Fixed
+
+- Publish unique `X-SNAPSHOT.N` Maven versions to `keel-maven`, the
+  repository consumers can anonymously resolve, with CI verification of the
+  advertised coordinates (#24).
+
 ## [0.0.2-SNAPSHOT.1] - 2026-09-12
 
 ### Added

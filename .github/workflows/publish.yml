@@ -30,6 +30,8 @@ jobs:
           YURI_CAPITAL_REPO_USERNAME: ${{ secrets.YURI_CAPITAL_REPO_USERNAME }}
           YURI_CAPITAL_REPO_PASSWORD: ${{ secrets.YURI_CAPITAL_REPO_PASSWORD }}
         run: bash .github/scripts/publish-maven.sh
+      - name: Verify Maven resolution
+        run: bash .github/scripts/verify-maven-resolution.sh
 
   npm:
     runs-on: ubuntu-latest
@@ -52,3 +54,5 @@ jobs:
           YURI_CAPITAL_REPO_USERNAME: ${{ secrets.YURI_CAPITAL_REPO_USERNAME }}
           YURI_CAPITAL_REPO_PASSWORD: ${{ secrets.YURI_CAPITAL_REPO_PASSWORD }}
         run: bash .github/scripts/publish-npm.sh
+      - name: Verify npm resolution
+        run: bash .github/scripts/verify-npm-resolution.sh

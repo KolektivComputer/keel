@@ -10,8 +10,8 @@ Docs: https://keel.mey.cat/  (GitHub Pages; local `pnpm dev` is http://127.0.0.1
 
 ## Docs
 
-- [Server Installation](https://keel.mey.cat/docs/getting-started/server/): Maven — one repo (`maven-releases` or `maven-snapshots`), `dev.kolektiv.keel:core`
-- [Client Setup](https://keel.mey.cat/docs/getting-started/client/): npm — one registry (`npm-releases` or `npm-snapshots`), `@kolektiv/keel*`
+- [Server Installation](https://keel.mey.cat/docs/getting-started/server/): Maven — one repo (`maven-releases`, `maven-snapshots`, or `keel-maven` for unique pre-releases), `dev.kolektiv.keel:core`
+- [Client Setup](https://keel.mey.cat/docs/getting-started/client/): npm — `keel-npm` registry, `@kolektiv/keel*`
 - [Host (Ktor)](https://keel.mey.cat/docs/getting-started/host/): stand up a Keel host
 - [Pack (Svelte)](https://keel.mey.cat/docs/getting-started/pack/): keel-scaffold or keelPack in Vite
 - [Wire protocol](https://keel.mey.cat/docs/implementing/protocol/): seed JSON, headers, status codes, path grammar, CSRF, `/__keel/schema`

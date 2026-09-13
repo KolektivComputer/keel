@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-# Publish Keel Maven artifacts to Nexus, tolerating assets that are already
-# present: hosted repos reject redeploys (409) and snapshot repos reject
-# versions that do not end in -SNAPSHOT (400). Any other failure fails the job.
+# Publish Keel Maven artifacts to Nexus. Classification:
+#   *-SNAPSHOT  canonical snapshot -> keel-maven + maven-snapshots
+#   *SNAPSHOT*  unique pre-release -> keel-maven only
+#   other       numbered release   -> keel-maven + maven-releases
+# Hosted repos reject redeploys (409), and release-policy repos reject
+# versions containing SNAPSHOT (400); a version-policy rejection is tolerated
+# only when the asset already exists in keel-maven. Any other failure fails.
 set -uo pipefail
 
 : "${YURI_CAPITAL_REPO_USERNAME:?set YURI_CAPITAL_REPO_USERNAME}"
@@ -18,9 +22,13 @@ if [ -z "${VERSION}" ]; then
   exit 1
 fi
 
-# Maven snapshots are versions that end exactly in -SNAPSHOT.
+# Canonical Maven snapshots end exactly in -SNAPSHOT. Version lines like
+# 0.0.2-SNAPSHOT.1 are unique pre-releases: maven-snapshots rejects them and
+# maven-releases rejects the SNAPSHOT substring, so keel-maven is their
+# advertised repository.
 case "${VERSION}" in
   *-SNAPSHOT) TARGET_REPO="maven-snapshots" ;;
+  *SNAPSHOT*) TARGET_REPO="keel-maven" ;;
   *) TARGET_REPO="maven-releases" ;;
 esac
 
@@ -47,7 +55,11 @@ fi
 LOG="$(mktemp)"
 trap 'rm -f "${LOG}"' EXIT
 
-echo "publishing dev.kolektiv.keel:${VERSION} to keel-maven and ${TARGET_REPO}"
+if [ "${TARGET_REPO}" = "keel-maven" ]; then
+  echo "publishing dev.kolektiv.keel:${VERSION} to keel-maven (unique pre-release; not a canonical Maven snapshot)"
+else
+  echo "publishing dev.kolektiv.keel:${VERSION} to keel-maven and ${TARGET_REPO}"
+fi
 ./gradlew :lib:publish :ktor:publish --continue 2>&1 | tee "${LOG}"
 status="${PIPESTATUS[0]}"
 

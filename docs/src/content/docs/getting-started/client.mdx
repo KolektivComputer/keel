@@ -8,21 +8,20 @@ order: 3
 import CodePair from "../../../components/CodePair.astro"
 import { path } from "../../../lib/paths"
 
-Svelte is the first adapter. Pick **one** npm repository: releases for
-numbered versions, or snapshots for `*-SNAPSHOT*`. Do not point the scope
-at both.
-
-## Releases (recommended)
-
-Current release: `0.0.1`. Put this in `.npmrc` at the pack root (or your user
-`~/.npmrc`):
+Svelte is the first adapter. Client packages live in the hosted `keel-npm`
+repository on Nexus at `repo.yuri.capital`. Put this in `.npmrc` at the pack
+root (or your user `~/.npmrc`):
 
 ```bash
 # .npmrc
-@kolektiv:registry=https://repo.yuri.capital/repository/npm-releases/
+@kolektiv:registry=https://repo.yuri.capital/repository/keel-npm/
 ```
 
-Then install:
+Resolving does not require Nexus credentials; publishing does.
+
+## Releases (recommended)
+
+Current release: `0.0.1`. Then install:
 
 <CodePair
   title="package.json — Svelte pack"
@@ -59,19 +58,11 @@ the toolchain: `keel-scaffold` from a live host schema, a Vite plugin
 (`keelPack`) that discovers pages and writes a `.feb`, and `keel-pack` to
 zip a dist by hand.
 
-## Snapshots instead
+## Pre-releases
 
-Current snapshot: `0.0.2-SNAPSHOT.1`. If you are tracking snapshot builds,
-point the scope at snapshots **instead of** releases:
-
-```bash
-# .npmrc
-@kolektiv:registry=https://repo.yuri.capital/repository/npm-snapshots/
-```
-
-Publishers write to hosted `keel-npm`. You resolve from the group you
-chose (`npm-releases` or `npm-snapshots`). Resolving does not require
-Nexus credentials; publishing does.
+Current pre-release: `0.0.2-SNAPSHOT.1`. The `-SNAPSHOT.1` suffix is part of
+a literal, unique version, and the same `keel-npm` registry serves it. Swap
+the `0.0.1` pins above for `0.0.2-SNAPSHOT.1` to track the pre-release line.
 
 Next: <a href={path("/docs/getting-started/pack")}>scaffold a pack</a>.
 The host half is
