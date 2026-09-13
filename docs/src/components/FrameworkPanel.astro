@@ -1,0 +1,16 @@
+---
+/**
+ * Gate docs prose/callouts on the navbar FrameworkPicker (`keel:frontend`).
+ * Uses existing html[data-frontend] + [data-fw] CSS (same as CodeBlock).
+ * Provide a Svelte panel as the fallback when a topic has no other coverage.
+ */
+interface Props {
+  /** One or more framework ids, space-separated (e.g. "react preact"), or "all". */
+  frameworks: string
+}
+const { frameworks } = Astro.props
+---
+
+<div data-fw={frameworks}>
+  <slot />
+</div>

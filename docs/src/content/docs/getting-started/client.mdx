@@ -6,6 +6,8 @@ order: 3
 ---
 
 import CodeBlock from "../../../components/CodeBlock.astro"
+import FrameworkPanel from "../../../components/FrameworkPanel.astro"
+import Callout from "../../../components/Callout.astro"
 import { path } from "../../../lib/paths"
 
 Keel ships a framework-neutral router (`@kolektiv/keel`) and seven pack
@@ -170,11 +172,30 @@ Current release: `0.1.0`. Every adapter is versioned in lockstep with
   ]}
 />
 
-Angular 19 rejects TypeScript ≥ 5.9, so its scaffold pins `~5.8.3`;
-build that pack with the Analog Vite plugin (`@analogjs/vite-plugin-angular`
-plus `@angular/build`). Lit and Angular take `@tanstack/query-core` directly
-because those adapters build their own controllers/injectables over it, the
-other four use the framework-specific TanStack Query package.
+<FrameworkPanel frameworks="svelte react vue solid preact">
+TanStack Query ships as the framework-specific package (`@tanstack/react-query`,
+`@tanstack/vue-query`, and so on). Pin it with the adapter above.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="lit angular">
+Lit and Angular take `@tanstack/query-core` directly because those adapters
+build their own controllers/injectables over it.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="angular">
+<Callout title="Angular TypeScript pin">
+  Angular 19 rejects TypeScript ≥ 5.9, so its scaffold pins `~5.8.3`. Build that
+  pack with the Analog Vite plugin (`@analogjs/vite-plugin-angular` plus
+  `@angular/build`).
+</Callout>
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="svelte">
+<Callout title="Svelte is the docs default">
+  Examples without a framework-specific panel fall back to Svelte. Change the
+  navbar frontend picker to switch install steps and snippets site-wide.
+</Callout>
+</FrameworkPanel>
 
 `@kolektiv/keel` is the host router (visits, history, prefetch, `action()`).
 The adapter package is the framework binding. `@kolektiv/keel-pack` is the
