@@ -16,7 +16,7 @@ Agents (human or otherwise) should read [AGENTS.md](./AGENTS.md).
 - `ktor/` — Ktor plugin: document shell, `respondPage`, visits, pack static files
 - `samples/harbor` — in-memory message board (Ktor + Svelte pack; `./gradlew :samples:harbor:run`)
 - `packages/` — TypeScript router, Svelte bindings, and `keel-pack` (`.feb` zip + `keel-scaffold`)
-- `skills/` — Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`) for Claude, Grok, and `.agents/skills` (`npx skills add kolektivdev/keel`)
+- `skills/` — Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`) for Claude, Grok, and `.agents/skills` (`npx skills add KolektivComputer/keel`)
 - `llms.txt` — curated map for LLMs (also served from the docs site)
 - `docs/` — homepage and documentation (Astro, Tailwind 4, daisyUI 5, Shiki Catppuccin)
 - `public/logo.svg` — product mark (also `favicon.svg`); `public/mark.svg` is the hull glyph

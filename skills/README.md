@@ -14,7 +14,7 @@ layout.
 ## Install
 
 ```bash
-npx skills add kolektivdev/keel
+npx skills add KolektivComputer/keel
 ```
 
 Installs all three skills in the current project. Useful flags:

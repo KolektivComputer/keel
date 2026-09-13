@@ -18,7 +18,7 @@ against the same typed contract.
 | `packages/core` | `@kolektiv/keel` — visits, history, prefetch, `action()` |
 | `packages/svelte` | `@kolektiv/keel-svelte` — `Link`, `Form`, `Head`, `page()`, `useForm`, `useAction` |
 | `packages/pack` | `@kolektiv/keel-pack` — `.feb` zip, Vite plugin, `keel-scaffold` |
-| `skills/` | Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`) for Claude / Grok / `.agents` — `npx skills add kolektivdev/keel` |
+| `skills/` | Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`) for Claude / Grok / `.agents` — `npx skills add KolektivComputer/keel` |
 | `docs/` | Homepage and guides (Astro 7, Tailwind 4, daisyUI 5, Shiki Catppuccin). pnpm workspace package `@kolektiv/keel-docs`. Getting started splits **Server Installation** and **Client Setup**. Search, SCM links, and a combined theme popup live in the site chrome. |
 | `buildSrc/` | Gradle conventions (JVM 17, Maven publish) |
 | `public/` | `logo.svg` / `favicon.svg` product mark, `mark.svg` hull glyph. `.idea/icon.svg` is the same mark as the IntelliJ project icon. |

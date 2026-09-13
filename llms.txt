@@ -33,16 +33,16 @@ Docs: https://keel.mey.cat/  (GitHub Pages; local `pnpm dev` is http://127.0.0.1
 - [Host adapter](https://keel.mey.cat/docs/implementing/host-adapter/): what a backend must implement, `KeelConfig` knobs
 - [Pack adapter](https://keel.mey.cat/docs/implementing/pack-adapter/): PageModule, .feb, RouterAdapter, manifest head/layout fields
 - [Typegen](https://keel.mey.cat/docs/implementing/typegen/): `.ts`, `.d.ts`, JSON contract
-- [AGENTS.md](https://github.com/kolektivdev/keel/blob/main/AGENTS.md): how to work in this repository
+- [AGENTS.md](https://github.com/KolektivComputer/keel/blob/main/AGENTS.md): how to work in this repository
 
 ## Optional
 
-- [Harbor sample](https://github.com/kolektivdev/keel/tree/main/samples/harbor): `./gradlew :samples:harbor:run` → http://127.0.0.1:8090
+- [Harbor sample](https://github.com/KolektivComputer/keel/tree/main/samples/harbor): `./gradlew :samples:harbor:run` → http://127.0.0.1:8090
 
 ## Skills
 
-- [keel-host](https://raw.githubusercontent.com/kolektivdev/keel/main/skills/keel-host/SKILL.md): implement a Keel host — pages, actions, call-site packs, document head, CSP, hot reload
-- [keel-pack](https://raw.githubusercontent.com/kolektivdev/keel/main/skills/keel-pack/SKILL.md): author a frontend pack — Svelte pages, `+head.svelte`, navigation guards, `.feb` builds
-- [keel-scaffold](https://raw.githubusercontent.com/kolektivdev/keel/main/skills/keel-scaffold/SKILL.md): scaffold a blank pack from `/__keel/schema`
+- [keel-host](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-host/SKILL.md): implement a Keel host — pages, actions, call-site packs, document head, CSP, hot reload
+- [keel-pack](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-pack/SKILL.md): author a frontend pack — Svelte pages, `+head.svelte`, navigation guards, `.feb` builds
+- [keel-scaffold](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-scaffold/SKILL.md): scaffold a blank pack from `/__keel/schema`
 
-Install: `npx skills add kolektivdev/keel`. Or copy `skills/*` into `.claude/skills/`, `.grok/skills/`, or `.agents/skills/`. See `skills/README.md`.
+Install: `npx skills add KolektivComputer/keel`. Or copy `skills/*` into `.claude/skills/`, `.grok/skills/`, or `.agents/skills/`. See `skills/README.md`.
