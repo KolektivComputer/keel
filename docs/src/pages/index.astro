@@ -159,7 +159,7 @@ export default class Home {
 
 <Base
   title="Keel"
-  description="Host-owned routing for Kotlin MPAs. The server owns URLs, page ids, and payload types; the call site passes the pack that renders them. Packs implement ids — never paths — and ship as .feb bundles."
+  description="Host-owned routing for Kotlin MPAs. The server owns URLs, page ids, and payload types; the call site passes the pack that renders them. Packs implement ids, never paths, and ship as .feb bundles."
 >
   <Navbar />
   <main id="main">
@@ -276,12 +276,12 @@ export default class Home {
             URLs and payload types are a Kotlin concern. A pack implements
             <code class="font-mono text-xs">blog.post</code>, never the path
             pattern. Write one pack for your app, or install several against
-            those ids — the call site passes the one that renders.
+            those ids. The call site passes the one that renders.
           </p>
           <ul class="mt-6 space-y-3 text-sm">
             <li class="flex gap-3">
               <span class="font-mono text-base-content/50">01</span>
-              <span>Register <code class="font-mono text-xs">{`page<T>(id, path)`}</code> — id, serializer, route.</span>
+              <span>Register <code class="font-mono text-xs">{`page<T>(id, path)`}</code>: id, serializer, route.</span>
             </li>
             <li class="flex gap-3">
               <span class="font-mono text-base-content/50">02</span>
@@ -289,7 +289,7 @@ export default class Home {
             </li>
             <li class="flex gap-3">
               <span class="font-mono text-base-content/50">03</span>
-              <span>Pass the pack that implements each id at the call site. Keel renders from that pack only — it does not shop among installed packs.</span>
+              <span>Pass the pack that implements each id at the call site. Keel renders from that pack only. It does not shop among installed packs.</span>
             </li>
           </ul>
         </div>
@@ -312,7 +312,7 @@ export default class Home {
           <ul class="mt-6 space-y-3 text-sm">
             <li class="flex gap-3">
               <span class="font-mono text-base-content/50">01</span>
-              <span><code class="font-mono text-xs">keel-scaffold &lt;origin&gt; ./pack</code> — schema in, Vite project + empty pages out.</span>
+              <span><code class="font-mono text-xs">keel-scaffold &lt;origin&gt; ./pack</code>: schema in, Vite project + empty pages out.</span>
             </li>
             <li class="flex gap-3">
               <span class="font-mono text-base-content/50">02</span>
@@ -324,8 +324,8 @@ export default class Home {
             </li>
           </ul>
           <p class="mt-6 text-sm text-base-content/55">
-            Seven adapters ship today — Svelte 5, React 18/19, Vue 3, Solid
-            1.9, Preact 10, Lit 3, and Angular 19 — all against the same
+            Seven adapters ship today: Svelte 5, React 18/19, Vue 3, Solid
+            1.9, Preact 10, Lit 3, and Angular 19, all against the same
             contract. A pack names a <code class="font-mono text-xs">framework</code>
             and plugs in a <code class="font-mono text-xs">RouterAdapter</code>;
             the host does not care which one it renders. See
@@ -340,10 +340,10 @@ export default class Home {
       <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2">
         <div class="lg:order-2">
           <p class="font-mono text-xs uppercase tracking-widest text-base-content/50">Packs at render time</p>
-          <h2 class="mt-3 font-display text-3xl sm:text-4xl">Pass the pack you want — Keel does not pick themes.</h2>
+          <h2 class="mt-3 font-display text-3xl sm:text-4xl">Pass the pack you want. Keel does not pick themes.</h2>
           <p class="mt-4 text-base-content/70">
-            Open a <code class="font-mono text-xs">FrontendBundle</code> once —
-            a jar resource, a file, or an exploded directory in dev — and pass
+            Open a <code class="font-mono text-xs">FrontendBundle</code> once
+            (a jar resource, a file, or an exploded directory in dev) and pass
             it into page render with the seed. The call site owns pack choice:
             a tenant route, an A/B branch, or an admin override is just the
             pack you pass. Keel never shops among installed packs.
@@ -430,7 +430,7 @@ export default class Home {
           </li>
           <li class="rounded-box border-2 border-base-300 bg-base-100 p-5">
             <h3 class="font-display text-lg font-medium">Swappable UI</h3>
-            <p class="mt-2 text-sm text-base-content/70">Packs against one contract — pass the one you want at render.</p>
+            <p class="mt-2 text-sm text-base-content/70">Packs against one contract. Pass the one you want at render.</p>
           </li>
           <li class="rounded-box border-2 border-base-300 bg-base-100 p-5">
             <h3 class="font-display text-lg font-medium">MPA bones, visit speed</h3>
