@@ -22,16 +22,16 @@ export default function Layout({ children }: { children: ComponentChildren }) {
 }
 
 function pageTsx(page: ScaffoldPage): string {
-  return `import { Head, page } from "@kolektiv/keel-preact"
+  return `import { Head, usePage } from "@kolektiv/keel-preact"
 import type { ${page.typeName} } from "${page.typesImport}"
 
 export default function Page() {
-  const ctx = page<${page.typeName}>()
+  const seed = usePage<${page.typeName}>()
   return (
     <>
       <Head />
       <p class="lede">${page.id} · <code>${page.path}</code></p>
-      <pre>{JSON.stringify(ctx.data, null, 2)}</pre>
+      <pre>{JSON.stringify(seed.data, null, 2)}</pre>
     </>
   )
 }
