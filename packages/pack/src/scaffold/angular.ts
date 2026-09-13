@@ -32,8 +32,9 @@ function selector(id: string): string {
 }
 
 function pageTs(page: ScaffoldPage): string {
-  return `import { Component, JsonPipe } from "@angular/core"
-import { page } from "@kolektiv/keel-angular"
+  return `import { JsonPipe } from "@angular/common"
+import { Component } from "@angular/core"
+import { injectKeelPage } from "@kolektiv/keel-angular"
 import type { ${page.typeName} } from "${page.typesImport}"
 
 @Component({
@@ -42,13 +43,36 @@ import type { ${page.typeName} } from "${page.typesImport}"
   imports: [JsonPipe],
   template: \`
     <p class="lede">${page.id} · <code>${page.path}</code></p>
-    <pre>{{ ctx.data | json }}</pre>
+    <pre>{{ page().data | json }}</pre>
   \`,
 })
 export default class Page {
-  readonly ctx = page<${page.typeName}>()
+  readonly page = injectKeelPage<${page.typeName}>()
 }
 `
+}
+
+/**
+ * Analog emits from its own program, so `noEmit: true` from the shared
+ * `tsconfig.json` must be switched off here or every module compiles to an
+ * empty string. Analog resolves the app config itself, except when `keelPack`
+ * turns on Vite lib mode after the plugin's config hook ran, which makes it
+ * look for a `tsconfig.lib.prod.json` this scaffold does not generate — so
+ * `vite.config.ts` passes the path explicitly.
+ */
+function tsconfigApp(): string {
+  return `${JSON.stringify(
+    {
+      extends: "./tsconfig.json",
+      compilerOptions: {
+        noEmit: false,
+        outDir: "./out-tsc/app",
+      },
+      include: ["src/**/*.ts", "src/**/*.d.ts"],
+    },
+    null,
+    2,
+  )}\n`
 }
 
 export function angularScaffoldProvider(): ScaffoldProvider {
@@ -69,9 +93,10 @@ export function angularScaffoldProvider(): ScaffoldProvider {
         },
         {
           "@analogjs/vite-plugin-angular": "^1.10.0",
+          "@angular/build": "^19.0.0",
           "@angular/compiler-cli": "^19.0.0",
           "@kolektiv/keel-pack": "workspace:*",
-          typescript: "^5.7.0",
+          typescript: "~5.8.3",
           vite: "^6.2.0",
         },
         project.keelVersion,
@@ -95,11 +120,11 @@ export function angularScaffoldProvider(): ScaffoldProvider {
         ["src/**/*.ts", "src/**/*.d.ts"],
         { angularCompilerOptions: { strictTemplates: true } },
       ),
-    frameworkConfig: () => [],
+    frameworkConfig: () => [{ file: "tsconfig.app.json", content: tsconfigApp() }],
     viteConfig: (project) =>
       viteConfigContent(project, "angular", {
         import: `import analog from "@analogjs/vite-plugin-angular"`,
-        call: "analog()",
+        call: `analog({ tsconfig: "tsconfig.app.json" })`,
       }),
     envDts: () => envDtsContent(),
     bootstrap: () => bootstrapContent("@kolektiv/keel-angular"),

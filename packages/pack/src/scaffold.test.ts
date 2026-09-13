@@ -99,7 +99,7 @@ const MATRIX: Record<ScaffoldFramework, FrameworkConventions> = {
     id: "+page.id.ts",
     head: "+head.html",
     runtime: "@kolektiv/keel-angular",
-    plugin: "analog()",
+    plugin: 'analog({ tsconfig: "tsconfig.app.json" })',
     pluginImport: "@analogjs/vite-plugin-angular",
   },
 }
@@ -118,6 +118,7 @@ function expectedFiles(framework: ScaffoldFramework): string[] {
     `src/pages/${conventions.layout}`,
   ]
   if (framework === "svelte") files.push("svelte.config.js")
+  if (framework === "angular") files.push("tsconfig.app.json")
   for (const dir of ["harbor/home", "harbor/notFound"]) {
     files.push(`src/pages/${dir}/${conventions.id}`, `src/pages/${dir}/${conventions.page}`)
     if (conventions.head) files.push(`src/pages/${dir}/${conventions.head}`)
@@ -320,6 +321,37 @@ test("lit provider pages extend the KeelElement base class", async () => {
   assert.equal(manifest.dependencies.lit, "^3.2.1")
   assert.equal(manifest.dependencies["@tanstack/query-core"], "^5.66.0")
   assert.equal(manifest.dependencies["@tanstack/lit-query"], undefined)
+})
+
+test("angular provider pages use the injectKeelPage signal", async () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-angular-"))
+  const out = join(root, "pack")
+  await scaffoldPack({ outDir: out, schema, id: "harbor", framework: "angular" })
+  const page = readFileSync(join(out, "src/pages/harbor/home/+page.ts"), "utf8")
+  assert.match(page, /import \{ injectKeelPage \} from "@kolektiv\/keel-angular"/)
+  assert.match(page, /readonly page = injectKeelPage<HomePage>\(\)/)
+  assert.match(page, /page\(\)\.data/)
+  assert.doesNotMatch(page, /\bpage<HomePage>/)
+  const layout = readFileSync(join(out, "src/pages/+layout.ts"), "utf8")
+  assert.match(layout, /standalone: true/)
+  assert.match(layout, /<ng-content \/>/)
+  const tsconfig = readFileSync(join(out, "tsconfig.app.json"), "utf8")
+  assert.match(tsconfig, /"extends": "\.\/tsconfig\.json"/)
+  assert.match(tsconfig, /"noEmit": false/)
+  const vite = readFileSync(join(out, "vite.config.ts"), "utf8")
+  assert.match(vite, /analog\(\{ tsconfig: "tsconfig\.app\.json" \}\)/)
+  const bootstrap = readFileSync(join(out, "src/bootstrap.ts"), "utf8")
+  assert.equal(bootstrap, `import { bootstrap } from "@kolektiv/keel-angular"\n\nvoid bootstrap()\n`)
+  const manifest = JSON.parse(readFileSync(join(out, "package.json"), "utf8")) as {
+    dependencies: Record<string, string>
+    devDependencies: Record<string, string>
+  }
+  assert.equal(manifest.dependencies["@kolektiv/keel-angular"], ownPackage.version)
+  assert.equal(manifest.dependencies["@tanstack/angular-query-experimental"], "^5.66.0")
+  assert.equal(manifest.dependencies["@angular/core"], "^19.0.0")
+  assert.equal(manifest.devDependencies["@analogjs/vite-plugin-angular"], "^1.10.0")
+  assert.equal(manifest.devDependencies["@angular/build"], "^19.0.0")
+  assert.equal(manifest.devDependencies.typescript, "~5.8.3")
 })
 
 test("scaffoldPack writes published @kolektiv versions instead of workspace protocol", async () => {
