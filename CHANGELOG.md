@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `@kolektiv/keel-react`: React 18/19 binding with
+  `usePage`/`useForm`/`useAction`/`useKeelPageQuery`, `Link`/`Form`/`Head`,
+  `useKeelAnchor`, navigation/unload guards, `createPage` mount factory, and
+  `bootstrap` (#43).
+
 ### Changed
 
 - Framework-neutral binding primitives in `@kolektiv/keel` (head DOM helpers,
