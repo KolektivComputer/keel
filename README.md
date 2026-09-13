@@ -20,6 +20,7 @@ Agents (human or otherwise) should read [AGENTS.md](./AGENTS.md).
 - `llms.txt` — curated map for LLMs (also served from the docs site)
 - `docs/` — homepage and documentation (Astro, Tailwind 4, daisyUI 5, Shiki Catppuccin)
 - `public/logo.svg` — product mark (also `favicon.svg`); `public/mark.svg` is the hull glyph
+- [CHANGELOG.md](./CHANGELOG.md) — versioned release notes (Keep a Changelog)
 
 ```bash
 ./gradlew :lib:test :ktor:test :samples:harbor:test
