@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@kolektiv/keel-pack` gains a framework adapter registry with codegen for
   React, Vue, Solid, Preact, Lit, and Angular packs (`+head.html` replaces
   Svelte-only head authoring for non-Svelte frameworks) (#38).
+- `keel-scaffold` grows a per-framework template provider and can scaffold
+  React, Vue, Solid, Preact, Lit, and Angular packs (Svelte output unchanged)
+  (#39).
 
 ### Fixed
 

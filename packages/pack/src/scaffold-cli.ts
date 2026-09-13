@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util"
-import { scaffoldPack } from "./scaffold.ts"
+import { isScaffoldFramework, scaffoldFrameworks, scaffoldPack } from "./scaffold.ts"
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
@@ -17,11 +17,12 @@ const { values, positionals } = parseArgs({
 const HELP = `usage: keel-scaffold <origin> <dir>
        keel-scaffold --schema <file.json> <dir>
 
-Fetches GET {origin}/__keel/schema and writes a blank Svelte pack.
+Fetches GET {origin}/__keel/schema and writes a blank pack.
 
 options:
   --schema <file.json>  offline contract instead of an origin
-  --framework <name>    generated framework; choices: svelte (default)
+  --framework <name>    generated framework; choices: ${scaffoldFrameworks.join(", ")}
+                        (default: svelte)
   --id <id>             pack id (default: output directory name)
   --version <version>   pack version (default: 0.1.0)
   --force               overwrite existing files
@@ -42,11 +43,10 @@ if (values.help) {
 }
 
 const framework = values.framework ?? "svelte"
-if (framework === "react") {
-  fail("keel-scaffold: React packs are not generated yet; use --framework svelte")
-}
-if (framework !== "svelte") {
-  fail(`keel-scaffold: unsupported framework '${framework}'; use --framework svelte`)
+if (!isScaffoldFramework(framework)) {
+  fail(
+    `keel-scaffold: unsupported framework '${framework}'; supported frameworks: ${scaffoldFrameworks.join(", ")}`,
+  )
 }
 
 try {

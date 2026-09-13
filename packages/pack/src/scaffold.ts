@@ -1,8 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
+import type { ScaffoldPage, ScaffoldProject } from "./scaffold/provider.ts"
+import { scaffoldProvider, type ScaffoldFramework } from "./scaffold/providers.ts"
 import { originFromHost, parsePackSchema, schemaUrl, type PackSchema, type SchemaType } from "./schema.ts"
 
-export type ScaffoldFramework = "svelte" | "react"
+export type { ScaffoldFramework } from "./scaffold/providers.ts"
+export { isScaffoldFramework, scaffoldFrameworks } from "./scaffold/providers.ts"
 
 export interface ScaffoldOptions {
   outDir: string
@@ -36,10 +39,7 @@ export async function loadSchema(options: ScaffoldOptions): Promise<PackSchema> 
 }
 
 export async function scaffoldPack(options: ScaffoldOptions): Promise<string[]> {
-  const framework = options.framework ?? "svelte"
-  if (framework !== "svelte") {
-    throw new Error(`keel-scaffold: framework '${framework}' is not generated yet; pass --framework svelte`)
-  }
+  const provider = scaffoldProvider(options.framework ?? "svelte")
   const schema = await loadSchema(options)
   const pageIds = Object.keys(schema.pages)
   if (pageIds.length === 0) {
@@ -51,38 +51,44 @@ export async function scaffoldPack(options: ScaffoldOptions): Promise<string[]> 
   const version = options.version ?? "0.1.0"
   const pagesName = options.pagesName ?? schema.pagesName ?? pascal(id) + "Pages"
   const notFound = pageIds.find((pageId) => pageId.endsWith(".notFound") || pageId === "not-found" || pageId === "notFound")
+  const project: ScaffoldProject = {
+    id,
+    version,
+    keelVersion: packVersion(),
+    pagesName,
+    notFound,
+  }
   const written: string[] = []
 
-  write(outDir, "package.json", packageJson(id, version), options.force, written)
-  write(outDir, "tsconfig.json", tsconfigJson(), options.force, written)
-  write(outDir, "svelte.config.js", svelteConfig(), options.force, written)
-  write(outDir, "vite.config.ts", viteConfig(id, version, notFound), options.force, written)
-  write(outDir, "src/env.d.ts", envDts(), options.force, written)
-  write(outDir, "src/bootstrap.ts", bootstrapTs(), options.force, written)
-  write(outDir, "src/styles.css", stylesCss(), options.force, written)
+  write(outDir, "package.json", provider.packageJson(project), options.force, written)
+  write(outDir, "tsconfig.json", provider.tsconfig(project), options.force, written)
+  for (const file of provider.frameworkConfig(project)) {
+    write(outDir, file.file, file.content, options.force, written)
+  }
+  write(outDir, "vite.config.ts", provider.viteConfig(project), options.force, written)
+  write(outDir, "src/env.d.ts", provider.envDts(project), options.force, written)
+  write(outDir, "src/bootstrap.ts", provider.bootstrap(project), options.force, written)
+  write(outDir, "src/styles.css", provider.styles(project), options.force, written)
   write(outDir, "src/lib/page-types.ts", emitTypescript(schema, pagesName), options.force, written)
   write(outDir, "src/lib/page-types.json", `${JSON.stringify(schema, null, 2)}\n`, options.force, written)
-  write(outDir, "src/pages/+layout.svelte", rootLayout(), options.force, written)
+  const layout = provider.rootLayout(project)
+  write(outDir, layout.file, layout.content, options.force, written)
 
   for (const pageId of pageIds) {
     const page = schema.pages[pageId]
     const dir = pageId.split(".").join("/")
     const depth = pageId.split(".").length
     const typesImport = `${"../".repeat(depth + 1)}lib/page-types`
-    write(
-      outDir,
-      `src/pages/${dir}/+page.ts`,
-      `export const id = ${JSON.stringify(pageId)}\n`,
-      options.force,
-      written,
-    )
-    write(
-      outDir,
-      `src/pages/${dir}/+page.svelte`,
-      pageSvelte(pageId, page.type, page.path ?? "/", typesImport),
-      options.force,
-      written,
-    )
+    const context: ScaffoldPage = {
+      id: pageId,
+      typeName: page.type,
+      path: page.path ?? "/",
+      fields: schema.types?.[page.type]?.fields ?? {},
+      typesImport,
+    }
+    for (const file of provider.pageFiles(context)) {
+      write(outDir, `src/pages/${dir}/${file.file}`, file.content, options.force, written)
+    }
   }
   return written
 }
@@ -157,166 +163,6 @@ function packVersion(): string {
     if (typeof parsed.version === "string" && parsed.version.length > 0) return parsed.version
   } catch {}
   return FALLBACK_KEEL_VERSION
-}
-
-function standaloneDependencies(keelVersion: string, deps: Record<string, string>): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(deps).map(([name, range]) => [name, range.startsWith("workspace:") ? keelVersion : range]),
-  )
-}
-
-function packageJson(id: string, version: string): string {
-  const keelVersion = packVersion()
-  return `${JSON.stringify(
-    {
-      name: id,
-      private: true,
-      version,
-      type: "module",
-      scripts: {
-        dev: "vite build --watch",
-        build: "vite build",
-        typecheck: "tsc --noEmit -p tsconfig.json",
-      },
-      dependencies: standaloneDependencies(keelVersion, {
-        "@kolektiv/keel": "workspace:*",
-        "@kolektiv/keel-svelte": "workspace:*",
-        "@tanstack/query-core": "^5.66.0",
-        "@tanstack/svelte-query": "^5.66.0",
-        svelte: "^5.16.0",
-      }),
-      devDependencies: standaloneDependencies(keelVersion, {
-        "@kolektiv/keel-pack": "workspace:*",
-        "@sveltejs/vite-plugin-svelte": "^5.0.3",
-        typescript: "^5.7.0",
-        vite: "^6.2.0",
-      }),
-    },
-    null,
-    2,
-  )}\n`
-}
-
-function tsconfigJson(): string {
-  return `${JSON.stringify(
-    {
-      compilerOptions: {
-        target: "ES2022",
-        lib: ["ES2022", "DOM", "DOM.Iterable"],
-        module: "ESNext",
-        moduleResolution: "bundler",
-        strict: true,
-        isolatedModules: true,
-        skipLibCheck: true,
-        noEmit: true,
-        verbatimModuleSyntax: true,
-        types: ["vite/client"],
-      },
-      include: ["src/**/*.ts", "src/**/*.d.ts"],
-    },
-    null,
-    2,
-  )}\n`
-}
-
-function svelteConfig(): string {
-  return `/** @type {import('@sveltejs/vite-plugin-svelte').Options} */
-export default {
-  compilerOptions: { runes: true },
-  vitePlugin: {
-    dynamicCompileOptions({ filename }) {
-      if (filename.includes("node_modules")) return { runes: false }
-    },
-  },
-}
-`
-}
-
-function viteConfig(id: string, version: string, notFound: string | undefined): string {
-  const notFoundLine = notFound ? `\n      notFound: ${JSON.stringify(notFound)},` : ""
-  return `import { svelte } from "@sveltejs/vite-plugin-svelte"
-import { keelPack } from "@kolektiv/keel-pack/vite"
-import { defineConfig } from "vite"
-
-export default defineConfig({
-  plugins: [
-    svelte(),
-    keelPack({
-      id: ${JSON.stringify(id)},
-      version: ${JSON.stringify(version)},
-      framework: "svelte",
-      pagesDir: "src/pages",
-      bootstrap: "src/bootstrap.ts",
-      contract: "src/lib/page-types.json",${notFoundLine}
-      pack: ${JSON.stringify(`dist/${id}.feb`)},
-    }),
-  ],
-})
-`
-}
-
-function envDts(): string {
-  return `declare module "*.svelte" {
-  import type { Component } from "svelte"
-  const component: Component
-  export default component
-}
-
-declare module "*.css" {
-  const css: string
-  export default css
-}
-`
-}
-
-function bootstrapTs(): string {
-  return `import { bootstrap } from "@kolektiv/keel-svelte"
-
-void bootstrap()
-`
-}
-
-function stylesCss(): string {
-  return `:root {
-  color-scheme: dark;
-  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
-  background: #1e1e2e;
-  color: #cdd6f4;
-}
-html, body { margin: 0; min-height: 100%; }
-.shell { max-width: 42rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-.lede { color: #a6adc8; }
-pre { overflow: auto; background: #181825; padding: 1rem; border-radius: 0.5rem; }
-`
-}
-
-function rootLayout(): string {
-  return `<script lang="ts">
-  import type { Snippet } from "svelte"
-  import "../styles.css"
-
-  let { children }: { children: Snippet } = $props()
-</script>
-
-<div class="shell">
-  {@render children()}
-</div>
-`
-}
-
-function pageSvelte(id: string, typeName: string, path: string, typesImport: string): string {
-  return `<script lang="ts">
-  import { Head, page } from "@kolektiv/keel-svelte"
-  import type { ${typeName} } from "${typesImport}"
-
-  const ctx = page<${typeName}>()
-</script>
-
-<Head />
-
-<p class="lede">${id} · <code>${path}</code></p>
-<pre>{JSON.stringify(ctx.data, null, 2)}</pre>
-`
 }
 
 export { originFromHost, schemaUrl }
