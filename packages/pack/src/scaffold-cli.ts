@@ -10,18 +10,44 @@ const { values, positionals } = parseArgs({
     id: { type: "string" },
     version: { type: "string" },
     force: { type: "boolean", default: false },
+    help: { type: "boolean", default: false },
   },
 })
 
-function usage(): never {
-  console.error(
-    "usage: keel-scaffold <origin> <dir>\n       keel-scaffold --schema <file.json> <dir>\n\nFetches GET {origin}/__keel/schema and writes a blank Svelte pack.",
-  )
+const HELP = `usage: keel-scaffold <origin> <dir>
+       keel-scaffold --schema <file.json> <dir>
+
+Fetches GET {origin}/__keel/schema and writes a blank Svelte pack.
+
+options:
+  --schema <file.json>  offline contract instead of an origin
+  --framework <name>    generated framework; choices: svelte (default)
+  --id <id>             pack id (default: output directory name)
+  --version <version>   pack version (default: 0.1.0)
+  --force               overwrite existing files
+  --help                show this message`
+
+function fail(message: string): never {
+  console.error(message)
   process.exit(1)
 }
 
+function usage(): never {
+  fail(HELP)
+}
+
+if (values.help) {
+  console.log(HELP)
+  process.exit(0)
+}
+
 const framework = values.framework ?? "svelte"
-if (framework !== "svelte" && framework !== "react") usage()
+if (framework === "react") {
+  fail("keel-scaffold: React packs are not generated yet; use --framework svelte")
+}
+if (framework !== "svelte") {
+  fail(`keel-scaffold: unsupported framework '${framework}'; use --framework svelte`)
+}
 
 try {
   if (values.schema) {

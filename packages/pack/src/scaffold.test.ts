@@ -1,10 +1,16 @@
 import assert from "node:assert/strict"
+import { spawnSync } from "node:child_process"
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { test } from "node:test"
+import { fileURLToPath } from "node:url"
 import { originFromHost, schemaUrl } from "./schema.ts"
 import { emitTypescript, scaffoldPack } from "./scaffold.ts"
+
+const ownPackage = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string }
+const cliPath = fileURLToPath(new URL("./scaffold-cli.ts", import.meta.url))
+const semver = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/
 
 const schema = {
   format: "keel/1" as const,
@@ -67,6 +73,58 @@ test("scaffoldPack refuses to overwrite without --force", async () => {
     () => scaffoldPack({ outDir: root, schema, id: "demo" }),
     /exists/,
   )
+})
+
+test("scaffoldPack writes published @kolektiv versions instead of workspace protocol", async () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
+  const out = join(root, "pack")
+  await scaffoldPack({ outDir: out, schema, id: "harbor" })
+  const source = readFileSync(join(out, "package.json"), "utf8")
+  assert.doesNotMatch(source, /workspace:/)
+  const manifest = JSON.parse(source) as {
+    dependencies: Record<string, string>
+    devDependencies: Record<string, string>
+  }
+  assert.equal(manifest.dependencies["@kolektiv/keel"], ownPackage.version)
+  assert.equal(manifest.dependencies["@kolektiv/keel-svelte"], ownPackage.version)
+  assert.equal(manifest.devDependencies["@kolektiv/keel-pack"], ownPackage.version)
+  assert.match(manifest.dependencies["@kolektiv/keel"], semver)
+  assert.match(manifest.dependencies["@kolektiv/keel-svelte"], semver)
+  assert.match(manifest.devDependencies["@kolektiv/keel-pack"], semver)
+  assert.equal(manifest.dependencies.svelte, "^5.16.0")
+  assert.equal(manifest.devDependencies.vite, "^6.2.0")
+})
+
+test("scaffold CLI rejects --framework react before writing files", () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
+  const schemaFile = join(root, "schema.json")
+  writeFileSync(schemaFile, JSON.stringify(schema))
+  const out = join(root, "pack")
+  const result = spawnSync(
+    process.execPath,
+    ["--experimental-strip-types", cliPath, "--schema", schemaFile, "--framework", "react", out],
+    { encoding: "utf8" },
+  )
+  assert.notEqual(result.status, 0)
+  assert.match(result.stderr, /React packs are not generated yet/)
+  assert.match(result.stderr, /use --framework svelte/)
+  assert.equal(existsSync(out), false)
+})
+
+test("scaffold CLI writes a standalone package.json", () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
+  const schemaFile = join(root, "schema.json")
+  writeFileSync(schemaFile, JSON.stringify(schema))
+  const out = join(root, "pack")
+  const result = spawnSync(
+    process.execPath,
+    ["--experimental-strip-types", cliPath, "--schema", schemaFile, "--id", "demo", out],
+    { encoding: "utf8" },
+  )
+  assert.equal(result.status, 0, result.stderr)
+  const source = readFileSync(join(out, "package.json"), "utf8")
+  assert.doesNotMatch(source, /workspace:/)
+  assert.match(source, new RegExp(`"@kolektiv/keel": "${ownPackage.version}"`))
 })
 
 test("react framework is reserved", async () => {

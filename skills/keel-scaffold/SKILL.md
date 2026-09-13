@@ -30,8 +30,8 @@ are trimmed, then the CLI fetches `{origin}/__keel/schema`. `--schema
 ## Flags
 
 - `--schema <file.json>` — offline contract instead of an origin.
-- `--framework svelte` — the default. `--framework react` parses but fails:
-  "not generated yet".
+- `--framework svelte` — the default and the only generated framework.
+  `--framework react` is rejected before anything is written.
 - `--id <id>` — pack id; defaults to the output directory basename
   (sanitized).
 - `--version <v>` — defaults `0.1.0`.
@@ -59,9 +59,9 @@ PascalCase(id) + `Pages`.
 
 ## After
 
-`pnpm install` in a workspace with `@kolektiv/keel*` (or change `workspace:*`
-to published versions), then `pnpm build`. Point the host at `dist/<id>.feb`,
-or `dist/` for `FrontendBundle.fromDirectory`.
+`pnpm install` (the generated `package.json` pins `@kolektiv/keel*` to the
+`@kolektiv/keel-pack` version that scaffolded it), then `pnpm build`. Point the
+host at `dist/<id>.feb`, or `dist/` for `FrontendBundle.fromDirectory`.
 
 Do not invent page ids. If the schema is missing a page the host registered,
 fix the host and re-fetch `/__keel/schema`. Schema `path` values are host

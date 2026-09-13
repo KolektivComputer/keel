@@ -149,7 +149,24 @@ function emitType(name: string, type: SchemaType): string[] {
   return [`export interface ${name} {`, ...body, `}`]
 }
 
+const FALLBACK_KEEL_VERSION = "0.0.2-SNAPSHOT.3"
+
+function packVersion(): string {
+  try {
+    const parsed = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version?: unknown }
+    if (typeof parsed.version === "string" && parsed.version.length > 0) return parsed.version
+  } catch {}
+  return FALLBACK_KEEL_VERSION
+}
+
+function standaloneDependencies(keelVersion: string, deps: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(deps).map(([name, range]) => [name, range.startsWith("workspace:") ? keelVersion : range]),
+  )
+}
+
 function packageJson(id: string, version: string): string {
+  const keelVersion = packVersion()
   return `${JSON.stringify(
     {
       name: id,
@@ -161,19 +178,19 @@ function packageJson(id: string, version: string): string {
         build: "vite build",
         typecheck: "tsc --noEmit -p tsconfig.json",
       },
-      dependencies: {
+      dependencies: standaloneDependencies(keelVersion, {
         "@kolektiv/keel": "workspace:*",
         "@kolektiv/keel-svelte": "workspace:*",
         "@tanstack/query-core": "^5.66.0",
         "@tanstack/svelte-query": "^5.66.0",
         svelte: "^5.16.0",
-      },
-      devDependencies: {
+      }),
+      devDependencies: standaloneDependencies(keelVersion, {
         "@kolektiv/keel-pack": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^5.0.3",
         typescript: "^5.7.0",
         vite: "^6.2.0",
-      },
+      }),
     },
     null,
     2,
