@@ -14,9 +14,9 @@ repository:
 
 - `maven-releases` — numbered releases such as `0.0.1`
 - `maven-snapshots` — canonical `*-SNAPSHOT` builds
-- `keel-maven` — the unique pre-release line such as `0.0.2-SNAPSHOT.3`
+- `keel-maven` — the unique pre-release line such as `0.0.2-SNAPSHOT.4`
 
-A version like `0.0.2-SNAPSHOT.3` is **not** a canonical Maven snapshot:
+A version like `0.0.2-SNAPSHOT.4` is **not** a canonical Maven snapshot:
 snapshots end in `-SNAPSHOT`, and `maven-snapshots` rejects every other
 version. Do not add more than one — Gradle will mix channels.
 
@@ -66,7 +66,7 @@ dependencies {
 
 ## Unique pre-release instead
 
-Current pre-release: `0.0.2-SNAPSHOT.3`. The `-SNAPSHOT.3` suffix is part of
+Current pre-release: `0.0.2-SNAPSHOT.4`. The `-SNAPSHOT.4` suffix is part of
 a literal, unique version — not a canonical Maven snapshot — so point Gradle
 at `keel-maven`:
 

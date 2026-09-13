@@ -37,7 +37,7 @@ the JS workspace on Node 22. Implementing-Keel guides live under
 
 Consumers resolve **one** Maven repo — `maven-releases` for numbered
 versions, `maven-snapshots` for canonical `*-SNAPSHOT` builds, or
-`keel-maven` for unique pre-releases like `0.0.2-SNAPSHOT.3` — never more
+`keel-maven` for unique pre-releases like `0.0.2-SNAPSHOT.4` — never more
 than one. npm resolves from hosted `keel-npm`. Maintainers publish Maven to
 `keel-maven`, plus `maven-snapshots` for canonical snapshots or
 `maven-releases` for numbered releases; unique pre-releases go to
