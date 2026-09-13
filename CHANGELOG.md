@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docs and homepage tell the pack-at-render-time story: call-site pack
   selection, "Choosing a pack" replaces the theme-chain page, no resolver
   language (#11).
+- Refreshed the agent skill suite (`keel-host`, `keel-pack`, `keel-scaffold`)
+  for pack-at-render, document head + CSP, pack hot reload, and navigation
+  guards (#12).
 
 ## [0.0.2-SNAPSHOT.3] - 2026-09-13
 

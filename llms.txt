@@ -31,8 +31,8 @@ Docs: https://keel.mey.cat/  (GitHub Pages; local `pnpm dev` is http://127.0.0.1
 
 ## Skills
 
-- [keel-host](https://raw.githubusercontent.com/kolektivdev/keel/main/skills/keel-host/SKILL.md): implement a Keel server
-- [keel-pack](https://raw.githubusercontent.com/kolektivdev/keel/main/skills/keel-pack/SKILL.md): author a frontend pack
-- [keel-scaffold](https://raw.githubusercontent.com/kolektivdev/keel/main/skills/keel-scaffold/SKILL.md): scaffold a pack from `/__keel/schema`
+- [keel-host](https://raw.githubusercontent.com/kolektivdev/keel/main/skills/keel-host/SKILL.md): implement a Keel host — pages, actions, call-site packs, document head, CSP, hot reload
+- [keel-pack](https://raw.githubusercontent.com/kolektivdev/keel/main/skills/keel-pack/SKILL.md): author a frontend pack — Svelte pages, `+head.svelte`, navigation guards, `.feb` builds
+- [keel-scaffold](https://raw.githubusercontent.com/kolektivdev/keel/main/skills/keel-scaffold/SKILL.md): scaffold a blank pack from `/__keel/schema`
 
 Install: `npx skills add kolektivdev/keel`. Or copy `skills/*` into `.claude/skills/`, `.grok/skills/`, or `.agents/skills/`. See `skills/README.md`.
