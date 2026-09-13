@@ -1,6 +1,6 @@
 ---
 title: Document head and SEO
-description: Packs author +head.svelte; the host renders it into the HTML shell.
+description: Packs author +head.svelte (or +head.html); the host renders it into the HTML shell.
 category: core-concepts
 order: 7
 ---
@@ -16,7 +16,9 @@ not run JS, and visits are not the SEO unit.
 
 ## The pack authors the head
 
-A page declares its head in a sibling `+head.svelte`, next to `+page.svelte`:
+A page declares its head in a sibling `+head.svelte`, next to
+`+page.svelte`. Non-Svelte adapters compile the neutral `+head.html`
+instead; the placeholder grammar is the same:
 
 <CodePair
   fw="svelte"
@@ -59,8 +61,8 @@ an `on*` handler attribute, or a `<script>` with an inline body or no
 sanitized `src`, is dropped too; only external scripts survive.
 
 `PageRequest.head(...)` fills the fields a pack head omits, and is the whole
-head when the pack ships no `+head.svelte`. Canonical defaults to the
-document URL.
+head when the pack ships no `+head.svelte` / `+head.html`. Canonical defaults
+to the document URL.
 
 <CodeBlock
   lang="kotlin"
@@ -107,7 +109,8 @@ A document GET of `/u/{id}` contains the display name in `<title>` **without
 executing JavaScript**. That is the test that matters for share bots.
 
 <Callout title="Do not use +page.ts metadata">
-  The head contract is <code>+head.svelte</code>; the host resolves it onto
+  The head contract is <code>+head.svelte</code> for Svelte and
+  <code>+head.html</code> for the other adapters; the host resolves either onto
   <code>seed.head</code>. See
   <a href={path("/docs/core-concepts/seed")}>Seed and headers</a> for the JSON
   shape.

@@ -68,6 +68,93 @@ const svelteJs = `<script>
   <p>A greeting from Ktor. This pack is just a page.</p>
   <Link href="/notes">Open notes</Link>
 </main>`
+
+const reactPage = `import { Head, Link, usePage } from "@kolektiv/keel-react"
+import type { HomePage } from "@app/page-types"
+
+export default function Home() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <Head />
+      <h1>{seed.data.greeting}</h1>
+      <Link href="/notes">Open notes</Link>
+    </>
+  )
+}`
+
+const vuePage = `<script setup lang="ts">
+import { Head, Link, usePage } from "@kolektiv/keel-vue"
+import type { HomePage } from "@app/page-types"
+
+const seed = usePage<HomePage>()
+</script>
+
+<template>
+  <Head />
+  <h1>{{ seed.data.greeting }}</h1>
+  <Link href="/notes">Open notes</Link>
+</template>`
+
+const solidPage = `import { Head, Link, usePage } from "@kolektiv/keel-solid"
+import type { HomePage } from "@app/page-types"
+
+export default function Home() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <Head />
+      <h1>{seed().data.greeting}</h1>
+      <Link href="/notes">Open notes</Link>
+    </>
+  )
+}`
+
+const preactPage = `import { Head, Link, usePage } from "@kolektiv/keel-preact"
+import type { HomePage } from "@app/page-types"
+
+export default function Home() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <Head />
+      <h1>{seed.data.greeting}</h1>
+      <Link href="/notes">Open notes</Link>
+    </>
+  )
+}`
+
+const litPage = `import { html } from "lit"
+import { KeelElement } from "@kolektiv/keel-lit"
+import type { HomePage } from "@app/page-types"
+
+export default class Home extends KeelElement<HomePage> {
+  render() {
+    return html\`
+      <keel-head></keel-head>
+      <h1>\${this.page.data.greeting}</h1>
+      <keel-link href="/notes">Open notes</keel-link>
+    \`
+  }
+}`
+
+const angularPage = `import { Component } from "@angular/core"
+import { KeelHead, KeelLink, injectKeelPage } from "@kolektiv/keel-angular"
+import type { HomePage } from "@app/page-types"
+
+@Component({
+  selector: "app-home",
+  standalone: true,
+  imports: [KeelHead, KeelLink],
+  template: \`
+    <keel-head />
+    <h1>{{ page().data.greeting }}</h1>
+    <keel-link href="/notes">Open notes</keel-link>
+  \`,
+})
+export default class Home {
+  readonly page = injectKeelPage<HomePage>()
+}`
 ---
 
 <Base
@@ -111,6 +198,54 @@ const svelteJs = `<script>
                       files: [
                         { title: "route.kt", lang: "kotlin", code: ktorSnippet },
                         { title: "page.svelte", ts: svelteTs, js: svelteJs },
+                      ],
+                    },
+                    {
+                      id: "react",
+                      label: "React",
+                      files: [
+                        { title: "route.kt", lang: "kotlin", code: ktorSnippet },
+                        { title: "page.tsx", lang: "tsx", code: reactPage },
+                      ],
+                    },
+                    {
+                      id: "vue",
+                      label: "Vue",
+                      files: [
+                        { title: "route.kt", lang: "kotlin", code: ktorSnippet },
+                        { title: "page.vue", lang: "vue", code: vuePage },
+                      ],
+                    },
+                    {
+                      id: "solid",
+                      label: "Solid",
+                      files: [
+                        { title: "route.kt", lang: "kotlin", code: ktorSnippet },
+                        { title: "page.tsx", lang: "tsx", code: solidPage },
+                      ],
+                    },
+                    {
+                      id: "preact",
+                      label: "Preact",
+                      files: [
+                        { title: "route.kt", lang: "kotlin", code: ktorSnippet },
+                        { title: "page.tsx", lang: "tsx", code: preactPage },
+                      ],
+                    },
+                    {
+                      id: "lit",
+                      label: "Lit",
+                      files: [
+                        { title: "route.kt", lang: "kotlin", code: ktorSnippet },
+                        { title: "page.ts", lang: "ts", code: litPage },
+                      ],
+                    },
+                    {
+                      id: "angular",
+                      label: "Angular",
+                      files: [
+                        { title: "route.kt", lang: "kotlin", code: ktorSnippet },
+                        { title: "page.ts", lang: "ts", code: angularPage },
                       ],
                     },
                   ]}
@@ -189,9 +324,12 @@ const svelteJs = `<script>
             </li>
           </ul>
           <p class="mt-6 text-sm text-base-content/55">
-            Svelte 5 ships today. React and Vue adapters are on the roadmap —
-            packs already name a <code class="font-mono text-xs">framework</code> and plug in a
-            <code class="font-mono text-xs">RouterAdapter</code>.
+            Seven adapters ship today — Svelte 5, React 18/19, Vue 3, Solid
+            1.9, Preact 10, Lit 3, and Angular 19 — all against the same
+            contract. A pack names a <code class="font-mono text-xs">framework</code>
+            and plugs in a <code class="font-mono text-xs">RouterAdapter</code>;
+            the host does not care which one it renders. See
+            <a class="link" href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>.
           </p>
         </div>
         <CodeBlock title="FrontendBundle.kt" lang="kotlin" bw="ktor" code={packSnippet} />

@@ -16,21 +16,25 @@ implements those ids.
 You always do the same two things: declare a contract on the host, then pass
 a pack that implements it into render.
 
-**Glue an app.** Register pages, write one Svelte frontend, ship that pack.
-Keel is the router between Ktor and the UI — visits, seeds, forms — without
-a client-side router owning the URL.
+**Glue an app.** Register pages, write one frontend with any supported
+adapter — Svelte, React, Vue, Solid, Preact, Lit, or Angular — and ship that
+pack. Keel is the router between Ktor and the UI — visits, seeds, forms —
+without a client-side router owning the URL.
 
 **Install themes.** Keep the same registry. Publish the page ids and
 serializers as the contract. Authors provide packs typed for that data that
 implement the ids the host expects, and the call site passes the pack it
 wants at render. Visitors never store a theme.
 
-The first host is Ktor. The first adapter is Svelte 5.
+The first host is Ktor. Keel ships seven pack adapters — Svelte 5, React
+18/19, Vue 3, Solid 1.9, Preact 10, Lit 3, and Angular 19; Svelte was the
+first. See <a href={path("/docs/implementing/framework-adapters")}>Framework
+adapters</a> for the matrix.
 
 Walkthrough: <a href={path("/docs/getting-started/server")}>server</a> →
 <a href={path("/docs/getting-started/client")}>client</a> →
 <a href={path("/docs/getting-started/host")}>Ktor host</a> →
-<a href={path("/docs/getting-started/pack")}>Svelte pack</a> →
+<a href={path("/docs/getting-started/pack")}>pack</a> →
 <a href={path("/docs/getting-started/first-page")}>first page</a>.
 
 ## Where Keel sits
@@ -41,7 +45,8 @@ Inertia4J speaks the Inertia SPA protocol over Ktor or Spring. Kinetica and Kilu
 
 - **Keel** — product, CLI, Maven group `dev.kolektiv.keel`
 - **Pack** — a versioned frontend (`.feb` zip + manifest) keyed by page id, not path
-- **Adapter** — `mount` / `unmount` / `update` for a framework (Svelte today)
+- **Adapter** — `mount` / `unmount` / `update` for a framework (Svelte, React,
+  Vue, Solid, Preact, Lit, Angular)
 
 ## What the host does
 

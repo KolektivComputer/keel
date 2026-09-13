@@ -1,13 +1,18 @@
 ---
 title: Routing primitives
-description: Framework-agnostic router plus a thin Svelte adapter.
+description: Framework-agnostic router plus thin per-framework adapters.
 category: core-concepts
 order: 5
 ---
 
 import CodePair from "../../../components/CodePair.astro"
+import { path } from "../../../lib/paths"
 
-The router lives in `@kolektiv/keel`. `@kolektiv/keel-svelte` wraps it.
+The router lives in `@kolektiv/keel`. `@kolektiv/keel-svelte` wraps it, and
+React, Vue, Solid, Preact, Lit, and Angular adapters expose the same surface
+through their own idioms. The table and examples here use Svelte; see
+<a href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>
+for the per-framework names.
 
 | Export | Kind | Notes |
 | --- | --- | --- |

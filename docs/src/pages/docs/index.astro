@@ -7,12 +7,16 @@ const entries = await allDocs()
 const groups = groupedDocs(entries)
 ---
 
-<Docs title="Documentation" description="Keel documentation — getting started, core concepts, advanced cases, and implementing Keel.">
+<Docs title="Documentation" description="Keel documentation — getting started, core concepts, advanced cases, implementing Keel, and the seven framework adapters.">
   <p class="font-mono text-xs uppercase tracking-[0.18em] text-base-content/60">Documentation</p>
   <h1 class="mt-3 font-display text-4xl sm:text-5xl">Guides</h1>
   <p class="mt-4 text-lg text-base-content/70">
     Host-owned routing, a typed page contract, and packs the call site passes
     at render. One pack is your UI. Many packs are installed themes.
+  </p>
+  <p class="mt-3 text-base-content/70">
+    Packs target Svelte, React, Vue, Solid, Preact, Lit, or Angular through
+    the <a class="link" href={path("/docs/implementing/framework-adapters")}>framework adapters</a>.
   </p>
   <div class="mt-10 grid gap-5">
     {

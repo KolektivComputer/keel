@@ -13,7 +13,10 @@ A pack is a `.feb`: a zip whose root is `manifest.json` plus the modules it
 names. The manifest maps **page ids** to modules — the pack's implementation
 of the <a href={path("/docs/core-concepts/contracts")}>host contract</a>.
 
-Authors write a file tree of pages (ids, not URL routes):
+Authors write a file tree of pages (ids, not URL routes). The tree below is
+Svelte; other adapters swap the component and head extensions and keep the
+same folder ids — see
+<a href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>:
 
 ```
 src/pages/
@@ -30,7 +33,8 @@ The id is the directory path with `/` turned into `.`. A sibling `+page.ts`
 may `export const id = "harbor.home"` when the folder name should not be the
 id. `+layout.svelte` files wrap descendant pages, root-first. Route params
 like `[slug]` are not ids — the host owns URLs. A sibling `+head.svelte`
-compiles into the page's manifest `head` — see
+(Svelte) or `+head.html` (other adapters) compiles into the page's manifest
+`head` — see
 <a href={path("/docs/core-concepts/head")}>Document head and SEO</a>.
 
 <CodePair

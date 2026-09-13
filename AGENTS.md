@@ -17,6 +17,7 @@ against the same typed contract.
 | `samples/harbor` | In-memory message board: Ktor + Svelte pack. `./gradlew :samples:harbor:run` → http://127.0.0.1:8090 |
 | `packages/core` | `@kolektiv/keel` — visits, history, prefetch, `action()` |
 | `packages/svelte` | `@kolektiv/keel-svelte` — `Link`, `Form`, `Head`, `page()`, `useForm`, `useAction` |
+| `packages/{react,vue,solid,preact,lit,angular}` | Adapter bindings (`@kolektiv/keel-<framework>`) over the same core |
 | `packages/pack` | `@kolektiv/keel-pack` — `.feb` zip, Vite plugin, `keel-scaffold` |
 | `skills/` | Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`) for Claude / Grok / `.agents` — `npx skills add KolektivComputer/keel` |
 | `docs/` | Homepage and guides (Astro 7, Tailwind 4, daisyUI 5, Shiki Catppuccin). pnpm workspace package `@kolektiv/keel-docs`. Getting started splits **Server Installation** and **Client Setup**. Search, SCM links, and a combined theme popup live in the site chrome. |
@@ -46,7 +47,8 @@ JS workspace root is this repository (`packages/*` and `docs`).
 
 - Page ids + kotlinx.serialization payload types **are** the contract. A live
   host serves that contract at `GET /__keel/schema`. `keel-scaffold <origin>
-  <dir>` writes a blank Svelte pack from it. Gradle `generateKeelTypes` is the
+  <dir>` writes a blank pack from it for the chosen `--framework` (default
+  Svelte). Gradle `generateKeelTypes` is the
   offline classpath scan. Actions are a Kotlin function `(In) -> Out`.
 - Packs ship as `.feb` (zip of `manifest.json` + modules). Hosts load a
   `FrontendBundle` from a jar resource, a file, or an exploded directory.
@@ -54,8 +56,9 @@ JS workspace root is this repository (`packages/*` and `docs`).
   is a compatibility proxy for the pages DSL only.
 - Actions POST `/__keel/action/{id}` with JSON. They are **writes**. Reads stay
   the seed. After a mutation, TanStack Query invalidates and a visit rehydrates.
-- Document GET writes `seed.head` into the HTML shell — the pack's
-  `+head.svelte` template (sanitized) or the host `head(...)` fallback. Visits
+- Document GET writes `seed.head` into the HTML shell — the pack's head
+  template (`+head.svelte` for Svelte, `+head.html` for other adapters,
+  sanitized) or the host `head(...)` fallback. Visits
   return JSON and are not the SEO unit.
 - Pack choice is the call site's: `respondPage(pack, …)` or
   `route.keel(pack)`. Keel does not resolve themes, and packs do not read a
@@ -64,15 +67,19 @@ JS workspace root is this repository (`packages/*` and `docs`).
   source of truth or own URL patterns.
 - One pack and many packs use the same host API. A single-pack app passes its
   one pack at render.
-- First adapter is Svelte 5.
+- Adapters are Svelte 5, React 18/19, Vue 3, Solid 1.9, Preact 10, Lit 3, and
+  Angular 19 — one contract; the matrix and per-framework guides live at
+  `docs/src/content/docs/implementing/framework-adapters.mdx`.
 
 ## Docs site
 
 Catppuccin daisyUI themes (`catppuccin-mocha` default). Type: Source Serif 4
 (display), Source Sans 3 (body / UI), Iosevka (code) in
 `docs/src/styles/global.css`. Site chrome uses daisyUI
-primitives. Code samples: Svelte, Ktor host. TS/JS toggles live on docs pages
-and on individual snippets.
+primitives — search, SCM links, a combined theme popup, and a framework
+picker that sets `data-frontend` (default Svelte; snippets opt in with `fw`
+or per-framework panels). Code samples: Svelte-default, plus Ktor host. TS/JS
+toggles live on docs pages and on individual snippets.
 
 Production docs are `https://keel.mey.cat` (GitHub Pages custom domain, site
 root). All in-app links must go through `path()` in `docs/src/lib/paths.ts`

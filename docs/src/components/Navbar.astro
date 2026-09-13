@@ -1,6 +1,7 @@
 ---
 import LangToggle from "./LangToggle.astro"
 import ThemePicker from "./ThemePicker.astro"
+import FrameworkPicker from "./FrameworkPicker.astro"
 import ScmMenu from "./ScmMenu.astro"
 import SearchDialog from "./SearchDialog.astro"
 import Mark from "./Mark.astro"
@@ -50,6 +51,7 @@ const index = await searchIndex()
         <LangToggle />
       </div>
     )}
+    <FrameworkPicker />
     <ScmMenu />
     <ThemePicker />
   </div>
