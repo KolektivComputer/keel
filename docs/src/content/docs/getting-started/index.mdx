@@ -1,6 +1,6 @@
 ---
 title: What is Keel
-description: Host-owned routing. Packs implement page ids. The server picks the bundle.
+description: Host-owned routing. Packs implement page ids. The call site passes the pack.
 category: getting-started
 order: 1
 ---
@@ -10,20 +10,20 @@ import { path } from "../../../lib/paths"
 
 Keel is a protocol and a small set of libraries for serving MPAs with a
 frameworked UI from Kotlin. The **host** owns URLs, page ids, payload types,
-and **which frontend bundle to mount**. A **pack** is a versioned frontend
-that implements those ids.
+and **which pack to render with**. A **pack** is a versioned frontend that
+implements those ids.
 
-You always do the same two things: declare a contract on the host, then mount
-packs that implement it.
+You always do the same two things: declare a contract on the host, then pass
+a pack that implements it into render.
 
 **Glue an app.** Register pages, write one Svelte frontend, ship that pack.
 Keel is the router between Ktor and the UI — visits, seeds, forms — without
 a client-side router owning the URL.
 
 **Install themes.** Keep the same registry. Publish the page ids and
-serializers as the contract. Authors pick from packs installed on the app;
-each pack is typed for that data and provides the ids the host expects.
-Visitors never store a theme. The host does.
+serializers as the contract. Authors provide packs typed for that data that
+implement the ids the host expects, and the call site passes the pack it
+wants at render. Visitors never store a theme.
 
 The first host is Ktor. The first adapter is Svelte 5.
 
@@ -47,7 +47,8 @@ Inertia4J speaks the Inertia SPA protocol over Ktor or Spring. Kinetica and Kilu
 
 - Declares `page<T>(id, path)` — id + payload type + path
 - Declares `action<I, O>(id)` — typed writes, JSON in / JSON out
-- Resolves which pack implements that id (one pack, or a chain of installed themes)
+- Passes the pack that implements that id into render (one pack, or one of
+  several installed packs)
 - Renders a shell with `#__keel_seed` (and `seed.head` in the document) or answers a visit (`X-Keel-Visit`) with the same JSON
 
 ## What a pack must not do
@@ -55,7 +56,7 @@ Inertia4J speaks the Inertia SPA protocol over Ktor or Spring. Kinetica and Kilu
 - Own URL patterns
 - Fetch its own page payload as a second source of truth — **actions are writes; reads stay the seed**
 - Parse the seed outside bootstrap
-- Read a visitor theme preference from the browser
+- Choose its own pack, or read a visitor theme preference from the browser
 
 ```json
 {
@@ -74,8 +75,11 @@ Inertia4J speaks the Inertia SPA protocol over Ktor or Spring. Kinetica and Kilu
 }
 ```
 
+`theme` is the serving pack's `{ id, version }`; `entry` is the page module
+Keel loads from that pack.
+
 <Callout title="One pack or many">
-  A single-pack app still runs `ChainThemeResolver` — the chain has one
-  entry. Adding a second pack does not change the host API. It changes
-  which bundle the resolver writes into the seed.
+  A single-pack app passes its one pack to render. Adding a second installed
+  pack does not change the host API — it stays installed until a call site
+  passes it or a route scopes it with `route.keel(pack)`.
 </Callout>

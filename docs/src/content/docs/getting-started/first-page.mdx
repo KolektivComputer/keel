@@ -15,9 +15,9 @@ If you have not stood the process up yet, start with
 <a href={path("/docs/getting-started/host")}>the host</a> and
 <a href={path("/docs/getting-started/pack")}>the pack</a>.
 
-This is the one-pack shape: you own the host and the frontend. The same
-registry is the contract theme authors would implement if you later install
-more packs. See <a href={path("/docs/core-concepts/contracts")}>Page contracts</a>.
+This is the one-pack shape: you own the host and the frontend, and pass that
+one pack at render. The same registry is the contract other packs would
+implement if you later install them. See <a href={path("/docs/core-concepts/contracts")}>Page contracts</a>.
 
 <CodeBlock
   lang="kotlin"
@@ -36,7 +36,7 @@ pages {
 
 The registry is the source of truth for ids and payload serializers. Ktor (or
 any host) walks it to bind routes. Typegen walks it to emit `.d.ts` — publish
-that file for theme authors.
+that file for pack authors.
 
 The pack file tree is keyed by **page id**, not URL. `pages/home/+page.svelte`
 implements `home`; `pages/harbor/home/+page.svelte` implements `harbor.home`.

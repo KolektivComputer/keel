@@ -26,7 +26,7 @@ checklist.
 ## Seed construction
 
 Build a seed for every document and visit: page id, absolute path, params,
-encoded payload, selected theme `{ id, version }`, entry URL, css URLs, host
+encoded payload, serving pack `{ id, version }`, entry URL, css URLs, host
 selector, optional `head` / `shared` / `redirect`.
 
 ## Document vs visit
@@ -58,11 +58,16 @@ exploded directory. Serve files at `/__keel/pack/{bundleId}/…`.
 Keep the zip central directory open for the bundle's lifetime; do not reopen
 it on every request.
 
-## Theme resolution
+## Call-site pack
 
-`ChainThemeResolver` walks configured packs until one implements the page id.
-An override arrives as `X-Keel-Theme`. Missing from every pack is a host
-error — map it to the default pack's `notFound`.
+The host opens packs up front and passes one into render. `respondPage(pack,
+id, data)` is canonical; `route.keel(pack)` scopes a pack to a route subtree
+so a bundle-less `respondPage` resolves it. With no scoped route, a
+bundle-less render resolves only when exactly one pack is configured in
+total; otherwise it throws (`MissingPackException` / `AmbiguousPackException`).
+The serving pack's `{ id, version }` goes into the seed and the
+`X-Keel-Theme` / `X-Keel-Version` response headers. Never select a pack from
+a request header.
 
 ## CSRF
 

@@ -1,6 +1,6 @@
 # Keel
 
-Host-owned routing and swappable frontend packs for Kotlin servers.
+Host-owned routing and render-time frontend packs for Kotlin servers.
 
 | Coordinate | Name |
 | --- | --- |

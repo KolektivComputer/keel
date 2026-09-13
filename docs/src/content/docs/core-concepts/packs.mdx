@@ -103,8 +103,8 @@ Asset URLs are per bundle: `/__keel/pack/{bundleId}/…`. Seed `entry` / `css`
 are rewritten to that prefix so multiple bundles on one app do not clash.
 
 Pass `contract` (typegen's `keel/1` JSON) so a pack that implements an
-unknown id fails the build. A pack may implement a subset; the host walks
-the theme chain.
+unknown id fails the build. A pack may implement a subset; the call site
+passes the pack per route.
 
 The `.feb` layout, `PageModule`, and `RouterAdapter` are specified under
 <a href={path("/docs/implementing/pack-adapter")}>Pack adapter</a>.

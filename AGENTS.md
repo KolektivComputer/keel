@@ -4,14 +4,15 @@ This file is for humans and coding agents working in this repository.
 
 Keel is a protocol and libraries for serving MPAs with a frameworked UI from
 Kotlin. The **host** owns URLs, page ids, payload types, and which frontend
-**pack** to mount. Packs implement ids — never paths. One pack is an app UI.
-Many packs are installed themes against the same typed contract.
+**pack** to pass at render time. Packs implement ids — never paths. Keel does
+not choose packs. One pack is an app UI. Many packs are installed themes
+against the same typed contract.
 
 ## Layout
 
 | Path | What |
 | --- | --- |
-| `lib/` | Kotlin core (`dev.kolektiv.keel:core`) — seed, manifest, `PageRegistry`, `ActionRegistry`, `FrontendBundle`, typegen, theme chain. No Ktor dependency. |
+| `lib/` | Kotlin core (`dev.kolektiv.keel:core`) — seed, manifest, `PageRegistry`, `ActionRegistry`, `FrontendBundle`, typegen. No Ktor dependency. |
 | `ktor/` | `dev.kolektiv.keel:ktor` — binds the registry, `respondPage`, actions, HTML shell, visits, pack files. |
 | `samples/harbor` | In-memory message board: Ktor + Svelte pack. `./gradlew :samples:harbor:run` → http://127.0.0.1:8090 |
 | `packages/core` | `@kolektiv/keel` — visits, history, prefetch, `action()` |
@@ -55,12 +56,13 @@ JS workspace root is this repository (`packages/*` and `docs`).
   the seed. After a mutation, TanStack Query invalidates and a visit rehydrates.
 - Document GET writes `seed.head` (`<title>`, description, canonical, `og:*`)
   into the HTML shell. Visits return JSON and are not the SEO unit.
-- Theme selection is host policy (`ChainThemeResolver`). Packs do not read a
+- Pack choice is the call site's: `respondPage(pack, …)` or
+  `route.keel(pack)`. Keel does not resolve themes, and packs do not read a
   visitor theme from the browser.
 - The seed JSON is the only **read** model. Packs must not fetch a second
   source of truth or own URL patterns.
-- One pack and many packs use the same host API. A single-pack app is a theme
-  chain of one.
+- One pack and many packs use the same host API. A single-pack app passes its
+  one pack at render.
 - First adapter is Svelte 5.
 
 ## Docs site

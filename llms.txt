@@ -1,6 +1,6 @@
 # Keel
 
-> Host-owned routing and swappable frontend packs. The server owns URLs, page ids, and payload types. Packs implement ids — never paths.
+> Host-owned routing and render-time frontend packs. The server owns URLs, page ids, and payload types. Packs implement ids — never paths.
 
 Keel is a protocol plus Kotlin/JS libraries. Format `keel/1`. First host adapter is Ktor; first pack adapter is Svelte 5. Maven: `dev.kolektiv.keel:core`, `dev.kolektiv.keel:ktor`. npm: `@kolektiv/keel`, `@kolektiv/keel-svelte`, `@kolektiv/keel-pack`.
 
@@ -21,6 +21,7 @@ Docs: https://keel.mey.cat/  (GitHub Pages; local `pnpm dev` is http://127.0.0.1
 - [Routing](https://keel.mey.cat/docs/core-concepts/routing/)
 - [Actions](https://keel.mey.cat/docs/core-concepts/actions/)
 - [Packs](https://keel.mey.cat/docs/core-concepts/packs/)
+- [Choosing a pack](https://keel.mey.cat/docs/advanced/choosing-a-pack/): the call site passes the pack into render
 - [AGENTS.md](https://github.com/kolektivdev/keel/blob/main/AGENTS.md): how to work in this repository
 
 ## Optional

@@ -13,7 +13,7 @@ The host registry is the contract: a **stable page id**, a **payload type**,
 and a **path the host owns**. Packs implement ids. They never own URLs.
 
 One pack is your app UI. Many packs are installed themes against the same
-types. Same API either way.
+types. The call site passes the one that renders; the API does not change.
 
 ```kotlin
 @KeelType("harbor.home")
@@ -39,7 +39,7 @@ pages {
 ```
 
 Typegen walks `@KeelType` / `@KeelAction` and emits `.d.ts` plus JSON.
-Gradle `generateKeelTypes` is the offline scan. Theme authors depend on that
+Gradle `generateKeelTypes` is the offline scan. Pack authors depend on that
 file — not on your running server.
 
 ```ts
@@ -95,8 +95,9 @@ A Svelte page is keyed by id. `pages/harbor/home/+page.svelte` implements
 {/each}`}
 />
 
-A pack declares which ids it implements. Omitting `harbor.user` is valid —
-the host skips that pack for that id and walks the chain.
+A pack declares which ids it implements. It may implement a subset —
+omitting `harbor.user` is valid, and the call site passes the pack that
+covers the page.
 
 <CodeBlock
   lang="json"
@@ -117,5 +118,5 @@ the host skips that pack for that id and walks the chain.
 <Callout title="The contract is Kotlin">
   Authors do not invent page ids. If the app expects <code>harbor.home</code>,
   a pack that ships <code>home</code> or <code>/</code> does not match. Change
-  <code>HomePage</code> and typegen fails the theme at build.
+  <code>HomePage</code> and typegen fails the pack at build.
 </Callout>

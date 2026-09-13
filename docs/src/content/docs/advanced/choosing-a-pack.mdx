@@ -1,0 +1,77 @@
+---
+title: Choosing a pack
+description: Which pack renders a page is the call site's concern — pass an opened pack into render.
+category: advanced
+order: 1
+---
+
+import Callout from "../../../components/Callout.astro"
+
+A pack is a versioned frontend keyed by page id. One pack is an app UI. Many
+packs are installed apps or themes against the same typed contract — and Keel
+does not choose between them. The call site does.
+
+## Pass the pack you want
+
+`respondPage(pack, pageId, data, …)` is the canonical form: open a
+`FrontendBundle` once and pass it into render. Keel loads that pack's page
+module and CSS, and records its `{ id, version }` as the seed's `theme` — the
+identity of the pack that served the page.
+
+```kotlin
+val harbor = FrontendBundle.fromFile(Path.of("pack/dist/harbor.feb"))
+
+routing {
+    keel(harbor) {
+        get("/") {
+            call.respondPage(harbor, "harbor.home", HomePage(feed = Board.feed()))
+        }
+    }
+}
+```
+
+`route.keel(pack) { … }` scopes a pack to a route subtree. Inside that scope a
+bundle-less `respondPage(pageId, data)` resolves to the scoped pack, so a
+subtree shares one pack without repeating it on every call.
+
+`KeelConfig.bundle` and `KeelConfig.bundles` hold the host's configured packs:
+the one the pages DSL renders from, plus any additional installed packs. A
+bundle-less `respondPage` with no scoped route resolves only when exactly one
+pack is configured in total. None throws `MissingPackException`; several
+without a scoped route throws `AmbiguousPackException`. Both tell the host to
+pass the pack explicitly or scope the route.
+
+## The call site is the policy
+
+- **Tenant** — one host process, a pack per tenant; pick the pack from the
+  tenant record before rendering.
+- **A/B** — choose the pack per request branch. The seed's `theme.id` records
+  which one served.
+- **Override** — an admin or preview route passes a draft pack typed for the
+  same ids.
+- **Admin** — scope an admin subtree to an admin pack with `route.keel`.
+
+None of this is a request header or a cookie. There is no resolver and no
+chain: Keel never scans installed packs for one that implements the page, and
+packs never read a visitor theme from the browser.
+
+<Callout title="Open once, reuse">
+  Opening a `.feb` reads its manifest and keeps the archive open. Build the
+  `FrontendBundle` at startup (or when a draft changes) and pass the same
+  instance into every render.
+</Callout>
+
+## What the response carries
+
+The seed's `theme` field is the serving pack's `{ id, version }`, alongside
+the `entry` module and `css` URLs from that pack. The same values also go out
+as the `X-Keel-Theme` and `X-Keel-Version` response headers. They are
+responses, not request overrides — a visitor cannot select a pack with a
+header.
+
+## Missing pages
+
+If the passed pack does not implement the page id, render fails with
+`UnknownPageInBundleException`; Keel does not substitute another installed
+pack. The host maps unmatched URLs to the configured `notFoundPageId`, and a
+pack can declare its own `notFound` module for those documents.
