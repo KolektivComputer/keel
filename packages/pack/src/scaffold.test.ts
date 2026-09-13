@@ -267,6 +267,21 @@ test("vue provider pages use the usePage composable", async () => {
   assert.equal(bootstrap, `import { bootstrap } from "@kolektiv/keel-vue"\n\nvoid bootstrap()\n`)
 })
 
+test("solid provider pages use the usePage accessor", async () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-solid-"))
+  const out = join(root, "pack")
+  await scaffoldPack({ outDir: out, schema, id: "harbor", framework: "solid" })
+  const page = readFileSync(join(out, "src/pages/harbor/home/+page.tsx"), "utf8")
+  assert.match(page, /import \{ Head, usePage \} from "@kolektiv\/keel-solid"/)
+  assert.match(page, /const page = usePage<HomePage>\(\)/)
+  assert.match(page, /page\(\)\.data/)
+  assert.doesNotMatch(page, /\bpage<HomePage>/)
+  const layout = readFileSync(join(out, "src/pages/+layout.tsx"), "utf8")
+  assert.match(layout, /children: JSX.Element/)
+  const bootstrap = readFileSync(join(out, "src/bootstrap.ts"), "utf8")
+  assert.equal(bootstrap, `import { bootstrap } from "@kolektiv/keel-solid"\n\nvoid bootstrap()\n`)
+})
+
 test("scaffoldPack writes published @kolektiv versions instead of workspace protocol", async () => {
   const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
   const out = join(root, "pack")

@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `usePage`/`useForm`/`useAction`/`useKeelPageQuery`, `Link`/`Form`/`Head`,
   `useKeelAnchor`, navigation/unload guards, `createPage`, and `bootstrap`
   (#44).
+- `@kolektiv/keel-solid`: Solid 1.9 binding with
+  `usePage`/`useForm`/`useAction`/`useKeelPageQuery`, `Link`/`Form`/`Head`,
+  `useKeelAnchor`, navigation/unload guards, `createPage`, and `bootstrap`
+  (#45).
 
 ### Changed
 
