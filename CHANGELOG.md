@@ -7,11 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2-SNAPSHOT.3] - 2026-09-13
+
 ### Added
 
 - Cancelable, pluggable navigation guards (`router.beforeEach`,
   `useNavigationGuard`, `useUnloadGuard`; async `onBefore`; `force`; `blocked`
   event; popstate-safe cancel/redirect) (#23).
+- Versioned changelog and release process: the full `CHANGELOG.md` ships in
+  the `core` / `ktor` jars (`META-INF/CHANGELOG.md`), the `@kolektiv/keel`,
+  `@kolektiv/keel-svelte`, and `@kolektiv/keel-pack` npm tarballs, and as a
+  GitHub Release asset (#25).
 
 ### Fixed
 

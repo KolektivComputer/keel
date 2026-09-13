@@ -40,14 +40,24 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="${{ steps.tag.outputs.tag }}"
+          version="${{ steps.tag.outputs.version }}"
+          create_flags=()
+          edit_flags=()
+          case "${version}" in
+            *SNAPSHOT*)
+              create_flags=(--prerelease --latest=false)
+              edit_flags=(--prerelease)
+              ;;
+          esac
           if gh release view "${tag}" >/dev/null 2>&1; then
             echo "release ${tag} exists, updating body and changelog asset"
-            gh release edit "${tag}" --title "${tag}" --notes-file release-notes.md
+            gh release edit "${tag}" --title "${tag}" --notes-file release-notes.md "${edit_flags[@]}"
             gh release upload "${tag}" CHANGELOG.md --clobber
           else
             echo "creating release ${tag}"
             gh release create "${tag}" CHANGELOG.md \
               --verify-tag \
               --title "${tag}" \
-              --notes-file release-notes.md
+              --notes-file release-notes.md \
+              "${create_flags[@]}"
           fi
