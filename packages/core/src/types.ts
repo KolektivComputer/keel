@@ -96,12 +96,28 @@ export interface KeelManifest {
   compat?: { contract: string } | null
 }
 
+/**
+ * The module a pack entry exports for a page id.
+ *
+ * Adapters are **client-mount-only**: the host renders the shell HTML and the
+ * browser mounts the entry, so there is no SSR / hydration seam. Core calls
+ * `mount(host, ctx)` for a newly applied seed and `update(ctx)` when a visit
+ * keeps the same page id and entry with `preserveState`. `ctx` is the exact
+ * context built from that seed — adapters must forward it to framework code
+ * (context, props, or DI), even when they also read the global seed store.
+ */
 export interface PageModule<T = unknown> {
   mount(host: Element, ctx: PageContext<T>): void | Promise<void>
   unmount(): void | Promise<void>
   update?(ctx: PageContext<T>): void | Promise<void>
 }
 
+/**
+ * The data a page module receives for one applied seed: ids, route params,
+ * payload, validation errors, theme, shared values, and `navigate`. Every
+ * applied seed produces one context; reactive adapters may keep reading the
+ * seed store for updates, but `ctx.data` is always that seed's payload.
+ */
 export interface PageContext<T = unknown> {
   page: string
   path: string

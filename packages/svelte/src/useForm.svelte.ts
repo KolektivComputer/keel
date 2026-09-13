@@ -1,4 +1,9 @@
-import { router, type Method, type VisitOptions } from "@kolektiv/keel"
+import {
+  createFormState,
+  type FormSnapshot,
+  type Method,
+  type VisitOptions,
+} from "@kolektiv/keel"
 
 export interface FormState<T extends Record<string, unknown>> {
   data: T
@@ -20,31 +25,37 @@ export interface FormState<T extends Record<string, unknown>> {
 }
 
 export function useForm<T extends Record<string, unknown>>(initial: T): FormState<T> {
-  const defaults = { ...initial }
-  let data = $state({ ...initial })
-  let errors = $state<Record<string, string[]>>({})
-  let processing = $state(false)
-  let progress = $state<number | null>(null)
-  let wasSuccessful = $state(false)
-  let isDirty = $state(false)
+  const form = createFormState<T>(initial)
+  let data = $state<T>(form.get().data)
+  let errors = $state<Record<string, string[]>>(form.get().errors)
+  let processing = $state(form.get().processing)
+  let progress = $state<number | null>(form.get().progress)
+  let wasSuccessful = $state(form.get().wasSuccessful)
+  let isDirty = $state(form.get().isDirty)
 
-  function markDirty() {
-    isDirty = JSON.stringify(data) !== JSON.stringify(defaults)
+  function sync(state: FormSnapshot<T> = form.get()) {
+    data = state.data
+    errors = state.errors
+    processing = state.processing
+    progress = state.progress
+    wasSuccessful = state.wasSuccessful
+    isDirty = state.isDirty
   }
 
-  const form: FormState<T> = {
+  const state: FormState<T> = {
     get data() {
       return data
     },
     set data(value) {
-      data = value
-      markDirty()
+      form.setData(value)
+      sync()
     },
     get errors() {
       return errors
     },
     set errors(value) {
-      errors = value
+      form.setErrors(value)
+      sync()
     },
     get processing() {
       return processing
@@ -59,55 +70,35 @@ export function useForm<T extends Record<string, unknown>>(initial: T): FormStat
       return isDirty
     },
     set(keyOrValues: keyof T | Partial<T>, value?: unknown) {
-      if (typeof keyOrValues === "object") {
-        Object.assign(data, keyOrValues)
+      if (typeof keyOrValues === "object" && keyOrValues !== null) {
+        form.set(keyOrValues as Partial<T>)
       } else {
-        data[keyOrValues] = value as T[typeof keyOrValues]
+        form.set(keyOrValues as keyof T, value as T[keyof T])
       }
-      markDirty()
+      sync()
     },
     reset(...fields: (keyof T)[]) {
-      if (fields.length === 0) {
-        data = { ...defaults }
-      } else {
-        for (const field of fields) data[field] = defaults[field]
-      }
-      isDirty = false
+      form.reset(...fields)
+      sync()
     },
     clearErrors() {
-      errors = {}
+      form.clearErrors()
+      sync()
     },
     async submit(method, href, options = {}) {
-      processing = true
-      wasSuccessful = false
+      const stop = form.subscribe(sync)
       try {
-        await router.visit(href, {
-          ...options,
-          method,
-          data,
-          onError(next) {
-            errors = next
-            options.onError?.(next)
-          },
-          onSuccess(page) {
-            errors = {}
-            wasSuccessful = true
-            options.onSuccess?.(page)
-          },
-          onProgress(next) {
-            progress = next.percentage
-            options.onProgress?.(next)
-          },
-        })
+        await form.submit(method, href, options)
       } finally {
-        processing = false
+        stop()
+        sync()
       }
     },
-    get: (href, options) => form.submit("get", href, options),
-    post: (href, options) => form.submit("post", href, options),
-    put: (href, options) => form.submit("put", href, options),
-    patch: (href, options) => form.submit("patch", href, options),
-    delete: (href, options) => form.submit("delete", href, options),
+    get: (href, options) => state.submit("get", href, options),
+    post: (href, options) => state.submit("post", href, options),
+    put: (href, options) => state.submit("put", href, options),
+    patch: (href, options) => state.submit("patch", href, options),
+    delete: (href, options) => state.submit("delete", href, options),
   }
-  return form
+  return state
 }

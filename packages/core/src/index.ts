@@ -27,7 +27,7 @@ export {
   type VisitOptions,
 } from "./types.ts"
 
-export { bootstrap, router, type RouterConfig } from "./router.ts"
+export { bootstrap, router, type RouterConfig, type SeedPhase } from "./router.ts"
 export { isBuildMismatch, KeelBuildMismatchError } from "./router.ts"
 export { clearPrefetch } from "./prefetch.ts"
 export { getPage, getProcessing, peekPage, setPage, subscribe, subscribeProcessing } from "./store.ts"
@@ -36,3 +36,11 @@ export { on as onRouterEvent } from "./events.ts"
 export { action, ActionError } from "./action.ts"
 export { sendVisit, type ProgressPayload, type SendVisitOptions } from "./transport.ts"
 export { announce, focusHost } from "./a11y.ts"
+export { applyHead, fromPageHead, KEEL_HEAD_ATTR, setTitle, syncHead, type HeadInput } from "./head.ts"
+export {
+  createFormState,
+  type FormListener,
+  type FormSnapshot,
+  type FormStore,
+} from "./form.ts"
+export { KEEL_PAGE_QUERY_KEY, pageQueryKey } from "./query.ts"
