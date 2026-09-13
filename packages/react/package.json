@@ -1,0 +1,53 @@
+{
+  "name": "@kolektiv/keel-react",
+  "version": "0.0.2-SNAPSHOT.4",
+  "description": "Keel React 18/19 bindings — Link, Form, Head, usePage, useForm, useAction.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://repo.yuri.capital/repository/keel-npm/"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./mount": {
+      "types": "./dist/mount.d.ts",
+      "import": "./dist/mount.js",
+      "default": "./dist/mount.js"
+    },
+    "./bootstrap": {
+      "types": "./dist/bootstrap.d.ts",
+      "import": "./dist/bootstrap.js",
+      "default": "./dist/bootstrap.js"
+    }
+  },
+  "files": ["dist", "CHANGELOG.md"],
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "pnpm build",
+    "prepack": "node -e \"require('fs').copyFileSync(require('path').join('..','..','CHANGELOG.md'),'CHANGELOG.md')\"",
+    "test": "node --experimental-strip-types --test test/*.test.ts"
+  },
+  "peerDependencies": {
+    "@kolektiv/keel": "workspace:*",
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@kolektiv/keel": "workspace:*",
+    "@tanstack/react-query": "^5.66.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "happy-dom": "^20.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}

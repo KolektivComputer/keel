@@ -237,6 +237,21 @@ export default defineConfig({
   )
 })
 
+test("react provider pages use the usePage hook", async () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-react-"))
+  const out = join(root, "pack")
+  await scaffoldPack({ outDir: out, schema, id: "harbor", framework: "react" })
+  const page = readFileSync(join(out, "src/pages/harbor/home/+page.tsx"), "utf8")
+  assert.match(page, /import \{ Head, usePage \} from "@kolektiv\/keel-react"/)
+  assert.match(page, /const seed = usePage<HomePage>\(\)/)
+  assert.match(page, /seed\.data/)
+  assert.doesNotMatch(page, /\bpage<HomePage>/)
+  const layout = readFileSync(join(out, "src/pages/+layout.tsx"), "utf8")
+  assert.match(layout, /children: ReactNode/)
+  const bootstrap = readFileSync(join(out, "src/bootstrap.ts"), "utf8")
+  assert.equal(bootstrap, `import { bootstrap } from "@kolektiv/keel-react"\n\nvoid bootstrap()\n`)
+})
+
 test("scaffoldPack writes published @kolektiv versions instead of workspace protocol", async () => {
   const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
   const out = join(root, "pack")
