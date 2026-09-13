@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Framework-neutral binding primitives in `@kolektiv/keel` (head DOM helpers,
   form-state machine, seed-applied hook, `PageContext` parity, query-key
   helpers) so framework adapters share one spine (#37).
+- `@kolektiv/keel-pack` gains a framework adapter registry with codegen for
+  React, Vue, Solid, Preact, Lit, and Angular packs (`+head.html` replaces
+  Svelte-only head authoring for non-Svelte frameworks) (#38).
+
+### Fixed
+
+- Pack-adapter docs no longer claim a manifest `layouts` map or per-page
+  `layout` field: adapters inline the layout chain into each entry module, and
+  `keel-pack` writes neither (#38).
 
 ## [0.0.2-SNAPSHOT.4] - 2026-09-13
 

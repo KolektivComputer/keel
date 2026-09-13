@@ -4,7 +4,7 @@ import type { Plugin } from "vite"
 import type { DiscoveredPage, RouterAdapter } from "./adapter.ts"
 import { cssFromBundle, writePackManifest, type ManifestBundle, type PackManifestPage } from "./manifest-write.ts"
 import { packFeb } from "./pack-feb.ts"
-import { svelteFiles } from "./svelte.ts"
+import { routerFor } from "./registry.ts"
 import type { PackManifest } from "./manifest-write.ts"
 
 export interface PackagerOptions {
@@ -57,7 +57,7 @@ export function keelPack(options: KeelPackOptions): Plugin {
       if (!existsSync(bootstrap)) {
         throw new Error(`keelPack: bootstrap not found: ${bootstrap}`)
       }
-      adapter = options.router ?? defaultRouter(options.framework)
+      adapter = options.router ?? routerFor(options.framework)
       pages = adapter.discover(pagesDir)
       if (pages.length === 0) {
         throw new Error(`keelPack: no pages found in ${pagesDir}`)
@@ -182,9 +182,4 @@ function defaultPackager(opts: PackagerOptions): void {
     outFile: resolve(opts.root, opts.pack),
     contract: opts.contract,
   })
-}
-
-function defaultRouter(framework: string): RouterAdapter {
-  if (framework === "svelte") return svelteFiles()
-  throw new Error(`keelPack: no router for framework '${framework}'; pass router`)
 }

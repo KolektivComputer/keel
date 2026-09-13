@@ -15,6 +15,20 @@ export function compileHeadTemplate(source: string, from = "+head.svelte"): stri
   return compiled
 }
 
+/**
+ * Framework-neutral `+head.html`: a plain HTML template with no component
+ * wrapper to unwrap. Script, style, and comment blocks are dropped, and
+ * `{seed.a.b}` / `{{a.b}}` interpolations become host placeholders.
+ */
+export function compileHtmlHeadTemplate(source: string, from = "+head.html"): string {
+  const markup = source.replace(SCRIPT_OR_STYLE, "").replace(HTML_COMMENT, "")
+  const compiled = replaceMustaches(markup, from).trim()
+  if (!compiled) {
+    throw new Error(`${from}: +head.html produced no head markup`)
+  }
+  return compiled
+}
+
 function replaceMustaches(markup: string, from: string): string {
   let out = ""
   let i = 0

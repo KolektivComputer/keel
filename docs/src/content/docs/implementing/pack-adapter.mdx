@@ -67,11 +67,12 @@ Page entry fields:
 | --- | --- | --- |
 | `module` | yes | Page module path, relative to the archive root |
 | `css` | no | Stylesheet paths the page needs |
-| `layout` | no | Layout module id, surfaced as the seed's `layout` |
-| `head` | no | Compiled `+head.svelte` markup with `{{…}}` placeholders |
+| `head` | no | Compiled head markup with `{{…}}` placeholders |
 
-The manifest also carries a `layouts` map and a `notFound` module. The host
-substitutes the `head` placeholders and renders it on the document GET. See
+Layouts are not separate manifest entries. Adapters inline the page's layout
+chain, root-first, into the emitted entry module. The manifest carries the
+`notFound` module alongside `pages`. The host substitutes the `head`
+placeholders and renders it on the document GET. See
 <a href={path("/docs/core-concepts/head")}>Document head and SEO</a>.
 
 ## RouterAdapter
@@ -86,9 +87,17 @@ interface RouterAdapter {
 }
 ```
 
-`svelteFiles()` is the default for `framework: "svelte"`. Any other
-framework must pass `router`. Export your adapter from the pack package
-and document it.
+`routerFor(name)` resolves the built-in adapter for `framework`:
+`svelte` is the default; `react`, `vue`, `solid`, `preact`, `lit`, and
+`angular` ship as codegen adapters. An unknown name throws with the supported
+list. Pass `router` to use a custom adapter — it takes precedence over the
+registry. New frameworks register an adapter factory; `vite.ts` does not
+change.
+
+Each non-Svelte adapter compiles a neutral `+head.html` instead of
+`+head.svelte`, and uses `+page.ts` for the id override except Lit and
+Angular, where the page itself is `+page.ts`, so the override is
+`+page.id.ts`.
 
 ## Packager and manifest hooks
 
