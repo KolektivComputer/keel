@@ -62,5 +62,7 @@ jobs:
         run: pnpm test
       - name: Build packages
         run: pnpm build:packages
+      - name: Check publishable packages
+        run: bash .github/scripts/check-publishable-packages.sh
       - name: Build docs
         run: pnpm --filter @kolektiv/keel-docs build

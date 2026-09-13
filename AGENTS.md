@@ -110,6 +110,19 @@ URLs are not available on this Nexus instance. Consumers point the
 after publishing with `.github/scripts/verify-npm-resolution.sh`. Workflow:
 `.github/workflows/publish.yml` (tag `v*` or `workflow_dispatch`).
 
+### Adding an npm package
+
+A new package lives in `packages/<dir>/` and is named `@kolektiv/keel-<dir>`
+(router: `@kolektiv/keel`). Copy the boilerplate from an existing adapter:
+version locked to `packages/core`'s version, `publishConfig.registry` =
+hosted `keel-npm`, `files` including `dist` and `CHANGELOG.md`, and the
+standard `prepack` one-liner that copies the root `CHANGELOG.md`. A
+`"private": true` package is skipped. `pnpm build:packages`,
+`publish-npm.sh`, `verify-npm-resolution.sh`, and
+`check-publishable-packages.sh` all discover packages from
+`packages/*/package.json` — never edit a central package list. CI runs the
+checker after `pnpm build:packages`; publish runs it before publishing.
+
 **Credentials (never commit values).** Same Nexus login for Maven and npm:
 
 1. **CI** — GitHub repo **Settings → Secrets and variables → Actions**:
@@ -145,6 +158,5 @@ section, and `.github/workflows/release.yml` runs it on `v*` tags (or
 attached.
 
 The full changelog ships in every artifact: `META-INF/CHANGELOG.md` in the
-`core` / `ktor` jars, `CHANGELOG.md` in the `@kolektiv/keel` /
-`@kolektiv/keel-svelte` / `@kolektiv/keel-pack` npm tarballs, and as a GitHub
-Release asset.
+`core` / `ktor` jars, `CHANGELOG.md` in every publishable
+`@kolektiv/keel*` npm tarball, and as a GitHub Release asset.

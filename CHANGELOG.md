@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `keel-scaffold` grows a per-framework template provider and can scaffold
   React, Vue, Solid, Preact, Lit, and Angular packs (Svelte output unchanged)
   (#39).
+- Publish/CI scripts discover all publishable `@kolektiv/*` packages
+  automatically and enforce package boilerplate (version lockstep, changelog
+  prepack, keel-npm registry) so new framework adapters need no central
+  wiring (#40).
 
 ### Fixed
 
