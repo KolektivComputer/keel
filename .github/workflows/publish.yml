@@ -49,6 +49,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build packages
         run: pnpm build:packages
+      - name: Check publishable packages
+        run: bash .github/scripts/check-publishable-packages.sh
       - name: Publish npm
         env:
           YURI_CAPITAL_REPO_USERNAME: ${{ secrets.YURI_CAPITAL_REPO_USERNAME }}

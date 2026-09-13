@@ -2,18 +2,33 @@
 # Verify anonymously that @kolektiv/* at a version resolves from the
 # advertised npm registry (hosted keel-npm).
 #
+# Publishable packages are discovered from packages/*/package.json (every
+# non-private @kolektiv/keel* package, sorted by name).
+#
 # Usage: verify-npm-resolution.sh [version]
 set -uo pipefail
 
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(CDPATH= cd -- "${SCRIPT_DIR}/../.." && pwd)"
 REGISTRY="https://repo.yuri.capital/repository/keel-npm/"
-PACKAGES=(@kolektiv/keel @kolektiv/keel-pack @kolektiv/keel-svelte)
 
 VERSION="${1:-}"
 if [ -z "${VERSION}" ]; then
-  VERSION="$(node -p "require('./packages/core/package.json').version" 2>/dev/null)"
+  VERSION="$(PKG_MANIFEST="${ROOT_DIR}/packages/core/package.json" node -p 'require(process.env.PKG_MANIFEST).version' 2>/dev/null)"
 fi
 if [ -z "${VERSION}" ]; then
-  echo "::error::usage: $0 <version> (or run from the repository root with node available)"
+  echo "::error::usage: $0 <version> (or run with node and packages/core/package.json available)"
+  exit 2
+fi
+
+PACKAGE_LIST="$(node "${SCRIPT_DIR}/list-publishable-packages.mjs" "${ROOT_DIR}/packages")"
+PACKAGES=()
+while IFS= read -r pkg; do
+  [ -n "${pkg}" ] || continue
+  PACKAGES+=("${pkg}")
+done <<<"${PACKAGE_LIST}"
+if [ "${#PACKAGES[@]}" -eq 0 ]; then
+  echo "::error::no publishable @kolektiv/keel* packages found under packages/"
   exit 2
 fi
 
