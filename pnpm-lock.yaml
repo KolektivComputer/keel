@@ -20,8 +20,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@kolektiv/themes':
-        specifier: ^0.0.1-SNAPSHOT.1
-        version: 0.0.1-SNAPSHOT.1
+        specifier: ^0.0.1-SNAPSHOT.2
+        version: 0.0.1-SNAPSHOT.2
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))
@@ -1096,8 +1096,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kolektiv/themes@0.0.1-SNAPSHOT.1':
-    resolution: {integrity: sha512-BgIUIBLgVvMwr7xG2lu3Ya5MW8geQ831t72/79RS2qsurSoP5oRPny4vypt2GW4EoqAtmYjo7xNFW4m7LHQvVQ==}
+  '@kolektiv/themes@0.0.1-SNAPSHOT.2':
+    resolution: {integrity: sha512-4vEkdHZeUcVsldRET+eb5Xbjo1JDwv/A2qVAOBv0pvLmcT91S+FVK/eJ/NsbXBG2gCxMvhoYrcgQ78uxQqH7JQ==}
 
   '@lit-labs/ssr-dom-shim@1.6.0':
     resolution: {integrity: sha512-VHb0ALPMTlgKjM6yIxxoQNnpKyUKLD04VzeQdsiXkMqkvYlAHxq9glGLmgbb889/1GsohSOAjvQYoiBppXFqrQ==}
@@ -4013,7 +4013,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@kolektiv/themes@0.0.1-SNAPSHOT.1': {}
+  '@kolektiv/themes@0.0.1-SNAPSHOT.2': {}
 
   '@lit-labs/ssr-dom-shim@1.6.0': {}
 
