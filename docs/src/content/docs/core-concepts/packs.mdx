@@ -21,6 +21,7 @@ src/pages/
   harbor/
     +layout.svelte
     home/+page.svelte        → harbor.home
+    home/+head.svelte        → harbor.home document head
     user/+page.svelte        → harbor.user
     notFound/+page.svelte    → harbor.notFound
 ```
@@ -28,7 +29,9 @@ src/pages/
 The id is the directory path with `/` turned into `.`. A sibling `+page.ts`
 may `export const id = "harbor.home"` when the folder name should not be the
 id. `+layout.svelte` files wrap descendant pages, root-first. Route params
-like `[slug]` are not ids — the host owns URLs.
+like `[slug]` are not ids — the host owns URLs. A sibling `+head.svelte`
+compiles into the page's manifest `head` — see
+<a href={path("/docs/core-concepts/head")}>Document head and SEO</a>.
 
 <CodePair
   fw="svelte"

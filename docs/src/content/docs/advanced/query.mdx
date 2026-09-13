@@ -58,8 +58,11 @@ re-run on every mutation transition, so an effect-driven load that checks
 `POST /__keel/action/{id}` loop that hammers the host and flashes the spinner.
 
 `useAction` mutations also reload the page by default: on success they
-`router.reload()` and rehydrate the seed. `reload: false` skips that visit; it
-does not stop an effect from re-reading action state.
+`router.reload()` and rehydrate the seed. That reload is a navigation, so
+registered guards run with `source: "reload"` before the seed is fetched —
+see <a href={path("/docs/advanced/navigation-guards")}>Navigation guards</a>.
+`reload: false` skips that visit; it does not stop an effect from re-reading
+action state.
 
 <CodeBlock
   lang="svelte"

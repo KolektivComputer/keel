@@ -28,12 +28,18 @@ pnpm exec keel-scaffold 127.0.0.1:8090 ./pack --id app
 cd pack && pnpm install && pnpm build
 ```
 
-`localhost` / `127.*` use `http://`. Other hosts default to `https://`.
-`--framework svelte` is the default. Re-run with `--force` to overwrite.
+`localhost` / `127.*` use `http://`; other hosts default to `https://`.
+`--framework svelte` is the default, `--id` names the pack (default: the
+output directory), `--version` pins the manifest version (default `0.1.0`),
+and `--schema <file.json>` scaffolds from a saved contract with no host
+running. Re-run with `--force` to overwrite.
 
-You get `src/pages/app/home/+page.svelte` (id `app.home`), a root layout,
-`src/bootstrap.ts`, and `dist/app.feb` after `pnpm build`. Point the host at
-that file.
+You get `src/pages/app/home/+page.ts` (`export const id = "app.home"`) and
+`+page.svelte` per id, a root layout, `src/bootstrap.ts`,
+`src/lib/page-types.ts` / `.json`, and `dist/app.feb` after `pnpm build`.
+Point the host at that file. `pnpm dev` runs the same build in watch mode;
+a host with `watchPacks = true` swaps the result — see
+<a href={path("/docs/advanced/pack-hot-reload")}>Pack hot reload</a>.
 
 ## Option B — Vite plugin by hand
 

@@ -5,6 +5,8 @@ category: advanced
 order: 6
 ---
 
+import { path } from "../../../lib/paths"
+
 Guards run before an inflight visit is aborted, before any fetch, and before
 any history or DOM change. They run for every navigation source: `visit`,
 `replace`, `reload`, `get`/`post`/…, server redirect seeds, and `popstate`.
@@ -99,5 +101,13 @@ router.on("blocked", ({ to, from }) => {
 
 ## Exemptions
 
-Prefetch never runs guards. `bootstrap()` renders the initial seed without
-running them.
+Prefetch never runs guards — including a prefetch with `only` / `except`,
+whose partial seed is never cached and so cannot satisfy a later navigation.
+`bootstrap()` renders the initial seed without running them.
+
+A partial visit (`only` / `except`) is an ordinary navigation: guards run
+before the fetch and see the full target, not just the named data keys. See
+<a href={path("/docs/advanced/partials")}>Partial reloads</a>. The mounted
+page keeps whatever the guards allowed: canceled or failed popstate attempts
+restore the entry the mounted page belongs to, so `history.state` and the DOM
+stay in sync.

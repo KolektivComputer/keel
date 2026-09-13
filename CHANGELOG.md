@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refreshed the agent skill suite (`keel-host`, `keel-pack`, `keel-scaffold`)
   for pack-at-render, document head + CSP, pack hot reload, and navigation
   guards (#12).
+- Docs cover the full current feature surface: pack-at-render, document head
+  and CSP, pack hot reload, navigation guards, and the updated protocol/config
+  references.
 
 ## [0.0.2-SNAPSHOT.3] - 2026-09-13
 
