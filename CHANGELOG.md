@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   links, package metadata, and the skills install command now use
   `KolektivComputer/keel`.
 
+### Fixed
+
+- `keel-scaffold` generates standalone packs with published dependency versions
+  instead of `workspace:*`, and rejects unsupported `--framework react` before
+  writing files.
+
 ## [0.0.2-SNAPSHOT.3] - 2026-09-13
 
 ### Added
