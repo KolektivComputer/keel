@@ -50,6 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docs cover the framework adapter matrix with multi-framework chrome,
   per-framework guides for React, Vue, Solid, Preact, Lit, and Angular, and
   updated install/bootstrap/pack guidance (#41).
+- Agent skills cover the framework adapter matrix: pack/scaffold/host
+  guidance for React, Vue, Solid, Preact, Lit, and Angular (#42).
 
 ### Fixed
 

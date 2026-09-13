@@ -68,6 +68,10 @@ routing {
 - A passed pack that does not implement the page id throws
   `UnknownPageInBundleException`. Keel never substitutes another installed
   pack.
+- `manifest.json` `framework` records the adapter (`svelte`, `react`, `vue`,
+  `solid`, `preact`, `lit`, or `angular`) for tooling only. The host never
+  branches on it: pack-at-render, document head, CSP, asset serving, and hot
+  reload are identical for every adapter.
 - The seed's `theme { id, version }` and the `X-Keel-Theme` /
   `X-Keel-Version` response headers name the serving pack. They are
   responses, never request overrides.
@@ -76,7 +80,8 @@ routing {
 
 ## Document head
 
-A pack's `+head.svelte` compiles into a `head` template in its manifest. On a
+A pack's head template — `+head.svelte` (Svelte) or `+head.html` (every
+other adapter) — compiles into a `head` template in its manifest. On a
 document GET the host:
 
 1. substitutes `{{page}}`, `{{path}}`, `{{params.*}}`, `{{data.*}}`,
@@ -90,7 +95,7 @@ document GET the host:
 Visits return the same `seed.head` as JSON so `<Head>` stays in sync; visits
 are not the SEO unit. `PageRequest.head(title, description = …, canonical =
 documentUrl(), …)` is the host fallback: the whole head when the pack has no
-`+head.svelte`, and a fill for fields the pack omits. Canonical defaults to
+head template, and a fill for fields the pack omits. Canonical defaults to
 the document URL.
 
 ## CSP

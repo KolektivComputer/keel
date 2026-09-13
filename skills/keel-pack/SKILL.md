@@ -1,11 +1,12 @@
 ---
 name: keel-pack
 description: >
-  Author or adapt a Keel frontend pack. Use when writing Svelte pages,
-  +head.svelte, keelPack Vite config and .feb builds, typed contracts,
-  navigation guards, action/effect patterns, or a RouterAdapter for another
-  framework. Triggers: "keel pack", "+page.svelte", "+head.svelte",
-  "keelPack", "PageModule", ".feb", "svelteFiles", "beforeEach".
+  Author or adapt a Keel frontend pack for Svelte, React, Vue, Solid,
+  Preact, Lit, or Angular. Use when writing pages and +head templates,
+  keelPack Vite config and .feb builds, typed contracts, navigation guards,
+  action/effect patterns, or a RouterAdapter. Triggers: "keel pack",
+  "+page.svelte", "+page.tsx", "+page.ts", "+head.html", "keelPack",
+  "PageModule", ".feb", "supportedFrameworks", "beforeEach".
   Slash: /keel-pack.
 ---
 
@@ -16,23 +17,95 @@ A pack implements page ids. It never owns paths. Spec:
 
 ## Page modules
 
-Every compiled page exports `mount` / `unmount` / optional `update`.
-`@kolektiv/keel-svelte/mount` `createPage` wraps `+page.svelte` + layouts.
+Every compiled page exports `mount` / `unmount` / optional `update`. The
+framework's `/mount` subpath (`@kolektiv/keel-svelte/mount`, …) `createPage`
+wraps the page component + layouts.
 
-Svelte files live under `pagesDir` as `+page.svelte`. Id is the directory
-path with `/` → `.` (`pages/harbor/home/+page.svelte` → `harbor.home`). A
-sibling `+page.ts` may `export const id = "harbor.home"`. `_`-prefixed files
+Files live under `pagesDir` using the adapter's convention (Svelte shown
+here; the full table is under Framework adapters). Id is the directory path
+with `/` → `.` (`pages/harbor/home/+page.svelte` → `harbor.home`). A sibling
+id-override file may `export const id = "harbor.home"`. `_`-prefixed files
 and directories are skipped, `(group)` directory segments are not part of the
-id, and a root-level `+page.svelte` needs an explicit id. `+layout.svelte`
-wraps descendants root-first. Duplicate ids fail the build.
+id, and a root-level page needs an explicit id. `+layout.svelte`
+(`+layout.tsx` / `+layout.vue` / `+layout.ts` elsewhere) wraps descendants
+root-first. Duplicate ids fail the build.
 
 `page<T>()` returns the current seed (`processing` is true while a visit is
 in flight). Reads come from the seed — never fetch a second read model.
 
-## +head.svelte
+## Framework adapters
 
-A page may declare a sibling `+head.svelte`. `compileHeadTemplate` runs at
-pack build time:
+Seven adapters ship: `svelte` (default), `react`, `vue`, `solid`, `preact`,
+`lit`, and `angular`. `keelPack({ framework })` resolves one through the
+registry:
+
+- `supportedFrameworks` — sorted `["angular", "lit", "preact", "react",
+  "solid", "svelte", "vue"]`.
+- `routerFor(framework)` — returns the built-in adapter; an unknown name
+  throws with the supported list. A passed `router` takes precedence over
+  the registry.
+- `RouterAdapter { name, discover(pagesDir), entrySource(page) }` — maps
+  files to page ids, never URL params.
+
+| Framework | Page / layout | Id override | Head template |
+| --- | --- | --- | --- |
+| Svelte | `+page.svelte`, `+layout.svelte` | `+page.ts` | `+head.svelte` |
+| React | `+page.tsx`, `+layout.tsx` | `+page.ts` | `+head.html` |
+| Vue | `+page.vue`, `+layout.vue` | `+page.ts` | `+head.html` |
+| Solid | `+page.tsx`, `+layout.tsx` | `+page.ts` | `+head.html` |
+| Preact | `+page.tsx`, `+layout.tsx` | `+page.ts` | `+head.html` |
+| Lit | `+page.ts`, `+layout.ts` | `+page.id.ts` | `+head.html` |
+| Angular | `+page.ts`, `+layout.ts` | `+page.id.ts` | `+head.html` |
+
+Lit and Angular pages are themselves `+page.ts` modules, so the id override
+moves to `+page.id.ts`. Every generated entry has the same shape — the page,
+layouts root-first, and `createPage` from the framework's `/mount` subpath:
+
+```ts
+import Page from "/proj/src/pages/harbor/home/+page.tsx"
+import L0 from "/proj/src/pages/+layout.tsx"
+import { createPage } from "@kolektiv/keel-react/mount"
+export const { mount, unmount, update } = createPage(Page, [L0])
+```
+
+Runtime package and query dependency per framework:
+
+| Framework | Runtime | Query |
+| --- | --- | --- |
+| Svelte 5 | `@kolektiv/keel-svelte` | `@tanstack/svelte-query` |
+| React 18/19 | `@kolektiv/keel-react` | `@tanstack/react-query` |
+| Vue 3 | `@kolektiv/keel-vue` | `@tanstack/vue-query` |
+| Solid 1.9 | `@kolektiv/keel-solid` | `@tanstack/solid-query` |
+| Preact 10 | `@kolektiv/keel-preact` | `@tanstack/preact-query` |
+| Lit 3 | `@kolektiv/keel-lit` | `@tanstack/query-core` controllers |
+| Angular 19 | `@kolektiv/keel-angular` | `@tanstack/angular-query-experimental` |
+
+Each runtime re-exports `bootstrap()` and exposes `./mount`; see
+`docs/src/content/docs/implementing/framework-adapters.mdx` for each
+framework's page/form/action/mount API.
+
+### Writing a new adapter
+
+1. Reuse the shared discovery helpers `discoverPages(pagesDir, spec)` and
+   `pageEntrySource(page, mount)`; the common codegen case is one
+   `frameworkAdapter({ name, mount, pageFile, layoutFile, idFile })` call
+   (that helper always discovers `+head.html` via
+   `compileHtmlHeadTemplate`).
+2. Implement `RouterAdapter` when conventions differ: `discover` returns
+   `DiscoveredPage[]`, `entrySource` emits `createPage(Page, [layouts])`.
+3. Register the factory in `packages/pack/src/registry.ts`; `keelPack`
+   resolves through `routerFor`, so `vite.ts` needs no change.
+4. Add the runtime package `@kolektiv/keel-<fw>` (a `./mount` subpath
+   exporting `createPage`) and a scaffold provider in
+   `packages/pack/src/scaffold/providers.ts`. The provider registry must
+   cover every framework in the adapter registry, and each provider owns its
+   package.json deps, tsconfig, vite plugin, bootstrap, layout, and page
+   files.
+
+## +head.svelte / +head.html
+
+A page may declare a sibling `+head.svelte` (Svelte) or `+head.html` (every
+other adapter). `compileHeadTemplate` runs at pack build time:
 
 - strips `<script>` / `<style>` blocks and HTML comments, unwraps
   `<svelte:head>` when present;
@@ -40,6 +113,11 @@ pack build time:
   is normalized away); only `seed.*` expressions are allowed — blocks,
   `{@html}`, and anything else fail the build;
 - rejects empty output.
+
+`+head.html` compiles through `compileHtmlHeadTemplate`: the same
+`{seed.*}` → `{{…}}` interpolation and sanitizing rules, no `<svelte:head>`
+unwrap, and existing `{{path}}`-style placeholders pass through. It is plain
+markup with no framework imports.
 
 ```svelte
 <script lang="ts">
@@ -162,8 +240,9 @@ zip). Options: `id`, `version`, `framework`, `host`, `pagesDir`, `bootstrap`,
 (`chunks/[name]-[hash].js`, `assets/[name]-[hash][ext]`), so host asset URLs
 are immutable.
 
-`RouterAdapter`: `{ name, discover(pagesDir), entrySource(page) }`.
-`svelteFiles()` ships today; any other framework must pass `router`.
+`framework` is required: pass a `supportedFrameworks` name (for Svelte,
+`"svelte"`) or a custom `router` to bypass the registry. See Framework
+adapters for the registry and file conventions.
 
 ## Dev loop
 
