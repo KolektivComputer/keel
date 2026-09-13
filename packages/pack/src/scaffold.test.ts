@@ -5,8 +5,9 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { test } from "node:test"
 import { fileURLToPath } from "node:url"
+import { supportedFrameworks } from "./registry.ts"
 import { originFromHost, schemaUrl } from "./schema.ts"
-import { emitTypescript, scaffoldPack } from "./scaffold.ts"
+import { emitTypescript, scaffoldFrameworks, scaffoldPack, type ScaffoldFramework } from "./scaffold.ts"
 
 const ownPackage = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string }
 const cliPath = fileURLToPath(new URL("./scaffold-cli.ts", import.meta.url))
@@ -28,6 +29,100 @@ const schema = {
     SetNameIn: { kind: "object", fields: { displayName: "string" } },
     SetNameOut: { kind: "object", fields: { ok: "boolean" } },
   },
+}
+
+interface FrameworkConventions {
+  page: string
+  layout: string
+  id: string
+  head?: string
+  runtime: string
+  plugin?: string
+  pluginImport?: string
+}
+
+const MATRIX: Record<ScaffoldFramework, FrameworkConventions> = {
+  svelte: {
+    page: "+page.svelte",
+    layout: "+layout.svelte",
+    id: "+page.ts",
+    runtime: "@kolektiv/keel-svelte",
+    plugin: "svelte()",
+    pluginImport: "@sveltejs/vite-plugin-svelte",
+  },
+  react: {
+    page: "+page.tsx",
+    layout: "+layout.tsx",
+    id: "+page.ts",
+    head: "+head.html",
+    runtime: "@kolektiv/keel-react",
+    plugin: "react()",
+    pluginImport: "@vitejs/plugin-react",
+  },
+  vue: {
+    page: "+page.vue",
+    layout: "+layout.vue",
+    id: "+page.ts",
+    head: "+head.html",
+    runtime: "@kolektiv/keel-vue",
+    plugin: "vue()",
+    pluginImport: "@vitejs/plugin-vue",
+  },
+  solid: {
+    page: "+page.tsx",
+    layout: "+layout.tsx",
+    id: "+page.ts",
+    head: "+head.html",
+    runtime: "@kolektiv/keel-solid",
+    plugin: "solid()",
+    pluginImport: "vite-plugin-solid",
+  },
+  preact: {
+    page: "+page.tsx",
+    layout: "+layout.tsx",
+    id: "+page.ts",
+    head: "+head.html",
+    runtime: "@kolektiv/keel-preact",
+    plugin: "preact()",
+    pluginImport: "@preact/preset-vite",
+  },
+  lit: {
+    page: "+page.ts",
+    layout: "+layout.ts",
+    id: "+page.id.ts",
+    head: "+head.html",
+    runtime: "@kolektiv/keel-lit",
+  },
+  angular: {
+    page: "+page.ts",
+    layout: "+layout.ts",
+    id: "+page.id.ts",
+    head: "+head.html",
+    runtime: "@kolektiv/keel-angular",
+    plugin: "analog()",
+    pluginImport: "@analogjs/vite-plugin-angular",
+  },
+}
+
+function expectedFiles(framework: ScaffoldFramework): string[] {
+  const conventions = MATRIX[framework]
+  const files = [
+    "package.json",
+    "tsconfig.json",
+    "vite.config.ts",
+    "src/env.d.ts",
+    "src/bootstrap.ts",
+    "src/styles.css",
+    "src/lib/page-types.ts",
+    "src/lib/page-types.json",
+    `src/pages/${conventions.layout}`,
+  ]
+  if (framework === "svelte") files.push("svelte.config.js")
+  for (const dir of ["harbor/home", "harbor/notFound"]) {
+    files.push(`src/pages/${dir}/${conventions.id}`, `src/pages/${dir}/${conventions.page}`)
+    if (conventions.head) files.push(`src/pages/${dir}/${conventions.head}`)
+  }
+  return files.sort()
 }
 
 test("originFromHost defaults localhost to http and domains to https", () => {
@@ -75,6 +170,73 @@ test("scaffoldPack refuses to overwrite without --force", async () => {
   )
 })
 
+test("scaffold providers cover the keel-pack framework registry", () => {
+  assert.deepEqual(scaffoldFrameworks, supportedFrameworks)
+  assert.deepEqual([...scaffoldFrameworks].sort(), [
+    "angular",
+    "lit",
+    "preact",
+    "react",
+    "solid",
+    "svelte",
+    "vue",
+  ])
+})
+
+test("scaffoldPack rejects an unknown framework before writing files", async () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
+  const out = join(root, "pack")
+  await assert.rejects(
+    () => scaffoldPack({ outDir: out, schema, framework: "qwik" as unknown as ScaffoldFramework }),
+    /unsupported framework 'qwik'/,
+  )
+  assert.equal(existsSync(out), false)
+})
+
+test("svelte provider output keeps its pre-provider bytes", async () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
+  const out = join(root, "pack")
+  await scaffoldPack({ outDir: out, schema, id: "harbor" })
+  assert.equal(
+    readFileSync(join(out, "vite.config.ts"), "utf8"),
+    `import { svelte } from "@sveltejs/vite-plugin-svelte"
+import { keelPack } from "@kolektiv/keel-pack/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [
+    svelte(),
+    keelPack({
+      id: "harbor",
+      version: "0.1.0",
+      framework: "svelte",
+      pagesDir: "src/pages",
+      bootstrap: "src/bootstrap.ts",
+      contract: "src/lib/page-types.json",
+      notFound: "harbor.notFound",
+      pack: "dist/harbor.feb",
+    }),
+  ],
+})
+`,
+  )
+  assert.equal(
+    readFileSync(join(out, "src/pages/harbor/home/+page.svelte"), "utf8"),
+    `<script lang="ts">
+  import { Head, page } from "@kolektiv/keel-svelte"
+  import type { HomePage } from "../../../lib/page-types"
+
+  const ctx = page<HomePage>()
+</script>
+
+<Head />
+
+<p class="lede">harbor.home · <code>/</code></p>
+<pre>{JSON.stringify(ctx.data, null, 2)}</pre>
+`,
+  )
+})
+
 test("scaffoldPack writes published @kolektiv versions instead of workspace protocol", async () => {
   const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
   const out = join(root, "pack")
@@ -95,20 +257,94 @@ test("scaffoldPack writes published @kolektiv versions instead of workspace prot
   assert.equal(manifest.devDependencies.vite, "^6.2.0")
 })
 
-test("scaffold CLI rejects --framework react before writing files", () => {
+test("scaffoldPack generates the per-framework file matrix", async () => {
+  for (const framework of scaffoldFrameworks) {
+    const conventions = MATRIX[framework]
+    const root = mkdtempSync(join(tmpdir(), `keel-scaffold-${framework}-`))
+    const out = join(root, "pack")
+    const written = await scaffoldPack({ outDir: out, schema, id: "harbor", framework })
+    assert.deepEqual([...written].sort(), expectedFiles(framework), `${framework} file list`)
+
+    const app = join(out, "src/pages/harbor/home")
+    assert.equal(readFileSync(join(app, conventions.id), "utf8"), 'export const id = "harbor.home"\n')
+    assert.ok(existsSync(join(out, "src/pages", conventions.layout)), `${framework} root layout`)
+    if (conventions.head) {
+      assert.equal(readFileSync(join(app, conventions.head), "utf8"), "<title>{seed.data.greeting}</title>\n")
+    } else {
+      assert.equal(existsSync(join(app, "+head.html")), false)
+      assert.equal(existsSync(join(app, "+head.svelte")), false)
+    }
+
+    const manifestSource = readFileSync(join(out, "package.json"), "utf8")
+    assert.doesNotMatch(manifestSource, /workspace:/, `${framework} package.json`)
+    const manifest = JSON.parse(manifestSource) as {
+      dependencies: Record<string, string>
+      devDependencies: Record<string, string>
+    }
+    for (const [name, range] of Object.entries({ ...manifest.dependencies, ...manifest.devDependencies })) {
+      if (name.startsWith("@kolektiv/")) {
+        assert.equal(range, ownPackage.version, `${framework} ${name}`)
+      }
+    }
+    assert.equal(manifest.dependencies["@kolektiv/keel"], ownPackage.version)
+    assert.equal(manifest.dependencies[conventions.runtime], ownPackage.version)
+    assert.equal(manifest.devDependencies["@kolektiv/keel-pack"], ownPackage.version)
+
+    const vite = readFileSync(join(out, "vite.config.ts"), "utf8")
+    assert.match(vite, new RegExp(`framework: "${framework}"`), `${framework} keelPack framework`)
+    assert.match(vite, /notFound: "harbor\.notFound"/, `${framework} notFound`)
+    if (conventions.plugin && conventions.pluginImport) {
+      assert.ok(vite.includes(conventions.pluginImport), `${framework} plugin import`)
+      assert.ok(vite.includes(`${conventions.plugin},`), `${framework} plugin call`)
+    }
+    if (framework === "angular") {
+      assert.ok(vite.indexOf("analog()") < vite.indexOf("keelPack("), "Angular plugin runs first")
+    }
+
+    const bootstrap = readFileSync(join(out, "src/bootstrap.ts"), "utf8")
+    assert.equal(bootstrap, `import { bootstrap } from "${conventions.runtime}"\n\nvoid bootstrap()\n`)
+  }
+})
+
+test("scaffold CLI rejects an unknown framework before writing files", () => {
   const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
   const schemaFile = join(root, "schema.json")
   writeFileSync(schemaFile, JSON.stringify(schema))
   const out = join(root, "pack")
   const result = spawnSync(
     process.execPath,
-    ["--experimental-strip-types", cliPath, "--schema", schemaFile, "--framework", "react", out],
+    ["--experimental-strip-types", cliPath, "--schema", schemaFile, "--framework", "qwik", out],
     { encoding: "utf8" },
   )
   assert.notEqual(result.status, 0)
-  assert.match(result.stderr, /React packs are not generated yet/)
-  assert.match(result.stderr, /use --framework svelte/)
+  assert.match(result.stderr, /unsupported framework 'qwik'/)
+  assert.match(result.stderr, /angular, lit, preact, react, solid, svelte, vue/)
   assert.equal(existsSync(out), false)
+})
+
+test("scaffold CLI accepts every supported framework", () => {
+  for (const framework of scaffoldFrameworks) {
+    const root = mkdtempSync(join(tmpdir(), `keel-scaffold-cli-${framework}-`))
+    const schemaFile = join(root, "schema.json")
+    writeFileSync(schemaFile, JSON.stringify(schema))
+    const out = join(root, "pack")
+    const result = spawnSync(
+      process.execPath,
+      ["--experimental-strip-types", cliPath, "--schema", schemaFile, "--framework", framework, out],
+      { encoding: "utf8" },
+    )
+    assert.equal(result.status, 0, result.stderr)
+    assert.ok(existsSync(join(out, "package.json")), `${framework} package.json`)
+    assert.ok(existsSync(join(out, "src/pages", MATRIX[framework].layout)), `${framework} layout`)
+  }
+})
+
+test("scaffold CLI --help lists every supported framework", () => {
+  const result = spawnSync(process.execPath, ["--experimental-strip-types", cliPath, "--help"], { encoding: "utf8" })
+  assert.equal(result.status, 0, result.stderr)
+  for (const framework of scaffoldFrameworks) {
+    assert.ok(result.stdout.includes(framework), `${framework} in --help`)
+  }
 })
 
 test("scaffold CLI writes a standalone package.json", () => {
@@ -125,12 +361,4 @@ test("scaffold CLI writes a standalone package.json", () => {
   const source = readFileSync(join(out, "package.json"), "utf8")
   assert.doesNotMatch(source, /workspace:/)
   assert.match(source, new RegExp(`"@kolektiv/keel": "${ownPackage.version}"`))
-})
-
-test("react framework is reserved", async () => {
-  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
-  await assert.rejects(
-    () => scaffoldPack({ outDir: root, schema, framework: "react" }),
-    /not generated yet/,
-  )
 })
