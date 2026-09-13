@@ -34,16 +34,16 @@ import "../styles.css"
 
 function pageVue(page: ScaffoldPage): string {
   return `<script setup lang="ts">
-import { Head, page } from "@kolektiv/keel-vue"
+import { Head, usePage } from "@kolektiv/keel-vue"
 import type { ${page.typeName} } from "${page.typesImport}"
 
-const ctx = page<${page.typeName}>()
+const seed = usePage<${page.typeName}>()
 </script>
 
 <template>
   <Head />
   <p class="lede">${page.id} · <code>${page.path}</code></p>
-  <pre>{{ JSON.stringify(ctx.data, null, 2) }}</pre>
+  <pre>{{ JSON.stringify(seed.data, null, 2) }}</pre>
 </template>
 `
 }
