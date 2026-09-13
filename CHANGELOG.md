@@ -60,14 +60,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CSP nonces for pack-declared head assets with opt-in `KeelConfig.csp` (#5).
 - Pack hot reload with `seed.build` / `X-Keel-Build`, client full reload,
   host-side `.feb` watcher, and atomic packaging (#7, #14).
-- Agent skills installable with `npx skills add kolektivdev/keel` plus
+- Agent skills installable with `npx skills add KolektivComputer/keel` plus
   `skills.sh.json` grouping (#21).
 
 ### Changed
 
 - Call-site pack selection: `respondPage` / `route.keel` take an opened pack;
   the theme chain is removed.
-- Repository moved to `kolektivdev/keel`.
+- Repository moved to `KolektivComputer/keel`.
 - Docs install snippets paired with release/snapshot repositories (#10, #22).
 - Asset filenames are hashed.
 - Maven release-prep to `0.0.2-SNAPSHOT.1` (#20).
