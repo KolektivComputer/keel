@@ -18,7 +18,7 @@ against the same typed contract.
 | `packages/core` | `@kolektiv/keel` — visits, history, prefetch, `action()` |
 | `packages/svelte` | `@kolektiv/keel-svelte` — `Link`, `Form`, `Head`, `page()`, `useForm`, `useAction` |
 | `packages/pack` | `@kolektiv/keel-pack` — `.feb` zip, Vite plugin, `keel-scaffold` |
-| `skills/` | Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`) for Claude / Grok / `.agents` |
+| `skills/` | Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`) for Claude / Grok / `.agents` — `npx skills add kolektivdev/keel` |
 | `docs/` | Homepage and guides (Astro 7, Tailwind 4, daisyUI 5, Shiki Catppuccin). pnpm workspace package `@kolektiv/keel-docs`. Getting started splits **Server Installation** and **Client Setup**. Search, SCM links, and a combined theme popup live in the site chrome. |
 | `buildSrc/` | Gradle conventions (JVM 17, Maven publish) |
 | `public/` | `logo.svg` / `favicon.svg` product mark, `mark.svg` hull glyph. `.idea/icon.svg` is the same mark as the IntelliJ project icon. |
@@ -54,8 +54,9 @@ JS workspace root is this repository (`packages/*` and `docs`).
   is a compatibility proxy for the pages DSL only.
 - Actions POST `/__keel/action/{id}` with JSON. They are **writes**. Reads stay
   the seed. After a mutation, TanStack Query invalidates and a visit rehydrates.
-- Document GET writes `seed.head` (`<title>`, description, canonical, `og:*`)
-  into the HTML shell. Visits return JSON and are not the SEO unit.
+- Document GET writes `seed.head` into the HTML shell — the pack's
+  `+head.svelte` template (sanitized) or the host `head(...)` fallback. Visits
+  return JSON and are not the SEO unit.
 - Pack choice is the call site's: `respondPage(pack, …)` or
   `route.keel(pack)`. Keel does not resolve themes, and packs do not read a
   visitor theme from the browser.

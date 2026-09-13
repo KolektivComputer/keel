@@ -3,7 +3,7 @@
   "groupings": [
     {
       "title": "Keel",
-      "description": "Implement Keel hosts and author frontend packs.",
+      "description": "Implement Keel hosts, author frontend packs, and scaffold packs from the live schema.",
       "skills": ["keel-host", "keel-pack", "keel-scaffold"]
     }
   ]

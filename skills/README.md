@@ -7,9 +7,9 @@ layout.
 
 | Skill | When |
 | --- | --- |
-| `keel-host` | Server / protocol / schema / CSRF / packs on the host |
-| `keel-pack` | Svelte (or future React) pack authoring |
-| `keel-scaffold` | `keel-scaffold origin dir` from `GET /__keel/schema` |
+| `keel-host` | Server: pages, actions, CSRF, schema, pack-at-render, head, CSP, pack hot reload |
+| `keel-pack` | Pack: Svelte pages, `+head.svelte`, contracts, navigation guards, action effects, `.feb` |
+| `keel-scaffold` | `keel-scaffold <origin> <dir>` from `GET /__keel/schema` |
 
 ## Install
 
@@ -17,12 +17,13 @@ layout.
 npx skills add kolektivdev/keel
 ```
 
-Installs all three skills into the current project. Useful flags:
+Installs all three skills in the current project. Useful flags:
 
 - `-a claude-code -a grok -a kilo` — target specific agents (repeatable).
 - `-g` — install globally (`~/.<agent>/skills`) instead of the project.
 - `--copy` — copy instead of symlinking; useful on Windows or in Docker.
-- `--skill keel-host` — install just one skill.
+- `--skill keel-host` — install just one skill (repeatable).
+- `--list` — list the skills a repository exposes without installing.
 
 You can also copy the folders you want into the agent's project skills
 directory (or symlink). One copy in this repo is the source of truth — do not
