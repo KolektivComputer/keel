@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docs cover the full current feature surface: pack-at-render, document head
   and CSP, pack hot reload, navigation guards, and the updated protocol/config
   references.
+- Repository moved to the KolektivComputer organization; remote, docs/SCM
+  links, package metadata, and the skills install command now use
+  `KolektivComputer/keel`.
 
 ## [0.0.2-SNAPSHOT.3] - 2026-09-13
 
