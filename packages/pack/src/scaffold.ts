@@ -149,7 +149,7 @@ function emitType(name: string, type: SchemaType): string[] {
   return [`export interface ${name} {`, ...body, `}`]
 }
 
-const FALLBACK_KEEL_VERSION = "0.0.2-SNAPSHOT.3"
+const FALLBACK_KEEL_VERSION = "0.0.2-SNAPSHOT.4"
 
 function packVersion(): string {
   try {
