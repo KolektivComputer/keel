@@ -24,8 +24,6 @@ Host-owned routing and render-time frontend packs for Kotlin servers.
 
 - [Getting started](https://keel.kolektiv.computer/docs/getting-started/)
 - [AGENTS.md](./AGENTS.md): how to work in this repo (humans and coding agents)
-- [CONTRIBUTING.md](./CONTRIBUTING.md)
-- [DEVELOPING.md](./DEVELOPING.md)
 - [CHANGELOG.md](./CHANGELOG.md)
 - [llms.txt](./llms.txt): curated map for LLMs (also served from the docs site)
 
