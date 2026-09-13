@@ -19,8 +19,8 @@ pnpm --filter @kolektiv/harbor-pack dev
 ```
 
 `vite build --watch` rewrites `samples/harbor/pack/dist/harbor.feb` after every
-save. The file is written to a temp name and renamed into place, so a watcher
-never reads a partial zip.
+save. A scaffolded pack has the same `pnpm dev` script. The file is written to
+a temp name and renamed into place, so a watcher never reads a partial zip.
 
 Run the host against that file instead of the classpath copy:
 
@@ -51,6 +51,14 @@ metadata). The document and visit responses carry it as `X-Keel-Build` and as
 bootstrap router sees a fetched seed whose build differs from the mounted
 build, it clears the prefetch cache, aborts the stale seed, and calls
 `window.location.reload()`. No manual cache busting is needed.
+
+Build output is content-addressed: Vite emits `chunks/[name]-[hash].js` and
+`assets/[name]-[hash]…`, so a new build's seed points at new URLs and the
+immutable asset cache never has to be invalidated. See
+<a href={path("/docs/implementing/host-adapter")}>Host adapter</a> for the
+cache headers a host should send, and
+<a href={path("/docs/implementing/protocol")}>the wire protocol</a> for the
+`X-Keel-Build` header.
 
 ## Failure modes
 

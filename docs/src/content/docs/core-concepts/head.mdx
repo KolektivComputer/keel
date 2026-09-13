@@ -40,16 +40,23 @@ A page declares its head in a sibling `+head.svelte`, next to `+page.svelte`:
 
 `@kolektiv/keel-pack` compiles it at pack build time into the page's `head`
 string in `manifest.json`. Only head markup survives: `<title>`, `<meta>`,
-`<link>`, and `<script src>`. `{seed.path}` becomes a host placeholder
-(`{{path}}`), and blocks, `{@html}`, and non-`seed.*` expressions fail the
-pack build. No pack JS runs on the Kotlin host.
+`<link>`, and `<script src>` (external `src`, empty body). `{seed.*}`
+expressions compile to host placeholders: `{seed.page}` → `{{page}}`,
+`{seed.path}` → `{{path}}`, `{seed.params.slug}` → `{{params.slug}}`, plus
+`{{data.*}}`, `{{shared.*}}`, and `{{theme.id}}` / `{{theme.version}}`.
+Blocks, `{@html}`, and non-`seed.*` expressions fail the pack build. No pack
+JS runs on the Kotlin host. The manifest field is specified on
+<a href={path("/docs/implementing/pack-adapter")}>Pack adapter</a>.
 
 ## The host renders it
 
 On a document GET the host substitutes the placeholders from the seed
 (`page`, `path`, `params`, `data`, `shared`, `theme` — the serving pack),
 allowlists tags and attributes, drops unsafe URLs, and writes real tags into
-`<head>`.
+`<head>`. A tag whose placeholder has no value in the seed is dropped whole —
+other tags still render, and a document GET never throws. A tag that carries
+an `on*` handler attribute, or a `<script>` with an inline body or no
+sanitized `src`, is dropped too; only external scripts survive.
 
 `PageRequest.head(...)` fills the fields a pack head omits, and is the whole
 head when the pack ships no `+head.svelte`. Canonical defaults to the

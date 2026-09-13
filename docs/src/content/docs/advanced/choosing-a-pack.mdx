@@ -6,6 +6,7 @@ order: 1
 ---
 
 import Callout from "../../../components/Callout.astro"
+import { path } from "../../../lib/paths"
 
 A pack is a versioned frontend keyed by page id. One pack is an app UI. Many
 packs are installed apps or themes against the same typed contract — and Keel
@@ -75,3 +76,12 @@ If the passed pack does not implement the page id, render fails with
 `UnknownPageInBundleException`; Keel does not substitute another installed
 pack. The host maps unmatched URLs to the configured `notFoundPageId`, and a
 pack can declare its own `notFound` module for those documents.
+
+## See also
+
+- <a href={path("/docs/implementing/host-adapter")}>Host adapter</a> — the
+  server checklist and the `KeelConfig` knobs.
+- <a href={path("/docs/advanced/pack-hot-reload")}>Pack hot reload</a> — swap
+  an opened pack without a JVM restart while iterating.
+- <a href={path("/docs/core-concepts/head")}>Document head and SEO</a> — how
+  the serving pack's `theme` flows into the document head.

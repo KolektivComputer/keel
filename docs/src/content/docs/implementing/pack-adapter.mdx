@@ -61,9 +61,17 @@ There is no nested pack directory. Format `keel/1`:
 `keel-pack` zips a Vite dist into that archive. The Vite plugin
 (`keelPack`) discovers pages, writes the manifest, and calls a packager.
 
-A page entry may also carry `head`, the compiled markup from a sibling
-`+head.svelte`. The host substitutes its `{{seed.path}}` placeholders and
-renders it on the document GET. See
+Page entry fields:
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `module` | yes | Page module path, relative to the archive root |
+| `css` | no | Stylesheet paths the page needs |
+| `layout` | no | Layout module id, surfaced as the seed's `layout` |
+| `head` | no | Compiled `+head.svelte` markup with `{{…}}` placeholders |
+
+The manifest also carries a `layouts` map and a `notFound` module. The host
+substitutes the `head` placeholders and renders it on the document GET. See
 <a href={path("/docs/core-concepts/head")}>Document head and SEO</a>.
 
 ## RouterAdapter
@@ -107,4 +115,6 @@ pnpm exec keel-scaffold <origin> ./pack
 See <a href={path("/docs/implementing/typegen")}>Typegen</a>.
 
 See <a href={path("/docs/core-concepts/packs")}>Packs and manifests</a> for
-the author-facing description.
+the author-facing description and
+<a href={path("/docs/implementing/host-adapter")}>Host adapter</a> for how a
+host loads and serves the archive.

@@ -26,6 +26,7 @@ parses it and passes a typed context into `mount()`.
   "theme": { "id": "harbor", "version": "0.1.0" },
   "entry": "/__keel/pack/harbor/pages/harbor.home.js",
   "css": ["/__keel/pack/harbor/assets/mount.css"],
+  "build": "9f1c6e0b…",
   "host": "#__keel_root",
   "head": {
     "title": "Harbor",
@@ -59,9 +60,12 @@ A Svelte page reads that payload with `page()`. No second fetch.
 <p>{ctx.data.viewer?.displayName ?? "Anonymous"}</p>`}
 />
 
-`theme` is the serving pack's `{ id, version }`; `entry` and `css` come from
-that pack. Optional fields: `shared`, `layout`, `redirect`, `head`. `path` is
-absolute. `page` and `entry` are non-blank.
+`theme` is the serving pack's `{ id, version }`; `entry`, `css`, and `build`
+come from that pack. `build` is the pack's content hash (also `X-Keel-Build`);
+a client whose mounted build differs reloads itself — see
+<a href={path("/docs/advanced/pack-hot-reload")}>Pack hot reload</a>.
+Optional fields: `shared`, `layout`, `redirect`, `head`. `path` is absolute.
+`page` and `entry` are non-blank.
 
 On a document GET the host writes `head` into the HTML shell. Visits return
 the same `head` so `<Head>` stays in sync. See

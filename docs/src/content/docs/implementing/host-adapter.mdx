@@ -66,8 +66,30 @@ so a bundle-less `respondPage` resolves it. With no scoped route, a
 bundle-less render resolves only when exactly one pack is configured in
 total; otherwise it throws (`MissingPackException` / `AmbiguousPackException`).
 The serving pack's `{ id, version }` goes into the seed and the
-`X-Keel-Theme` / `X-Keel-Version` response headers. Never select a pack from
-a request header.
+`X-Keel-Theme` / `X-Keel-Version` response headers; its `build` hash goes out
+as `X-Keel-Build`. Never select a pack from a request header. Call-site policy
+options are on
+<a href={path("/docs/advanced/choosing-a-pack")}>Choosing a pack</a>.
+
+## Ktor config (`KeelConfig`)
+
+What the reference adapter exposes inside `keel { }`. A non-Ktor host applies
+the same behaviors however it likes.
+
+| Knob | Default | Effect |
+| --- | --- | --- |
+| `bundle` | `null` | The pack the pages DSL renders from; required when pages are registered and `bundles` is empty |
+| `bundles` | empty | Additional installed packs for `route.keel(pack)` subtrees |
+| `packUrlPrefix` | `/__keel/pack` | Asset URL prefix `/__keel/pack/{bundleId}/…` |
+| `bootstrap` | `bootstrap.js` | Module entry the shell loads, resolved from the serving pack |
+| `title` | `"Keel"` | Shell title when the resolved head has no title |
+| `shared` | `null` | `SharedProvider` that fills `seed.shared` per request |
+| `notFoundPageId` | `null` | Page id rendered for unmatched paths |
+| `csrf` | `null` | Custom `CsrfPolicy`; unset means `SameOriginCsrfPolicy(csrfAllowedOrigins)` |
+| `csrfAllowedOrigins` | empty | Extra origins the default CSRF policy accepts |
+| `csp` | `null` | Opt-in document CSP; see <a href={path("/docs/core-concepts/head")}>Document head and SEO</a> |
+| `watchPacks` | `false` | Poll file/directory packs and swap on change |
+| `packWatchIntervalMs` | `500` | Watcher poll interval (minimum 50 ms); see <a href={path("/docs/advanced/pack-hot-reload")}>Pack hot reload</a> |
 
 ## CSRF
 

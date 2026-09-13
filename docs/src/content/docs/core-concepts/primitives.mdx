@@ -86,5 +86,6 @@ Mirrored on `router.visit`, `Link`, and form helpers.
 | `prefetch` | `hover`, `mousedown`, or `mount` |
 | `viewTransition` | Optional `document.startViewTransition` |
 
-Prefetch warms both the seed and the entry module. Hover prefetch is the
-default on `Link`.
+Prefetch warms both the seed and the entry module. `Link` prefetches only when
+you opt in (`prefetch="hover"`, `"mousedown"`, `"mount"`, or `true`); the
+default is off. Guards never run for a prefetch.

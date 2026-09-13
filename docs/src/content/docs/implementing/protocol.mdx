@@ -29,11 +29,12 @@ as `application/json`. Fields:
 | `theme` | yes | `{ id, version }` of the serving pack |
 | `entry` | yes | URL of the page module |
 | `css` | yes | Stylesheet URLs |
+| `build` | yes | Serving pack content hash (`X-Keel-Build`); a change forces a client reload |
 | `host` | yes | Mount selector, default `#__keel_root` |
 | `shared` | no | Cross-page bag |
 | `layout` | no | Layout module id |
 | `redirect` | no | Absolute path to follow |
-| `head` | no | `{ title, description, canonical, image, type }` |
+| `head` | no | `{ title, description, canonical, image, type, html }`; `html` is sanitized pack markup |
 
 ## Headers
 
@@ -45,6 +46,10 @@ as `application/json`. Fields:
 | `X-Keel-Partial` | response | Comma-separated keys actually retained |
 | `X-Keel-Theme` | response | Serving pack id |
 | `X-Keel-Version` | response | Serving pack version |
+| `X-Keel-Build` | response | Serving pack content hash; clients reload when it changes |
+
+Documents and visits both carry `X-Keel-Theme`, `X-Keel-Version`, and
+`X-Keel-Build`. Selections never travel in the other direction.
 
 `only` / `except` apply **only on visits**. Document GETs always return the
 full seed — they are the SEO unit. The client shallow-merges a partial
