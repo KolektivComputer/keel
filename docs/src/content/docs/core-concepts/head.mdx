@@ -47,8 +47,9 @@ pack build. No pack JS runs on the Kotlin host.
 ## The host renders it
 
 On a document GET the host substitutes the placeholders from the seed
-(`page`, `path`, `params`, `data`, `shared`, `theme`), allowlists tags and
-attributes, drops unsafe URLs, and writes real tags into `<head>`.
+(`page`, `path`, `params`, `data`, `shared`, `theme` — the serving pack),
+allowlists tags and attributes, drops unsafe URLs, and writes real tags into
+`<head>`.
 
 `PageRequest.head(...)` fills the fields a pack head omits, and is the whole
 head when the pack ships no `+head.svelte`. Canonical defaults to the

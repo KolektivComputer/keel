@@ -39,6 +39,7 @@ export default defineConfig({
   output: "static",
   redirects: {
     "/docs/getting-started/install": "/docs/getting-started/server",
+    "/docs/advanced/theme-chain": "/docs/advanced/choosing-a-pack",
   },
   outDir: "../dist",
   publicDir: "../public",

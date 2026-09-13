@@ -26,7 +26,7 @@ as `application/json`. Fields:
 | `params` | yes | Path captures |
 | `data` | yes | Page payload object |
 | `errors` | yes | `{ field: string[] }` |
-| `theme` | yes | `{ id, version }` of the selected pack |
+| `theme` | yes | `{ id, version }` of the serving pack |
 | `entry` | yes | URL of the page module |
 | `css` | yes | Stylesheet URLs |
 | `host` | yes | Mount selector, default `#__keel_root` |
@@ -43,8 +43,8 @@ as `application/json`. Fields:
 | `X-Keel-Only` | request | Comma-separated top-level `data` keys to keep |
 | `X-Keel-Except` | request | Comma-separated top-level `data` keys to drop |
 | `X-Keel-Partial` | response | Comma-separated keys actually retained |
-| `X-Keel-Theme` | request | Pack override id |
-| `X-Keel-Version` | response | Selected pack version |
+| `X-Keel-Theme` | response | Serving pack id |
+| `X-Keel-Version` | response | Serving pack version |
 
 `only` / `except` apply **only on visits**. Document GETs always return the
 full seed — they are the SEO unit. The client shallow-merges a partial

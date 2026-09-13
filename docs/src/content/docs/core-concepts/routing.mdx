@@ -57,8 +57,9 @@ page.
 }`}
 />
 
-`Route.keel` registers the bundle and a default so `respondPage(pageId, data)`
-can omit the bundle argument. It does not steal unmatched paths.
+`route.keel(pack)` scopes the route subtree to a pack and makes it the
+default so `respondPage(pageId, data)` can omit the bundle argument. It does
+not steal unmatched paths.
 
 First load is a **document** (HTML shell + seed). Client navigation is a
 **visit**: the same page URL with `X-Keel-Visit: true`, JSON back. Path
@@ -102,7 +103,7 @@ The pack never invents routes. It visits host URLs:
 </button>`}
 />
 
-`replace` swaps the current history entry (login, pack switch).
+`replace` swaps the current history entry (login, redirects).
 `preserveState` on the same page id calls `update()` instead of remounting.
 Successful visits `pushState` the seed; back/forward re-applies it without a
 round-trip unless the entry module changed.

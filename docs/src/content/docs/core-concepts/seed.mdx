@@ -59,9 +59,9 @@ A Svelte page reads that payload with `page()`. No second fetch.
 <p>{ctx.data.viewer?.displayName ?? "Anonymous"}</p>`}
 />
 
-`theme` and `entry` are whatever the host selected. Optional fields:
-`shared`, `layout`, `redirect`, `head`. `path` is absolute. `page` and
-`entry` are non-blank.
+`theme` is the serving pack's `{ id, version }`; `entry` and `css` come from
+that pack. Optional fields: `shared`, `layout`, `redirect`, `head`. `path` is
+absolute. `page` and `entry` are non-blank.
 
 On a document GET the host writes `head` into the HTML shell. Visits return
 the same `head` so `<Head>` stays in sync. See
