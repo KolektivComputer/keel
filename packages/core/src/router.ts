@@ -24,11 +24,24 @@ import {
   type VisitOptions,
 } from "./types.ts"
 
+/** `"initial"` is the embedded seed read by `bootstrap()`; everything else is a `"visit"`. */
+export type SeedPhase = "initial" | "visit"
+
 export interface RouterConfig {
   navigatePath?: string
   host?: Element | null
   focusOnNavigate?: boolean
   announce?: boolean | ((seed: KeelSeed) => string)
+  /**
+   * Called with every seed the router is about to apply, after partial seeds
+   * are merged and before `setPage` / `mount` runs. Adapters hydrate derived
+   * caches here instead of re-reading `#__keel_seed` or subscribing to the
+   * page store. Prefetch does not call it — only applied seeds do.
+   *
+   * `phase` is `"initial"` for the embedded seed read by `bootstrap()` and
+   * `"visit"` for seeds from a visit, popstate, reload, or redirect target.
+   */
+  onSeed?: (seed: KeelSeed, phase: SeedPhase) => void | Promise<void>
 }
 
 interface VisitResult {
@@ -235,6 +248,7 @@ async function applySeed(
     return false
   }
   if (seed.build) mountedBuild = seed.build
+  await config.onSeed?.(seed, meta.initial ? "initial" : "visit")
   const sameEntry = currentEntry === seed.entry
   const samePage = peekPage()?.page === seed.page
   const preserve = Boolean(options.preserveState) && sameEntry && samePage && mounted?.update
@@ -511,6 +525,17 @@ export const router = {
   },
 }
 
+/**
+ * Reads the embedded `#__keel_seed`, applies it, and mounts the pack entry.
+ *
+ * Adapters are **client-mount-only**: the document shell is host-authored
+ * HTML, so there is no SSR / hydration seam and `mount` always runs in the
+ * browser against the seed JSON.
+ *
+ * The embedded seed is parsed exactly once here. `config.onSeed`, when set,
+ * runs for the initial seed and for every later applied seed before it is
+ * mounted, so adapters can hydrate caches without a second DOM read.
+ */
 export async function bootstrap(options: RouterConfig = {}): Promise<void> {
   router.configure(options)
   const node = document.getElementById("__keel_seed")

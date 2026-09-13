@@ -1,4 +1,12 @@
-import { action, ActionError, getPage, router, type KeelSeed } from "@kolektiv/keel"
+import {
+  action,
+  ActionError,
+  getPage,
+  KEEL_PAGE_QUERY_KEY,
+  pageQueryKey,
+  router,
+  type KeelSeed,
+} from "@kolektiv/keel"
 import { createMutation, createQuery, QueryClient } from "@tanstack/svelte-query"
 import { get } from "svelte/store"
 import { reactiveStore } from "./reactiveStore.js"
@@ -18,13 +26,11 @@ export function getQueryClient(): QueryClient {
   return client
 }
 
-export function pageQueryKey(path: string) {
-  return ["keel", "page", path] as const
-}
+export { pageQueryKey }
 
 export function hydrateKeelQuery(seed: KeelSeed): void {
   const qc = getQueryClient()
-  qc.setQueryData(["keel", "page"], seed)
+  qc.setQueryData(KEEL_PAGE_QUERY_KEY, seed)
   qc.setQueryData(pageQueryKey(seed.path), seed)
 }
 
@@ -72,7 +78,7 @@ export function useAction<I, O>(id: string, options: UseActionOptions = {}) {
           preserveState: options.preserveState ?? true,
         })
         hydrateKeelQuery(getPage())
-        queryClient.invalidateQueries({ queryKey: ["keel", "page"], refetchType: "none" })
+        queryClient.invalidateQueries({ queryKey: KEEL_PAGE_QUERY_KEY, refetchType: "none" })
       },
     },
     queryClient,
@@ -83,7 +89,7 @@ export function useAction<I, O>(id: string, options: UseActionOptions = {}) {
 export function useKeelPageQuery() {
   const store = createQuery(
     {
-      queryKey: ["keel", "page"] as const,
+      queryKey: KEEL_PAGE_QUERY_KEY,
       queryFn: async () => {
         await router.reload({ preserveScroll: true, preserveState: true })
         return getPage()

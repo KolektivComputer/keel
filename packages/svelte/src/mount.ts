@@ -1,19 +1,22 @@
-import type { PageModule } from "@kolektiv/keel"
+import { writable } from "svelte/store"
+import type { PageContext, PageModule } from "@kolektiv/keel"
 import { mount, unmount, type Component } from "svelte"
 import Wrap from "./Wrap.svelte"
 
 export function createPage(Page: Component, layouts: Component[] = []): PageModule {
   let app: ReturnType<typeof mount> | undefined
+  const ctx = writable<PageContext | undefined>(undefined)
 
   return {
-    async mount(host: Element) {
+    async mount(host: Element, context: PageContext) {
       if (app) {
         unmount(app)
         app = undefined
       }
       host.replaceChildren()
+      ctx.set(context)
       try {
-        app = mount(Wrap, { target: host, props: { layouts, Page } })
+        app = mount(Wrap, { target: host, props: { layouts, Page, ctx } })
       } catch (error) {
         const message = error instanceof Error ? error.stack ?? error.message : String(error)
         const pre = document.createElement("pre")
@@ -27,7 +30,10 @@ export function createPage(Page: Component, layouts: Component[] = []): PageModu
       if (!app) return
       unmount(app)
       app = undefined
+      ctx.set(undefined)
     },
-    update() {},
+    async update(context: PageContext) {
+      ctx.set(context)
+    },
   }
 }

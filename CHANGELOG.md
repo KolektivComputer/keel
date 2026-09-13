@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Framework-neutral binding primitives in `@kolektiv/keel` (head DOM helpers,
+  form-state machine, seed-applied hook, `PageContext` parity, query-key
+  helpers) so framework adapters share one spine (#37).
+
 ## [0.0.2-SNAPSHOT.4] - 2026-09-13
 
 ### Changed

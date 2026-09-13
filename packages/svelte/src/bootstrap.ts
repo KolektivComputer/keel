@@ -1,14 +1,14 @@
-import { bootstrap as start, subscribe, type RouterConfig } from "@kolektiv/keel"
+import { bootstrap as start, type RouterConfig } from "@kolektiv/keel"
 import { getQueryClient, hydrateKeelQuery } from "./query.js"
 
 export async function bootstrap(options: RouterConfig = {}): Promise<void> {
   getQueryClient()
-  const node = document.getElementById("__keel_seed")
-  if (!node?.textContent) throw new Error("Keel: missing #__keel_seed")
-  const seed = JSON.parse(node.textContent)
-  hydrateKeelQuery(seed)
-  subscribe((next) => {
-    hydrateKeelQuery(next)
+  const onSeed = options.onSeed
+  await start({
+    ...options,
+    onSeed(seed, phase) {
+      hydrateKeelQuery(seed)
+      return onSeed?.(seed, phase)
+    },
   })
-  await start(options)
 }
