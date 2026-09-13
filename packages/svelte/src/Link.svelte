@@ -14,6 +14,8 @@
     only,
     except,
     headers,
+    force = false,
+    onBefore,
     class: className = "",
     children,
     ...rest
@@ -43,6 +45,8 @@
       only,
       except,
       headers,
+      force,
+      onBefore,
     })
   }
 

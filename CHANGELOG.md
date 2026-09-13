@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No unreleased changes yet. Add an entry under `Added`, `Changed`, `Fixed`,
-`Removed`, or `Security` as PRs land, and paste this section into the PR body.
+### Added
+
+- Cancelable, pluggable navigation guards (`router.beforeEach`,
+  `useNavigationGuard`, `useUnloadGuard`; async `onBefore`; `force`; `blocked`
+  event; popstate-safe cancel/redirect) (#23).
 
 ## [0.0.2-SNAPSHOT.1] - 2026-09-12
 

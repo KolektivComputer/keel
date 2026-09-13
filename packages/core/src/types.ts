@@ -18,6 +18,27 @@ export const KEEL_HEADERS = {
 
 export type Method = "get" | "post" | "put" | "patch" | "delete"
 
+/** How a navigation was started. */
+export type NavigationSource = "visit" | "popstate" | "redirect" | "reload"
+
+export interface NavigationTarget {
+  url: string
+  method: Method
+  replace: boolean
+  source: NavigationSource
+}
+
+/**
+ * `false` cancels, `true`/`void` allows, `string` / `{ redirect }` redirects.
+ * Relative redirects resolve against the current location.
+ */
+export type GuardResult = boolean | void | string | { redirect: string }
+
+export type NavigationGuard = (
+  to: NavigationTarget,
+  from: NavigationTarget,
+) => GuardResult | Promise<GuardResult>
+
 export interface KeelThemeRef {
   id: string
   version: string
@@ -107,7 +128,9 @@ export interface VisitOptions {
   headers?: Record<string, string>
   prefetch?: PrefetchMode
   viewTransition?: boolean
-  onBefore?: (visit: PendingVisit) => boolean | void
+  /** Skip registered `beforeEach` guards for an app-confirmed navigation. */
+  force?: boolean
+  onBefore?: (visit: PendingVisit) => boolean | void | Promise<boolean | void>
   onStart?: (visit: PendingVisit) => void
   onProgress?: (progress: { percentage: number | null }) => void
   onSuccess?: (page: KeelSeed) => void
@@ -120,6 +143,10 @@ export interface PendingVisit {
   url: string
   method: Method
   cancelled: boolean
+  /** Cancel the navigation: no fetch, no history change. */
+  cancel(): void
+  /** Replace the target with `href`; guards re-run for it. */
+  redirect(href: string): void
 }
 
 export type RouterEvent =
@@ -129,6 +156,7 @@ export type RouterEvent =
   | "success"
   | "error"
   | "cancel"
+  | "blocked"
   | "finish"
   | "navigate"
   | "prefetching"

@@ -1,0 +1,103 @@
+---
+title: Navigation guards
+description: Cancel, allow, or redirect visits, reloads, and browser back/forward.
+category: advanced
+order: 6
+---
+
+Guards run before an inflight visit is aborted, before any fetch, and before
+any history or DOM change. They run for every navigation source: `visit`,
+`replace`, `reload`, `get`/`post`/…, server redirect seeds, and `popstate`.
+
+Register a guard with `router.beforeEach`. Guards are async-capable, awaited
+serially in registration order, and the returned function unsubscribes.
+
+```ts
+const stop = router.beforeEach((to, from) => {
+  if (to.source === "reload") return true
+  return isDirty() ? "/settings/account?leave=1" : true
+})
+
+stop()
+```
+
+## Targets and results
+
+`to` and `from` are `NavigationTarget`s:
+
+```ts
+interface NavigationTarget {
+  url: string
+  method: "get" | "post" | "put" | "patch" | "delete"
+  replace: boolean
+  source: "visit" | "popstate" | "redirect" | "reload"
+}
+```
+
+`to` is the URL the navigation will request; `to.source` says where it came
+from. `from` is best-effort: the current URL plus the method, `replace`, and
+source of the last seed applied to the page (defaults `get`/`visit`). At
+`popstate` time the browser URL has already moved, so `from` is the last
+applied target.
+
+A guard returns:
+
+| Result | Effect |
+| --- | --- |
+| `true`, `void` | Allow. |
+| `false` | Cancel. Nothing fetches, no history or DOM change. |
+| `string` or `{ redirect }` | Redirect to the target, resolved against the current location. |
+| thrown / rejected | Cancel and surface: a visit promise rejects; a blocked `popstate` restores and reports the error on `blocked`. |
+
+Redirect re-entry re-runs the registered guards for the target with
+`source: "redirect"`. A cap of 10 consecutive redirects stops loops.
+
+## Ordering
+
+For one navigation: the `router.on("before")` event fires first, then
+`VisitOptions.onBefore` (now async-capable), then `beforeEach` guards. A
+cancel or redirect at any stage skips the later stages. `PendingVisit` gained
+`cancel()` and `redirect(href)`, so event-style guards work too.
+
+`VisitOptions.force` skips the registered `beforeEach` guards for a navigation
+the app has already confirmed (for example after a native confirm dialog).
+The `before` event and `onBefore` still run; `Link` and `Form` forward both
+`onBefore` and `force`.
+
+## Popstate
+
+Back/forward resolves the target seed from `history.state` and runs guards
+before the seed is applied. On cancel the pointer is walked back to the entry
+the mounted page belongs to (`history.go(±1)` with a skip flag), so no entry
+is duplicated and forward history is not truncated. A `blocked` event carries
+`{ to, from }` so the page can highlight its alert.
+
+```ts
+router.on("blocked", ({ to, from }) => {
+  pendingLeave = to
+})
+```
+
+## Svelte hooks
+
+`useNavigationGuard` registers on mount and unregisters on destroy;
+`useUnloadGuard` adds a `beforeunload` prompt while its predicate is true.
+
+```svelte
+<script lang="ts">
+  import { useForm, useNavigationGuard, useUnloadGuard } from "@kolektiv/keel-svelte"
+
+  const form = useForm({ name: "" })
+
+  useNavigationGuard((to) => {
+    if (to.source === "reload") return true
+    return form.isDirty ? confirm("Discard changes?") : true
+  })
+  useUnloadGuard(() => form.isDirty)
+</script>
+```
+
+## Exemptions
+
+Prefetch never runs guards. `bootstrap()` renders the initial seed without
+running them.
