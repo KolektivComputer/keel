@@ -1,0 +1,833 @@
+---
+title: Framework adapters
+description: One pack contract across Svelte, React, Vue, Solid, Preact, Lit, and Angular — bootstrap, page state, forms, actions, components, guards, and mount.
+category: implementing
+order: 5
+---
+
+import { path } from "../../../lib/paths"
+
+A pack adapter turns ordinary framework components into the `PageModule`
+contract the host loads: `mount`, `unmount`, and an optional `update`. Keel
+ships seven of them. They all speak the same protocol — the differences are
+how each framework expresses reactivity, forms, and DOM access.
+
+| Framework | Package | Page state | Action / query | Components / directives | Guards | Mount |
+| --- | --- | --- | --- | --- | --- | --- |
+| Svelte 5 | `@kolektiv/keel-svelte` | `page()` store | `@tanstack/svelte-query` | `Link`, `Form`, `Head`, `use:keel` | `useNavigationGuard`, `useUnloadGuard` | `createPage` |
+| React 18/19 | `@kolektiv/keel-react` | `usePage()` | `@tanstack/react-query`: `useAction`, `useKeelPageQuery` | `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `createPage` (`createRoot`, `flushSync`) |
+| Vue 3 | `@kolektiv/keel-vue` | `usePage()` shallow ref | `@tanstack/vue-query` | SFC `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `createPage` (`createApp().mount`) |
+| Solid 1.9 | `@kolektiv/keel-solid` | `usePage()` accessor | `@tanstack/solid-query` | JSX `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `createPage` (`render` + dispose) |
+| Preact 10 | `@kolektiv/keel-preact` | `usePage()` | `@tanstack/preact-query` | JSX `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `createPage` (`render` / `render(null)`) |
+| Lit 3 | `@kolektiv/keel-lit` | `KeelElement.page` / `usePage` controller | `@tanstack/query-core` controllers: `KeelActionController`, `KeelPageQueryController` | `<keel-link>`, `form()` helper, `<keel-head>`, `keelAnchor` | controllers | `createPage` (`render`) |
+| Angular 19 | `@kolektiv/keel-angular` | `injectKeelPage()` signal | `@tanstack/angular-query-experimental` | `[keelLink]`, `[keelAnchor]`, `[keelForm]`, `KeelHead` | `injectNavigationGuard`, `injectUnloadGuard` | `createPage` (`createApplication` + `createComponent`/`attachView`) |
+
+The first adapter was Svelte 5. The other six bindings copy its contract
+rather than inventing a second one.
+
+## What every adapter shares
+
+**`bootstrap()`.** Each package re-exports a `bootstrap()` that reads
+`#__keel_seed`, hydrates the TanStack query cache from it, and mounts the pack
+entry. The caller's `onSeed` still runs, after hydration, for the initial seed
+and every applied visit. Scaffold writes `src/bootstrap.ts` for you.
+
+**`FormState`.** Field and method names are identical everywhere:
+`data`, `errors`, `processing`, `progress`, `wasSuccessful`, `isDirty`,
+`set`, `reset`, `clearErrors`, `submit`, and the `get` / `post` / `put` /
+`patch` / `delete` shortcuts. Only the reactivity wrapper differs (state
+subscription, refs, signals, controllers).
+
+**Query keys.** Every cache entry lives under the root key
+`KEEL_PAGE_QUERY_KEY` (`["keel", "page"]`); a path-scoped entry comes from
+`pageQueryKey(path)` (`["keel", "page", path]`). Actions invalidate the root
+key with `refetchType: "none"` because the follow-up visit rehydrates it.
+
+**Visit interception.** `Link` and the anchor helpers intercept unmodified
+left-clicks only. Modified clicks, non-left buttons, `defaultPrevented`, and
+GET visits into `target="_blank"` fall through to the browser. Prefetch is
+opt-in: `false` (default), `true`, `"hover"`, `"mousedown"`, or `"mount"`.
+
+**Mount and layouts.** `createPage(Page, layouts)` returns the `PageModule`.
+Layouts nest outermost-first; the root component applies `seed.head` exactly
+once. `update(ctx)` runs when a visit keeps the same page id with
+`preserveState` — partial reloads and validation 422s. `keelPack` generates
+the entry module, so packs rarely call `createPage` by hand.
+
+## Pack file conventions
+
+`keel-scaffold <origin> <dir> --framework <name>` writes these shapes.
+`--framework` accepts `angular`, `lit`, `preact`, `react`, `solid`, `svelte`,
+and `vue`; the default is `svelte`.
+
+| Framework | Page / layout | Id override | Head template |
+| --- | --- | --- | --- |
+| Svelte | `+page.svelte`, `+layout.svelte` | `+page.ts` | `+head.svelte` |
+| React | `+page.tsx`, `+layout.tsx` | `+page.ts` | `+head.html` |
+| Preact | `+page.tsx`, `+layout.tsx` | `+page.ts` | `+head.html` |
+| Solid | `+page.tsx`, `+layout.tsx` | `+page.ts` | `+head.html` |
+| Vue | `+page.vue`, `+layout.vue` | `+page.ts` | `+head.html` |
+| Lit | `+page.ts`, `+layout.ts` | `+page.id.ts` | `+head.html` |
+| Angular | `+page.ts`, `+layout.ts` | `+page.id.ts` | `+head.html` |
+
+Lit and Angular pages are themselves `+page.ts` modules, so the id override
+moves to `+page.id.ts`. Folders are page-id segments, never URL patterns; see
+<a href={path("/docs/core-concepts/contracts")}>Page contracts</a>. The
+non-Svelte head template is neutral markup, compiled by the adapter into
+`seed.head` placeholders.
+
+## React
+
+`@kolektiv/keel-react` supports React 18 and 19.
+
+### Install
+
+```bash
+pnpm add @kolektiv/keel @kolektiv/keel-react @tanstack/react-query react react-dom
+pnpm add -D @kolektiv/keel-pack @vitejs/plugin-react vite typescript
+```
+
+### Bootstrap
+
+```ts
+import { bootstrap } from "@kolektiv/keel-react"
+
+void bootstrap()
+```
+
+### Page state
+
+```tsx
+import { Head, usePage } from "@kolektiv/keel-react"
+import type { HomePage } from "../lib/page-types"
+
+export default function Home() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <Head />
+      <h1>{seed.data.greeting}</h1>
+    </>
+  )
+}
+```
+
+`usePage()` subscribes with `useSyncExternalStore` and returns the seed plus
+`processing`. `usePageContext()` exposes `params`, `errors`, `theme`, and
+`shared`.
+
+### Form
+
+```tsx
+import { useForm } from "@kolektiv/keel-react"
+
+export default function NoteForm() {
+  const form = useForm({ body: "" })
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        void form.post("/notes")
+      }}
+    >
+      <input
+        value={form.data.body}
+        onInput={(event) => form.set("body", event.currentTarget.value)}
+      />
+      {form.errors.body?.map((message) => (
+        <p key={message}>{message}</p>
+      ))}
+      <button disabled={form.processing}>Post</button>
+    </form>
+  )
+}
+```
+
+### Actions and queries
+
+```tsx
+import { useAction, useKeelPageQuery } from "@kolektiv/keel-react"
+
+const save = useAction<{ body: string }, { id: string }>("notes.create")
+await save.mutateAsync({ body: "hi" })
+
+const page = useKeelPageQuery<HomePage>()
+page.data?.data.greeting
+```
+
+`useAction` runs the POST, then reloads the current URL and rehydrates the
+cache unless you pass `{ reload: false }`.
+
+### Components and anchors
+
+```tsx
+import { Form, Head, Link, useKeelAnchor } from "@kolektiv/keel-react"
+
+<Link href="/notes" prefetch="hover">Notes</Link>
+<Form action="/notes" method="post" resetOnSuccess>{/* fields */}</Form>
+<Head title="Notes" />
+
+const anchor = useKeelAnchor({ href: "/about", prefetch: "hover" })
+<a {...anchor}>About</a>
+```
+
+### Guards
+
+```tsx
+import { useNavigationGuard, useUnloadGuard } from "@kolektiv/keel-react"
+
+useNavigationGuard((target) => !target.href.startsWith("/admin") || confirm("Leave?"))
+useUnloadGuard(() => form.isDirty)
+```
+
+### Mount
+
+```ts
+import { createPage } from "@kolektiv/keel-react/mount"
+
+export default createPage(Home, [RootLayout])
+```
+
+`createPage` renders with `createRoot` (never `hydrateRoot` — the shell is
+Kotlin-authored HTML) and wraps `render`/`update` in `flushSync`, so the DOM is
+committed when the `PageModule` method returns.
+
+## Vue
+
+`@kolektiv/keel-vue` targets Vue 3.
+
+### Install
+
+```bash
+pnpm add @kolektiv/keel @kolektiv/keel-vue @tanstack/vue-query vue
+pnpm add -D @kolektiv/keel-pack @vitejs/plugin-vue vue-tsc vite typescript
+```
+
+### Bootstrap
+
+```ts
+import { bootstrap } from "@kolektiv/keel-vue"
+
+void bootstrap()
+```
+
+### Page state
+
+```vue
+<script setup lang="ts">
+import { Head, usePage } from "@kolektiv/keel-vue"
+import type { HomePage } from "../lib/page-types"
+
+const seed = usePage<HomePage>()
+</script>
+
+<template>
+  <Head />
+  <h1>{{ seed.data.greeting }}</h1>
+</template>
+```
+
+`usePage()` returns a shallow ref with a stable snapshot object; templates
+unref it automatically, and script code reads `seed.value`.
+
+### Form
+
+```vue
+<script setup lang="ts">
+import { useForm } from "@kolektiv/keel-vue"
+
+const form = useForm({ body: "" })
+</script>
+
+<template>
+  <form @submit.prevent="form.post('/notes')">
+    <input v-model="form.data.body" />
+    <p v-for="message in form.errors.body" :key="message">{{ message }}</p>
+    <button :disabled="form.processing">Post</button>
+  </form>
+</template>
+```
+
+### Actions and queries
+
+```vue
+<script setup lang="ts">
+import { useAction, useKeelPageQuery } from "@kolektiv/keel-vue"
+
+const save = useAction<{ body: string }, { id: string }>("notes.create")
+const page = useKeelPageQuery<HomePage>()
+
+async function submit() {
+  await save.mutateAsync({ body: "hi" })
+}
+</script>
+```
+
+Vue Query deep-unrefs options. `useKeelPageQuery` therefore passes
+`initialData: () => getPage()`; the adapter handles that detail for you.
+
+### Components and anchors
+
+```vue
+<script setup lang="ts">
+import { Form, Head, Link, useKeelAnchor } from "@kolektiv/keel-vue"
+
+const anchor = useKeelAnchor({ href: "/about", prefetch: "hover" })
+</script>
+
+<template>
+  <Link href="/notes" prefetch="hover">Notes</Link>
+  <Form action="/notes" method="post" reset-on-success><!-- fields --></Form>
+  <Head title="Notes" />
+  <a v-bind="anchor">About</a>
+</template>
+```
+
+### Guards
+
+```ts
+import { useNavigationGuard, useUnloadGuard } from "@kolektiv/keel-vue"
+
+useNavigationGuard((target) => !target.href.startsWith("/admin") || confirm("Leave?"))
+useUnloadGuard(() => form.isDirty)
+```
+
+### Mount
+
+```ts
+import { createPage } from "@kolektiv/keel-vue/mount"
+
+export default createPage(Home, [RootLayout])
+```
+
+`createPage` uses `createApp().mount()` — never hydration — and `update`
+awaits `nextTick()` so descendants commit the new context before the router
+continues.
+
+## Solid
+
+`@kolektiv/keel-solid` targets Solid 1.9.
+
+### Install
+
+```bash
+pnpm add @kolektiv/keel @kolektiv/keel-solid @tanstack/solid-query solid-js
+pnpm add -D @kolektiv/keel-pack vite-plugin-solid vite typescript
+```
+
+### Bootstrap
+
+```ts
+import { bootstrap } from "@kolektiv/keel-solid"
+
+void bootstrap()
+```
+
+### Page state
+
+```tsx
+import { Head, usePage } from "@kolektiv/keel-solid"
+import type { HomePage } from "../lib/page-types"
+
+export default function Home() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <Head />
+      <h1>{seed().data.greeting}</h1>
+    </>
+  )
+}
+```
+
+`usePage()` returns an accessor: call `seed()` to read and subscribe.
+
+### Form
+
+```tsx
+import { Form, useForm } from "@kolektiv/keel-solid"
+
+export default function NoteForm() {
+  const form = useForm({ body: "" })
+  return (
+    <Form action="/notes" method="post" resetOnSuccess>
+      <input
+        value={form.data.body}
+        onInput={(event) => form.set("body", event.currentTarget.value)}
+      />
+      {form.errors.body?.map((message) => (
+        <p>{message}</p>
+      ))}
+      <button disabled={form.processing}>Post</button>
+    </Form>
+  )
+}
+```
+
+### Actions and queries
+
+```tsx
+import { useAction, useKeelPageQuery } from "@kolektiv/keel-solid"
+
+const save = useAction<{ body: string }, { id: string }>("notes.create")
+await save.mutateAsync({ body: "hi" })
+
+const page = useKeelPageQuery<HomePage>()
+page.data?.data.greeting
+```
+
+Solid Query results are reactive getters: reading `save.isPending` in JSX
+subscribes the component; calling `save.mutateAsync` does not.
+
+### Components and anchors
+
+```tsx
+import { Form, Head, Link, useKeelAnchor } from "@kolektiv/keel-solid"
+
+<Link href="/notes" prefetch="hover">Notes</Link>
+<Form action="/notes" method="post" resetOnSuccess>{/* fields */}</Form>
+<Head title="Notes" />
+
+const anchor = useKeelAnchor({ href: "/about", prefetch: "hover" })
+<a {...anchor}>About</a>
+```
+
+### Guards
+
+```ts
+import { useNavigationGuard, useUnloadGuard } from "@kolektiv/keel-solid"
+
+useNavigationGuard((target) => !target.href.startsWith("/admin") || confirm("Leave?"))
+useUnloadGuard(() => form.isDirty)
+```
+
+### Mount
+
+```ts
+import { createPage } from "@kolektiv/keel-solid/mount"
+
+export default createPage(Home, [RootLayout])
+```
+
+`createPage` uses `render()` from `solid-js/web` and returns a dispose
+function; `update` writes the shared seed and context signals in place instead
+of remounting. Solid commits synchronously.
+
+## Preact
+
+`@kolektiv/keel-preact` targets Preact 10. Preact 11 is still an RC, so the
+peer range stays on `^10.0.0`.
+
+### Install
+
+```bash
+pnpm add @kolektiv/keel @kolektiv/keel-preact @tanstack/preact-query preact
+pnpm add -D @kolektiv/keel-pack @preact/preset-vite vite typescript
+```
+
+### Bootstrap
+
+```ts
+import { bootstrap } from "@kolektiv/keel-preact"
+
+void bootstrap()
+```
+
+### Page state
+
+```tsx
+import { Head, usePage } from "@kolektiv/keel-preact"
+import type { HomePage } from "../lib/page-types"
+
+export default function Home() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <Head />
+      <h1>{seed.data.greeting}</h1>
+    </>
+  )
+}
+```
+
+`preact/hooks` does not export `useSyncExternalStore` (only
+`preact/compat` does), so the adapter ships a small `useState` + `useEffect`
+store subscription instead of pulling in the compat runtime. Head children
+and portals still use `preact/compat`'s `createPortal`, the one compat
+dependency.
+
+### Form
+
+```tsx
+import { useForm } from "@kolektiv/keel-preact"
+
+export default function NoteForm() {
+  const form = useForm({ body: "" })
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        void form.post("/notes")
+      }}
+    >
+      <input
+        value={form.data.body}
+        onInput={(event) => form.set("body", event.currentTarget.value)}
+      />
+      {form.errors.body?.map((message) => (
+        <p key={message}>{message}</p>
+      ))}
+      <button disabled={form.processing}>Post</button>
+    </form>
+  )
+}
+```
+
+### Actions and queries
+
+```tsx
+import { useAction, useKeelPageQuery } from "@kolektiv/keel-preact"
+
+const save = useAction<{ body: string }, { id: string }>("notes.create")
+await save.mutateAsync({ body: "hi" })
+
+const page = useKeelPageQuery<HomePage>()
+page.data?.data.greeting
+```
+
+### Components and anchors
+
+```tsx
+import { Form, Head, Link, useKeelAnchor } from "@kolektiv/keel-preact"
+
+<Link href="/notes" prefetch="hover">Notes</Link>
+<Form action="/notes" method="post" resetOnSuccess>{/* fields */}</Form>
+<Head title="Notes" />
+
+const anchor = useKeelAnchor({ href: "/about", prefetch: "hover" })
+<a {...anchor}>About</a>
+```
+
+### Guards
+
+```ts
+import { useNavigationGuard, useUnloadGuard } from "@kolektiv/keel-preact"
+
+useNavigationGuard((target) => !target.href.startsWith("/admin") || confirm("Leave?"))
+useUnloadGuard(() => form.isDirty)
+```
+
+### Mount
+
+```ts
+import { createPage } from "@kolektiv/keel-preact/mount"
+
+export default createPage(Home, [RootLayout])
+```
+
+`createPage` renders with `render()`; `unmount()` calls `render(null, host)`
+to tear the tree down.
+
+## Lit
+
+`@kolektiv/keel-lit` targets Lit 3. There is no `lit-query`: the adapter
+builds controller classes directly on `@tanstack/query-core`, so
+`@tanstack/query-core` is the only query peer dependency.
+
+### Install
+
+```bash
+pnpm add @kolektiv/keel @kolektiv/keel-lit @tanstack/query-core lit
+pnpm add -D @kolektiv/keel-pack vite typescript
+```
+
+### Bootstrap
+
+```ts
+import { bootstrap } from "@kolektiv/keel-lit"
+
+void bootstrap()
+```
+
+### Page state
+
+Pages and layouts are classes extending `KeelElement`. `this.page` is the
+cached `{ ...seed, processing }` snapshot; `this.ctx` is the `PageContext`.
+
+```ts
+import { html } from "lit"
+import { KeelElement } from "@kolektiv/keel-lit"
+import type { HomePage } from "../lib/page-types"
+
+export default class Home extends KeelElement<HomePage> {
+  render() {
+    return html`
+      <keel-head></keel-head>
+      <h1>${this.page.data.greeting}</h1>
+      <keel-link href="/notes" prefetch="hover">Notes</keel-link>
+    `
+  }
+}
+```
+
+`usePage(this)` creates a `KeelPageController` when a plain `LitElement`
+needs the same reactive read.
+
+### Form
+
+`useForm(this, initial)` returns a `KeelFormController`; the `form()` helper
+renders a real `<form>` in the light DOM so a shadow root cannot break
+`FormData` or native validation.
+
+```ts
+import { html } from "lit"
+import { KeelElement, form, useForm } from "@kolektiv/keel-lit"
+
+export default class NoteForm extends KeelElement {
+  readonly note = useForm(this, { body: "" })
+
+  render() {
+    return form(
+      { action: "/notes", method: "post", resetOnSuccess: true },
+      html`
+        <input
+          .value=${this.note.data.body}
+          @input=${(event: Event) =>
+            this.note.set("body", (event.target as HTMLInputElement).value)}
+        />
+        <button ?disabled=${this.note.processing}>Post</button>
+      `,
+    )
+  }
+}
+```
+
+### Actions and queries
+
+Controllers expose explicit read properties and `mutate` / `mutateAsync`
+methods.
+
+```ts
+import { KeelElement, useAction, useKeelPageQuery } from "@kolektiv/keel-lit"
+
+export default class SaveButton extends KeelElement {
+  readonly save = useAction<{ body: string }, { id: string }>(this, "notes.create")
+  readonly pageQuery = useKeelPageQuery(this)
+
+  render() {
+    return html`
+      <button ?disabled=${this.save.isPending} @click=${() => this.save.mutate({ body: "hi" })}>
+        Save
+      </button>
+    `
+  }
+}
+```
+
+`KeelActionController` and `KeelPageQueryController` are the classes behind
+those factories; `this.save.current` and `this.pageQuery.current` expose the
+full observer results.
+
+### Components, directives, and head
+
+`<keel-link>` and `<keel-head>` register automatically with the package
+entry (`defineKeelElements()` is idempotent). `keelAnchor` decorates an
+existing anchor element.
+
+```ts
+import { html } from "lit"
+import { keelAnchor } from "@kolektiv/keel-lit"
+
+html`<keel-link href="/notes" prefetch="hover">Notes</keel-link>`
+html`<a ${keelAnchor({ href: "/about", prefetch: "hover" })}>About</a>`
+```
+
+### Guards
+
+```ts
+import { KeelElement, useForm, useNavigationGuard, useUnloadGuard } from "@kolektiv/keel-lit"
+
+class Editor extends KeelElement {
+  readonly form = useForm(this, { body: "" })
+  readonly guard = useNavigationGuard(this, (target) =>
+    !target.href.startsWith("/admin") || confirm("Leave?"))
+  readonly unload = useUnloadGuard(this, () => this.form.isDirty)
+}
+```
+
+`setGuard(guard)` re-registers while the element stays connected.
+
+### Mount
+
+```ts
+import { createPage } from "@kolektiv/keel-lit/mount"
+
+export default createPage(Home, [RootLayout])
+```
+
+`createPage` instantiates the page and layouts directly (no
+`customElements.define` needed), renders through Lit's `render()`, and awaits
+each element's `updateComplete`. Classes need `experimentalDecorators: true`
+and `useDefineForClassFields: false` in `tsconfig.json` — the scaffold sets
+both.
+
+## Angular
+
+`@kolektiv/keel-angular` targets Angular 19 and uses the signal API
+throughout.
+
+### Install
+
+```bash
+pnpm add @kolektiv/keel @kolektiv/keel-angular @tanstack/angular-query-experimental @tanstack/query-core @angular/core @angular/common @angular/platform-browser rxjs
+pnpm add -D @kolektiv/keel-pack @angular/compiler-cli @angular/build @analogjs/vite-plugin-angular vite typescript@~5.8.3
+```
+
+Angular 19 rejects TypeScript ≥ 5.9, so the scaffold pins `~5.8.3`. Pack
+builds use the Analog Vite plugin plus `@angular/build`; the scaffold emits
+`tsconfig.app.json` with `noEmit: false` because Analog compiles from its own
+program.
+
+### Bootstrap
+
+```ts
+import { bootstrap } from "@kolektiv/keel-angular"
+
+void bootstrap()
+```
+
+`bootstrap` creates the pack-wide zoneless Angular application with TanStack
+Query provided, then core applies the embedded seed.
+
+### Page state
+
+```ts
+import { Component } from "@angular/core"
+import { KeelHead, KeelLink, injectKeelPage } from "@kolektiv/keel-angular"
+import type { HomePage } from "../lib/page-types"
+
+@Component({
+  selector: "app-home",
+  standalone: true,
+  imports: [KeelHead, KeelLink],
+  template: `
+    <keel-head />
+    <h1>{{ page().data.greeting }}</h1>
+    <keel-link href="/notes" prefetch="hover">Notes</keel-link>
+  `,
+})
+export default class Home {
+  readonly page = injectKeelPage<HomePage>()
+}
+```
+
+`injectKeelPage()` returns a signal: call it in the template (`page()`) and
+in script code. It must run in an injection context (a component or service
+constructor / field initializer).
+
+### Form
+
+```ts
+import { Component } from "@angular/core"
+import { injectKeelForm } from "@kolektiv/keel-angular"
+
+@Component({
+  selector: "app-note-form",
+  standalone: true,
+  template: `
+    <form [keelForm]="{ action: '/notes', method: 'post', resetOnSuccess: true }">
+      <input
+        name="body"
+        [value]="form.data.body"
+        (input)="form.set('body', $any($event.target).value)"
+      />
+      <button [disabled]="form.processing">Post</button>
+    </form>
+  `,
+})
+export default class NoteForm {
+  readonly form = injectKeelForm({ body: "" })
+}
+```
+
+Besides the shared `FormState` surface, Angular adds `setData(data)` and
+`setErrors(errors)` for template use.
+
+### Actions and queries
+
+```ts
+import { Component } from "@angular/core"
+import { injectKeelAction, injectKeelPageQuery } from "@kolektiv/keel-angular"
+
+@Component({
+  selector: "app-save",
+  standalone: true,
+  template: `
+    <button [disabled]="save.isPending()" (click)="save.mutate({ body: 'hi' })">Save</button>
+    <p>{{ pageQuery.data()?.data.greeting }}</p>
+  `,
+})
+export default class Save {
+  readonly save = injectKeelAction<{ body: string }, { id: string }>("notes.create")
+  readonly pageQuery = injectKeelPageQuery()
+}
+```
+
+The query adapter is `@tanstack/angular-query-experimental`; result fields
+are signals (`isPending()`, `error()`, `data()`).
+
+### Components and directives
+
+```html
+<a [keelLink]="'/about'" prefetch="hover">About</a>
+<a [keelAnchor]="{ href: '/about', prefetch: 'hover' }">About</a>
+<keel-link href="/notes" method="post">New note</keel-link>
+<form [keelForm]="'/notes'" method="post">…</form>
+<keel-head title="Notes" />
+```
+
+`[keelLink]` and `[keelForm]` accept either a bare string (`href` / `action`)
+or an options object. All are standalone directives/components, so import
+them where they are used.
+
+### Guards
+
+```ts
+import { Component } from "@angular/core"
+import { injectNavigationGuard, injectUnloadGuard } from "@kolektiv/keel-angular"
+
+@Component({ selector: "app-editor", standalone: true, template: "" })
+export default class Editor {
+  constructor() {
+    injectNavigationGuard((target) => !target.href.startsWith("/admin") || confirm("Leave?"))
+    injectUnloadGuard(() => this.form.isDirty)
+  }
+}
+```
+
+### Mount
+
+```ts
+import { createPage } from "@kolektiv/keel-angular/mount"
+
+export default createPage(Home, [RootLayout])
+```
+
+`createPage` awaits the shared `keelApplication()` runtime (which calls
+`createApplication()` once per page load), then builds the
+layout chain with `createComponent` + `projectableNodes` and attaches each
+view to the application. `mount` and `update` run `detectChanges()`
+synchronously on every view. Change detection is **zoneless** through
+`provideExperimentalZonelessChangeDetection()` (experimental in Angular 19).
+
+## Choosing an adapter
+
+All seven adapters are first-class pack targets. Svelte remains the default
+for `keel-scaffold` and the examples on the getting-started pages, not the
+only option. Framework choice is the pack's; the host does not know or care
+which adapter a `.feb` was built with — `manifest.json` records the
+framework name for tooling, and the page modules implement the same
+`PageModule`.
+
+Qwik is not supported in the current adapter line; a Qwik adapter is tracked
+in [#49](https://github.com/KolektivComputer/keel/issues/49).

@@ -1,16 +1,21 @@
 ---
 title: Client Setup
-description: Point the @kolektiv npm scope at Nexus releases and install the router.
+description: Point the @kolektiv npm scope at Nexus releases and install the router plus a framework adapter.
 category: getting-started
 order: 3
 ---
 
-import CodePair from "../../../components/CodePair.astro"
+import CodeBlock from "../../../components/CodeBlock.astro"
 import { path } from "../../../lib/paths"
 
-Svelte is the first adapter. Client packages live in the hosted `keel-npm`
-repository on Nexus at `repo.yuri.capital`. Put this in `.npmrc` at the pack
-root (or your user `~/.npmrc`):
+Keel ships a framework-neutral router (`@kolektiv/keel`) and seven pack
+adapters: Svelte 5, React 18/19, Vue 3, Solid 1.9, Preact 10, Lit 3, and
+Angular 19. Svelte is the default in the examples, not the only option — see
+<a href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>.
+
+Client packages live in the hosted `keel-npm` repository on Nexus at
+`repo.yuri.capital`. Put this in `.npmrc` at the pack root (or your user
+`~/.npmrc`):
 
 ```bash
 # .npmrc
@@ -21,12 +26,17 @@ Resolving does not require Nexus credentials; publishing does.
 
 ## Releases (recommended)
 
-Current release: `0.0.1`. Then install:
+Current release: `0.0.1`. Every adapter is versioned in lockstep with
+`@kolektiv/keel`, so pin the same version everywhere. Pick your framework:
 
-<CodePair
-  title="package.json — Svelte pack"
-  fw="svelte"
-  ts={`{
+<CodeBlock
+  title="package.json — by framework"
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      lang: "json",
+      code: `{
   "dependencies": {
     "@kolektiv/keel": "0.0.1",
     "@kolektiv/keel-svelte": "0.0.1",
@@ -37,32 +47,214 @@ Current release: `0.0.1`. Then install:
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "vite": "^6.2.0"
   }
-}`}
-  js={`{
+}`,
+    },
+    {
+      id: "react",
+      label: "React",
+      lang: "json",
+      code: `{
   "dependencies": {
     "@kolektiv/keel": "0.0.1",
-    "@kolektiv/keel-svelte": "0.0.1",
-    "svelte": "^5.16.0"
+    "@kolektiv/keel-react": "0.0.1",
+    "@tanstack/react-query": "^5.66.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@kolektiv/keel-pack": "0.0.1",
-    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.2.0"
   }
-}`}
+}`,
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      lang: "json",
+      code: `{
+  "dependencies": {
+    "@kolektiv/keel": "0.0.1",
+    "@kolektiv/keel-vue": "0.0.1",
+    "@tanstack/vue-query": "^5.66.0",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@kolektiv/keel-pack": "0.0.1",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.2.0",
+    "vue-tsc": "^2.2.0"
+  }
+}`,
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      lang: "json",
+      code: `{
+  "dependencies": {
+    "@kolektiv/keel": "0.0.1",
+    "@kolektiv/keel-solid": "0.0.1",
+    "@tanstack/solid-query": "^5.66.0",
+    "solid-js": "^1.9.4"
+  },
+  "devDependencies": {
+    "@kolektiv/keel-pack": "0.0.1",
+    "vite": "^6.2.0",
+    "vite-plugin-solid": "^2.11.1"
+  }
+}`,
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      lang: "json",
+      code: `{
+  "dependencies": {
+    "@kolektiv/keel": "0.0.1",
+    "@kolektiv/keel-preact": "0.0.1",
+    "@tanstack/preact-query": "^5.66.0",
+    "preact": "^10.25.4"
+  },
+  "devDependencies": {
+    "@kolektiv/keel-pack": "0.0.1",
+    "@preact/preset-vite": "^2.10.1",
+    "vite": "^6.2.0"
+  }
+}`,
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      lang: "json",
+      code: `{
+  "dependencies": {
+    "@kolektiv/keel": "0.0.1",
+    "@kolektiv/keel-lit": "0.0.1",
+    "@tanstack/query-core": "^5.66.0",
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@kolektiv/keel-pack": "0.0.1",
+    "vite": "^6.2.0"
+  }
+}`,
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      lang: "json",
+      code: `{
+  "dependencies": {
+    "@angular/common": "^19.0.0",
+    "@angular/core": "^19.0.0",
+    "@angular/platform-browser": "^19.0.0",
+    "@kolektiv/keel": "0.0.1",
+    "@kolektiv/keel-angular": "0.0.1",
+    "@tanstack/angular-query-experimental": "^5.66.0",
+    "@tanstack/query-core": "^5.66.0",
+    "rxjs": "^7.8.0"
+  },
+  "devDependencies": {
+    "@analogjs/vite-plugin-angular": "^1.10.0",
+    "@angular/build": "^19.0.0",
+    "@angular/compiler-cli": "^19.0.0",
+    "@kolektiv/keel-pack": "0.0.1",
+    "typescript": "~5.8.3",
+    "vite": "^6.2.0"
+  }
+}`,
+    },
+  ]}
 />
 
+Angular 19 rejects TypeScript ≥ 5.9, so its scaffold pins `~5.8.3`;
+build that pack with the Analog Vite plugin (`@analogjs/vite-plugin-angular`
+plus `@angular/build`). Lit and Angular take `@tanstack/query-core` directly
+because those adapters build their own controllers/injectables over it — the
+other four use the framework-specific TanStack Query package.
+
 `@kolektiv/keel` is the host router (visits, history, prefetch, `action()`).
-`@kolektiv/keel-svelte` is the Svelte 5 bindings. `@kolektiv/keel-pack` is
-the toolchain: `keel-scaffold` from a live host schema, a Vite plugin
+The adapter package is the framework binding. `@kolektiv/keel-pack` is the
+toolchain: `keel-scaffold` from a live host schema, a Vite plugin
 (`keelPack`) that discovers pages and writes a `.feb`, and `keel-pack` to
 zip a dist by hand.
+
+## Bootstrap
+
+Scaffold writes `src/bootstrap.ts`. It reads `#__keel_seed`, hydrates the
+TanStack query cache, and mounts the pack entry. The import is the only
+difference between frameworks:
+
+<CodeBlock
+  title="src/bootstrap.ts"
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      code: `import { bootstrap } from "@kolektiv/keel-svelte"
+
+void bootstrap()`,
+    },
+    {
+      id: "react",
+      label: "React",
+      code: `import { bootstrap } from "@kolektiv/keel-react"
+
+void bootstrap()`,
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      code: `import { bootstrap } from "@kolektiv/keel-vue"
+
+void bootstrap()`,
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      code: `import { bootstrap } from "@kolektiv/keel-solid"
+
+void bootstrap()`,
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      code: `import { bootstrap } from "@kolektiv/keel-preact"
+
+void bootstrap()`,
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      code: `import { bootstrap } from "@kolektiv/keel-lit"
+
+void bootstrap()`,
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      code: `import { bootstrap } from "@kolektiv/keel-angular"
+
+void bootstrap()`,
+    },
+  ]}
+/>
+
+`bootstrap(options?)` accepts the core `RouterConfig` (`onSeed`, `onError`,
+and the visit defaults). Each adapter's `onSeed` hydrates the query cache
+under `["keel", "page"]` first, then calls your `onSeed` for the initial seed
+and every applied visit. Angular's `bootstrap` also creates the pack-wide
+zoneless application before core applies the seed.
 
 ## Pre-releases
 
 Current pre-release: `0.0.2-SNAPSHOT.4`. The `-SNAPSHOT.4` suffix is part of
 a literal, unique version, and the same `keel-npm` registry serves it. Swap
-the `0.0.1` pins above for `0.0.2-SNAPSHOT.4` to track the pre-release line.
+the `0.0.1` pins above for `0.0.2-SNAPSHOT.4` to track the pre-release line —
+all seven adapter packages share the version.
 
 Next: <a href={path("/docs/getting-started/pack")}>scaffold a pack</a>.
 The host half is

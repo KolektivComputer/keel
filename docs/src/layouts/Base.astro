@@ -11,7 +11,7 @@ interface Props {
 
 const {
   title = "Keel",
-  description = "Host-owned routing and render-time frontend packs for Kotlin servers.",
+  description = "Host-owned routing and render-time frontend packs for Kotlin servers. Svelte, React, Vue, Solid, Preact, Lit, and Angular adapters.",
 } = Astro.props
 const pageTitle = title === "Keel" ? "Keel" : `${title} · Keel`
 const docs = await allDocs()
@@ -73,11 +73,13 @@ const ogImage = new URL(path("/logo.svg"), site).href
                 : stored || "catppuccin-mocha"
           const codeTheme = localStorage.getItem("keel:code-theme") || "follow"
           const lang = localStorage.getItem("keel:lang") || "ts"
+          const frontend = localStorage.getItem("keel:frontend")
+          const frontends = ["svelte", "react", "vue", "solid", "preact", "lit", "angular"]
           const root = document.documentElement
           root.setAttribute("data-theme", theme)
           root.dataset.codeTheme = codeTheme
           root.dataset.lang = lang
-          root.dataset.frontend = "svelte"
+          root.dataset.frontend = frontends.includes(frontend) ? frontend : "svelte"
           root.dataset.backend = "ktor"
         } catch {}
       })()
@@ -90,12 +92,28 @@ const ogImage = new URL(path("/logo.svg"), site).href
     </a>
     <slot />
     <script>
-      import { applyPrefs, readPrefs, syncControls, copyFromFigure } from "../lib/prefs"
+      import {
+        applyPrefs,
+        readPrefs,
+        syncControls,
+        syncFrameworkTargets,
+        copyFromFigure,
+      } from "../lib/prefs"
       import { installPreviewBridge } from "../lib/preview-bridge"
       import type { Prefs } from "../lib/prefs"
 
-      applyPrefs(readPrefs())
+      const initialPrefs = readPrefs()
+      applyPrefs(initialPrefs)
       syncControls()
+      syncFrameworkTargets(initialPrefs.frontend)
+
+      let currentFrontend = initialPrefs.frontend
+      document.addEventListener("keel:prefs", (event) => {
+        const detail = (event as CustomEvent<Prefs>).detail
+        if (!detail || detail.frontend === currentFrontend) return
+        currentFrontend = detail.frontend
+        syncFrameworkTargets(detail.frontend)
+      })
 
       const pathNode = document.getElementById("keel-preview-paths")
       const paths: string[] = pathNode?.textContent ? JSON.parse(pathNode.textContent) : ["/", "/docs"]

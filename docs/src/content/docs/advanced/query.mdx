@@ -20,6 +20,12 @@ something invalidates.
 `useAction(id)` is a mutation: POST `/__keel/action/{id}`, then
 `router.reload()` so `page()` and the cache rehydrate from the host.
 
+This page uses the Svelte binding. Every adapter exposes the same
+mutate-then-visit pattern with its own name (`useAction` in React, Vue,
+Solid, and Preact; `injectKeelAction` in Angular; `useAction` controllers in
+Lit) — see <a href={path("/docs/implementing/framework-adapters")}>Framework
+adapters</a>.
+
 <CodePair
   fw="svelte"
   title="useAction"

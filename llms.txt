@@ -2,7 +2,7 @@
 
 > Host-owned routing and render-time frontend packs. The server owns URLs, page ids, and payload types. Packs implement ids — never paths.
 
-Keel is a protocol plus Kotlin/JS libraries. Format `keel/1`. First host adapter is Ktor; first pack adapter is Svelte 5. Maven: `dev.kolektiv.keel:core`, `dev.kolektiv.keel:ktor`. npm: `@kolektiv/keel`, `@kolektiv/keel-svelte`, `@kolektiv/keel-pack`.
+Keel is a protocol plus Kotlin/JS libraries. Format `keel/1`. First host adapter is Ktor; seven pack adapters ship — Svelte 5, React 18/19, Vue 3, Solid 1.9, Preact 10, Lit 3, and Angular 19 (Svelte was the first). Maven: `dev.kolektiv.keel:core`, `dev.kolektiv.keel:ktor`. npm: `@kolektiv/keel`, `@kolektiv/keel-svelte`, `@kolektiv/keel-react`, `@kolektiv/keel-vue`, `@kolektiv/keel-solid`, `@kolektiv/keel-preact`, `@kolektiv/keel-lit`, `@kolektiv/keel-angular`, `@kolektiv/keel-pack`.
 
 Live contract: `GET /__keel/schema` on any Keel host. Scaffold a pack with `keel-scaffold <origin> <dir>`.
 
@@ -12,14 +12,14 @@ Docs: https://keel.mey.cat/  (GitHub Pages; local `pnpm dev` is http://127.0.0.1
 
 - [What is Keel](https://keel.mey.cat/docs/getting-started/): host-owned routing, packs implement ids
 - [Server Installation](https://keel.mey.cat/docs/getting-started/server/): Maven — one repo (`maven-releases`, `maven-snapshots`, or `keel-maven` for unique pre-releases), `dev.kolektiv.keel:core`
-- [Client Setup](https://keel.mey.cat/docs/getting-started/client/): npm — `keel-npm` registry, `@kolektiv/keel*`
+- [Client Setup](https://keel.mey.cat/docs/getting-started/client/): npm — `keel-npm` registry, `@kolektiv/keel*`, install and bootstrap per adapter
 - [Host (Ktor)](https://keel.mey.cat/docs/getting-started/host/): stand up a Keel host
-- [Pack (Svelte)](https://keel.mey.cat/docs/getting-started/pack/): keel-scaffold or keelPack in Vite
+- [Pack](https://keel.mey.cat/docs/getting-started/pack/): keel-scaffold (`--framework`) or keelPack in Vite
 - [First page](https://keel.mey.cat/docs/getting-started/first-page/): register a page id and implement it in a pack
 - [Routing](https://keel.mey.cat/docs/core-concepts/routing/): page ids live on the server; packs implement ids, never paths
 - [Page contracts](https://keel.mey.cat/docs/core-concepts/contracts/): page ids + payload types are the contract
 - [Seed and headers](https://keel.mey.cat/docs/core-concepts/seed/): the read model bootstrap and visits share
-- [Document head and SEO](https://keel.mey.cat/docs/core-concepts/head/): `+head.svelte`, placeholders, sanitizing, CSP nonces
+- [Document head and SEO](https://keel.mey.cat/docs/core-concepts/head/): `+head.svelte` / `+head.html`, placeholders, sanitizing, CSP nonces
 - [Packs](https://keel.mey.cat/docs/core-concepts/packs/): `.feb` manifest, page-id modules, asset prefixes
 - [Routing primitives](https://keel.mey.cat/docs/core-concepts/primitives/): router, Link, Form, useForm, Head
 - [Server actions](https://keel.mey.cat/docs/core-concepts/actions/): typed writes; the seed stays the read model
@@ -33,6 +33,7 @@ Docs: https://keel.mey.cat/  (GitHub Pages; local `pnpm dev` is http://127.0.0.1
 - [Host adapter](https://keel.mey.cat/docs/implementing/host-adapter/): what a backend must implement, `KeelConfig` knobs
 - [Pack adapter](https://keel.mey.cat/docs/implementing/pack-adapter/): PageModule, .feb, RouterAdapter, manifest head/layout fields
 - [Typegen](https://keel.mey.cat/docs/implementing/typegen/): `.ts`, `.d.ts`, JSON contract
+- [Framework adapters](https://keel.mey.cat/docs/implementing/framework-adapters/): one pack contract across Svelte, React, Vue, Solid, Preact, Lit, and Angular — install, bootstrap, page state, forms, actions, components, guards, mount, and DX caveats
 - [AGENTS.md](https://github.com/KolektivComputer/keel/blob/main/AGENTS.md): how to work in this repository
 
 ## Optional

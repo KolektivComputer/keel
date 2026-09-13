@@ -1,6 +1,6 @@
 ---
-title: Pack (Svelte)
-description: Scaffold a pack from /__keel/schema, or wire keelPack in Vite by hand.
+title: Pack
+description: Scaffold a pack from /__keel/schema for any adapter, or wire keelPack in Vite by hand.
 category: getting-started
 order: 5
 ---
@@ -12,38 +12,63 @@ import { path } from "../../../lib/paths"
 
 This is the **frontend** half. A pack implements page ids. It never owns
 paths. Two ways in: **scaffold** from a running host, or **Vite + `keelPack`**
-from a blank tree.
+from a blank tree. Packs can target any of the seven adapters — Svelte, React,
+Vue, Solid, Preact, Lit, or Angular. Svelte is the default and the examples
+below use it; see
+<a href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>
+for the per-framework APIs and build caveats.
 
 Have a host answering `GET /__keel/schema` first —
 <a href={path("/docs/getting-started/host")}>Host (Ktor)</a>.
 
 ## Option A — `keel-scaffold`
 
-The host is the source of truth. Scaffold writes blank Svelte pages for every
-id in the schema, plus `page-types.ts`, Vite, and `keelPack`.
+The host is the source of truth. Scaffold writes blank pages for every id in
+the schema, plus `page-types.ts`, Vite, and `keelPack`.
 
 ```bash
 pnpm add -D @kolektiv/keel-pack
-pnpm exec keel-scaffold 127.0.0.1:8090 ./pack --id app
+pnpm exec keel-scaffold 127.0.0.1:8090 ./pack --id app --framework svelte
 cd pack && pnpm install && pnpm build
 ```
 
 `localhost` / `127.*` use `http://`; other hosts default to `https://`.
-`--framework svelte` is the default, `--id` names the pack (default: the
-output directory), `--version` pins the manifest version (default `0.1.0`),
-and `--schema <file.json>` scaffolds from a saved contract with no host
-running. Re-run with `--force` to overwrite.
+`--framework` accepts `angular`, `lit`, `preact`, `react`, `solid`, `svelte`
+(the default), and `vue`; `--id` names the pack (default: the output
+directory), `--version` pins the manifest version (default `0.1.0`), and
+`--schema <file.json>` scaffolds from a saved contract with no host running.
+Re-run with `--force` to overwrite.
 
-You get `src/pages/app/home/+page.ts` (`export const id = "app.home"`) and
-`+page.svelte` per id, a root layout, `src/bootstrap.ts`,
-`src/lib/page-types.ts` / `.json`, and `dist/app.feb` after `pnpm build`.
-Point the host at that file. `pnpm dev` runs the same build in watch mode;
-a host with `watchPacks = true` swaps the result — see
+For Svelte you get `src/pages/app/home/+page.ts` (`export const id =
+"app.home"`) and `+page.svelte` per id, a root `+layout.svelte`,
+`src/bootstrap.ts`, `src/lib/page-types.ts` / `.json`, and `dist/app.feb`
+after `pnpm build`. Other frameworks change the component and head file
+extensions, not the layout:
+
+| Framework | Page / layout | Id override | Head template |
+| --- | --- | --- | --- |
+| Svelte | `+page.svelte`, `+layout.svelte` | `+page.ts` | `+head.svelte` |
+| React | `+page.tsx`, `+layout.tsx` | `+page.ts` | `+head.html` |
+| Preact | `+page.tsx`, `+layout.tsx` | `+page.ts` | `+head.html` |
+| Solid | `+page.tsx`, `+layout.tsx` | `+page.ts` | `+head.html` |
+| Vue | `+page.vue`, `+layout.vue` | `+page.ts` | `+head.html` |
+| Lit | `+page.ts`, `+layout.ts` | `+page.id.ts` | `+head.html` |
+| Angular | `+page.ts`, `+layout.ts` | `+page.id.ts` | `+head.html` |
+
+Lit and Angular pages are themselves TypeScript modules, so their id override
+moves to `+page.id.ts`. Angular scaffolds also emit `tsconfig.app.json` with
+`noEmit: false` and pin `typescript@~5.8.3`; Angular 19 rejects TypeScript
+≥ 5.9. Point the host at `dist/<id>.feb`. `pnpm dev` runs the same build in
+watch mode; a host with `watchPacks = true` swaps the result — see
 <a href={path("/docs/advanced/pack-hot-reload")}>Pack hot reload</a>.
 
 ## Option B — Vite plugin by hand
 
-Same result, files you type. After
+Same result, files you type. The example below is the Svelte plugin; each
+adapter pairs with its own Vite plugin — `@vitejs/plugin-react` for React,
+`@vitejs/plugin-vue` for Vue, `vite-plugin-solid` for Solid,
+`@preact/preset-vite` for Preact, and `@analogjs/vite-plugin-angular` (with
+`@angular/build`) for Angular. After
 <a href={path("/docs/getting-started/client")}>Client Setup</a>:
 
 <CodePair
@@ -153,4 +178,4 @@ val dev = FrontendBundle.fromDirectory(Path.of("pack/dist"))`}
 
 Then <a href={path("/docs/getting-started/first-page")}>register a page</a>
 if you have not already, and restart the host. Document GET should show the
-Svelte UI; a visit returns the seed JSON.
+pack UI; a visit returns the seed JSON.

@@ -84,6 +84,10 @@ router.on("blocked", ({ to, from }) => {
 
 `useNavigationGuard` registers on mount and unregisters on destroy;
 `useUnloadGuard` adds a `beforeunload` prompt while its predicate is true.
+The other adapters expose the same two hooks under the same names (React,
+Vue, Solid, Preact), as controllers in Lit, and as `injectNavigationGuard` /
+`injectUnloadGuard` in Angular — see
+<a href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>.
 
 ```svelte
 <script lang="ts">

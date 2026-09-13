@@ -47,6 +47,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   automatically and enforce package boilerplate (version lockstep, changelog
   prepack, keel-npm registry) so new framework adapters need no central
   wiring (#40).
+- Docs cover the framework adapter matrix with multi-framework chrome,
+  per-framework guides for React, Vue, Solid, Preact, Lit, and Angular, and
+  updated install/bootstrap/pack guidance (#41).
 
 ### Fixed
 

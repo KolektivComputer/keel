@@ -6,7 +6,8 @@ Host-owned routing and render-time frontend packs for Kotlin servers.
 | --- | --- |
 | Maven | `dev.kolektiv.keel:core`, `dev.kolektiv.keel:ktor` |
 | npm router | `@kolektiv/keel` |
-| npm Svelte | `@kolektiv/keel-svelte` |
+| npm adapters | `@kolektiv/keel-svelte`, `@kolektiv/keel-react`, `@kolektiv/keel-vue`, `@kolektiv/keel-solid`, `@kolektiv/keel-preact`, `@kolektiv/keel-lit`, `@kolektiv/keel-angular` |
+| npm pack toolchain | `@kolektiv/keel-pack` |
 | docs | [keel.mey.cat](https://keel.mey.cat/) |
 
 Agents (human or otherwise) should read [AGENTS.md](./AGENTS.md).
@@ -15,7 +16,7 @@ Agents (human or otherwise) should read [AGENTS.md](./AGENTS.md).
 - `lib/` — seed, manifest, page registry, `FrontendBundle`, typegen (no Ktor)
 - `ktor/` — Ktor plugin: document shell, `respondPage`, visits, pack static files
 - `samples/harbor` — in-memory message board (Ktor + Svelte pack; `./gradlew :samples:harbor:run`)
-- `packages/` — TypeScript router, Svelte bindings, and `keel-pack` (`.feb` zip + `keel-scaffold`)
+- `packages/` — TypeScript router, framework adapters (Svelte, React, Vue, Solid, Preact, Lit, Angular), and `keel-pack` (`.feb` zip + `keel-scaffold`)
 - `skills/` — Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`) for Claude, Grok, and `.agents/skills` (`npx skills add KolektivComputer/keel`)
 - `llms.txt` — curated map for LLMs (also served from the docs site)
 - `docs/` — homepage and documentation (Astro, Tailwind 4, daisyUI 5, Shiki Catppuccin)

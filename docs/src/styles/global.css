@@ -289,7 +289,13 @@ html[data-lang="js"] .keel-code:not([data-lang]) [data-lang-panel="ts"],
   display: none;
 }
 
-html[data-frontend="svelte"] [data-fw]:not([data-fw~="svelte"]):not([data-fw~="all"]) {
+html[data-frontend="svelte"] [data-fw]:not([data-fw~="svelte"]):not([data-fw~="all"]),
+html[data-frontend="react"] [data-fw]:not([data-fw~="react"]):not([data-fw~="all"]),
+html[data-frontend="vue"] [data-fw]:not([data-fw~="vue"]):not([data-fw~="all"]),
+html[data-frontend="solid"] [data-fw]:not([data-fw~="solid"]):not([data-fw~="all"]),
+html[data-frontend="preact"] [data-fw]:not([data-fw~="preact"]):not([data-fw~="all"]),
+html[data-frontend="lit"] [data-fw]:not([data-fw~="lit"]):not([data-fw~="all"]),
+html[data-frontend="angular"] [data-fw]:not([data-fw~="angular"]):not([data-fw~="all"]) {
   display: none;
 }
 
@@ -304,6 +310,18 @@ html[data-backend="ktor"] [data-bw]:not([data-bw~="ktor"]):not([data-bw~="all"])
 
 .keel-deck[data-framework="svelte"] [data-framework-panel="svelte"],
 .keel-code[data-framework="svelte"] [data-framework-panel="svelte"],
+.keel-deck[data-framework="react"] [data-framework-panel="react"],
+.keel-code[data-framework="react"] [data-framework-panel="react"],
+.keel-deck[data-framework="vue"] [data-framework-panel="vue"],
+.keel-code[data-framework="vue"] [data-framework-panel="vue"],
+.keel-deck[data-framework="solid"] [data-framework-panel="solid"],
+.keel-code[data-framework="solid"] [data-framework-panel="solid"],
+.keel-deck[data-framework="preact"] [data-framework-panel="preact"],
+.keel-code[data-framework="preact"] [data-framework-panel="preact"],
+.keel-deck[data-framework="lit"] [data-framework-panel="lit"],
+.keel-code[data-framework="lit"] [data-framework-panel="lit"],
+.keel-deck[data-framework="angular"] [data-framework-panel="angular"],
+.keel-code[data-framework="angular"] [data-framework-panel="angular"],
 .keel-code[data-framework="kts"] [data-framework-panel="kts"],
 .keel-code[data-framework="groovy"] [data-framework-panel="groovy"] {
   display: block;
