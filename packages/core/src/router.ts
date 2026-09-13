@@ -2,7 +2,14 @@ import { announce, focusHost } from "./a11y.ts"
 import { toContext } from "./context.ts"
 import { syncCss } from "./css.ts"
 import { emit, on } from "./events.ts"
-import { pushSeed, seedFromHistory } from "./history.ts"
+import { beforeEach, runGuards } from "./guards.ts"
+import {
+  currentSeedIndex,
+  pushSeed,
+  restoreSteps,
+  seedFromHistory,
+  seedIndexFromHistory,
+} from "./history.ts"
 import { cacheSeed, clearPrefetch, prefetchSeed, readSeed, warmModule } from "./prefetch.ts"
 import { beginVisit, endVisit, getPage, peekPage, setPage } from "./store.ts"
 import { sendVisit } from "./transport.ts"
@@ -10,6 +17,8 @@ import {
   KEEL_HEADERS,
   type KeelSeed,
   type Method,
+  type NavigationSource,
+  type NavigationTarget,
   type PageModule,
   type PendingVisit,
   type VisitOptions,
@@ -27,11 +36,25 @@ interface VisitResult {
   partial: string[] | null
 }
 
+/** Internal navigation identity: how it started and how many redirects deep. */
+interface NavMeta {
+  source: NavigationSource
+  redirects: number
+}
+
+const MAX_REDIRECTS = 10
+
 let config: RouterConfig = {}
 let mounted: PageModule | null = null
 let currentEntry: string | null = null
 let mountedBuild: string | null = null
 let inflight: AbortController | null = null
+/** Last seed applied to the page; best-effort `from` for guards. */
+let lastTarget: NavigationTarget | null = null
+/** Popstate events still owed to a `history.go` restore are skipped. */
+let restoring = 0
+
+const pendingRedirects = new WeakMap<PendingVisit, { href: string | null }>()
 
 /** Thrown when a visit raced a host-side pack swap; the page is reloading. */
 export class KeelBuildMismatchError extends Error {
@@ -108,6 +131,55 @@ function announcementFor(seed: KeelSeed): string | null {
   return seed.head?.title ?? (typeof document !== "undefined" ? document.title : "")
 }
 
+function resolveHref(href: string): string {
+  if (typeof location === "undefined") return href
+  try {
+    const url = new URL(href, location.href)
+    return url.pathname + url.search + url.hash
+  } catch {
+    return href
+  }
+}
+
+function currentUrl(): string | null {
+  if (typeof location === "undefined") return null
+  return location.pathname + location.search + location.hash
+}
+
+/**
+ * Best-effort `from` for guards: the current URL plus the method/source of the
+ * last applied seed (default `get`/`visit`).
+ */
+function currentTarget(): NavigationTarget {
+  return {
+    url: currentUrl() ?? lastTarget?.url ?? "",
+    method: lastTarget?.method ?? "get",
+    replace: lastTarget?.replace ?? false,
+    source: lastTarget?.source ?? "visit",
+  }
+}
+
+function createPendingVisit(url: string, method: Method): PendingVisit {
+  const state = { href: null as string | null }
+  const visit: PendingVisit = {
+    url,
+    method,
+    cancelled: false,
+    cancel() {
+      visit.cancelled = true
+    },
+    redirect(href: string) {
+      state.href = href
+    },
+  }
+  pendingRedirects.set(visit, state)
+  return visit
+}
+
+function redirectOf(visit: PendingVisit): string | null {
+  return pendingRedirects.get(visit)?.href ?? null
+}
+
 async function fetchSeed(href: string, options: VisitOptions, signal: AbortSignal): Promise<VisitResult> {
   const method = options.method ?? "get"
   const url = visitRequestUrl(href, config.navigatePath)
@@ -156,7 +228,7 @@ async function applySeed(
   seed: KeelSeed,
   options: VisitOptions,
   replace: boolean,
-  meta: { initial?: boolean } = {},
+  meta: { initial?: boolean; target?: NavigationTarget } = {},
 ): Promise<boolean> {
   if (isBuildMismatch(mountedBuild, seed.build)) {
     reloadForBuildMismatch()
@@ -189,6 +261,7 @@ async function applySeed(
       const text = announcementFor(seed)
       if (text) announce(text)
     }
+    if (meta.target) lastTarget = meta.target
     emit("navigate", { page: seed })
   }
 
@@ -200,12 +273,79 @@ async function applySeed(
   return true
 }
 
-async function visit(href: string, options: VisitOptions = {}): Promise<void> {
+async function redirectTo(href: string, options: VisitOptions, meta: NavMeta): Promise<void> {
+  await navigate(resolveHref(href), { ...options, method: "get", data: undefined }, {
+    source: "redirect",
+    redirects: meta.redirects + 1,
+  })
+}
+
+/**
+ * One navigation. Runs, in order: the `before` event, `options.onBefore`, and
+ * the registered `beforeEach` guards. A cancel or redirect at any stage
+ * short-circuits the later stages and happens before inflight abort, fetch,
+ * and any history/DOM change.
+ */
+async function navigate(
+  href: string,
+  options: VisitOptions = {},
+  meta: NavMeta = { source: "visit", redirects: 0 },
+): Promise<void> {
+  if (meta.redirects > MAX_REDIRECTS) {
+    throw new Error(`Keel: more than ${MAX_REDIRECTS} redirects`)
+  }
   const method: Method = options.method ?? "get"
   const url = buildUrl(href, method, options.data)
-  const visitState: PendingVisit = { url, method, cancelled: false }
-  if (options.onBefore?.(visitState) === false) return
-  emit("before", { visit: visitState })
+  const replace = Boolean(options.replace)
+  const to: NavigationTarget = { url, method, replace, source: meta.source }
+  const from = currentTarget()
+  const visitState = createPendingVisit(url, method)
+
+  if (meta.source === "redirect") {
+    const outcome = await runGuards(to, from, { force: options.force })
+    if (outcome.cancelled) {
+      if (outcome.error) throw outcome.error
+      emit("blocked", { to, from })
+      return
+    }
+    if (outcome.redirect) {
+      await redirectTo(outcome.redirect, options, meta)
+      return
+    }
+  } else {
+    emit("before", { visit: visitState })
+    if (visitState.cancelled) {
+      emit("blocked", { to, from })
+      return
+    }
+    let redirect = redirectOf(visitState)
+    if (redirect) {
+      await redirectTo(redirect, options, meta)
+      return
+    }
+
+    const onBeforeResult = await options.onBefore?.(visitState)
+    if (visitState.cancelled || onBeforeResult === false) {
+      emit("blocked", { to, from })
+      return
+    }
+    redirect = redirectOf(visitState)
+    if (redirect) {
+      await redirectTo(redirect, options, meta)
+      return
+    }
+
+    const outcome = await runGuards(to, from, { force: options.force })
+    if (outcome.cancelled) {
+      if (outcome.error) throw outcome.error
+      emit("blocked", { to, from })
+      return
+    }
+    if (outcome.redirect) {
+      await redirectTo(outcome.redirect, options, meta)
+      return
+    }
+  }
 
   inflight?.abort()
   const controller = new AbortController()
@@ -227,10 +367,16 @@ async function visit(href: string, options: VisitOptions = {}): Promise<void> {
     }
     const seed = mergePartial(fetched.seed, fetched.partial)
     if (seed.redirect) {
-      await visit(seed.redirect, { ...options, method: "get", data: undefined })
+      await navigate(seed.redirect, { ...options, method: "get", data: undefined }, {
+        source: "redirect",
+        redirects: meta.redirects + 1,
+      })
       return
     }
-    if (!(await applySeed(seed, options, Boolean(options.replace)))) return
+    const applied = await applySeed(seed, options, replace, {
+      target: { url: seed.path, method, replace, source: meta.source },
+    })
+    if (!applied) return
     if (Object.keys(seed.errors ?? {}).length > 0) {
       options.onError?.(seed.errors)
       emit("error", { errors: seed.errors })
@@ -252,6 +398,10 @@ async function visit(href: string, options: VisitOptions = {}): Promise<void> {
     endVisit()
     if (inflight === controller) inflight = null
   }
+}
+
+function visit(href: string, options: VisitOptions = {}): Promise<void> {
+  return navigate(href, options, { source: "visit", redirects: 0 })
 }
 
 async function prefetch(href: string, options: VisitOptions = {}): Promise<void> {
@@ -285,16 +435,55 @@ function cancel(): void {
 
 async function reload(options: VisitOptions = {}): Promise<void> {
   const page = getPage()
-  await visit(page.path, { ...options, replace: true })
+  await navigate(page.path, { ...options, replace: true }, { source: "reload", redirects: 0 })
+}
+
+function restorePopstate(targetIndex: number | null): void {
+  if (typeof history === "undefined") return
+  const steps = restoreSteps(currentSeedIndex(), targetIndex)
+  if (steps === 0) return
+  restoring += 1
+  history.go(steps)
+}
+
+/**
+ * Back/forward: the browser already moved the pointer, so resolve the target
+ * seed from `history.state` and run guards before `applySeed`. On cancel or a
+ * guard error, `history.go` walks the pointer back to the entry the mounted
+ * page belongs to; the resulting popstate is skipped so guards do not re-run
+ * and no entry is duplicated or truncated.
+ */
+async function handlePopstate(event: PopStateEvent): Promise<void> {
+  if (restoring > 0) {
+    restoring -= 1
+    return
+  }
+  const seed = seedFromHistory(event)
+  if (!seed) return
+  const targetIndex = seedIndexFromHistory(event)
+  const to: NavigationTarget = { url: seed.path, method: "get", replace: true, source: "popstate" }
+  const from: NavigationTarget = lastTarget
+    ? { ...lastTarget }
+    : { url: seed.path, method: "get", replace: false, source: "visit" }
+
+  const outcome = await runGuards(to, from)
+  if (outcome.cancelled) {
+    emit("blocked", { to, from, ...(outcome.error ? { error: outcome.error } : {}) })
+    restorePopstate(targetIndex)
+    return
+  }
+  if (outcome.redirect) {
+    await redirectTo(outcome.redirect, { replace: true }, { source: "redirect", redirects: 0 })
+    return
+  }
+  await applySeed(seed, { preserveScroll: true, replace: true }, true, { target: to })
 }
 
 function listenHistory(): void {
   if (typeof window === "undefined" || (window as unknown as { __keelHistory?: boolean }).__keelHistory) return
   ;(window as unknown as { __keelHistory?: boolean }).__keelHistory = true
   window.addEventListener("popstate", (event) => {
-    const seed = seedFromHistory(event)
-    if (!seed) return
-    void applySeed(seed, { preserveScroll: true, replace: true }, true)
+    void handlePopstate(event)
   })
 }
 
@@ -310,6 +499,7 @@ export const router = {
     visit(href, { ...options, method: "patch", data }),
   delete: (href: string, data?: VisitOptions["data"], options?: VisitOptions) =>
     visit(href, { ...options, method: "delete", data }),
+  beforeEach,
   reload,
   replace: (href: string, options?: VisitOptions) => visit(href, { ...options, replace: true }),
   prefetch,
@@ -326,5 +516,8 @@ export async function bootstrap(options: RouterConfig = {}): Promise<void> {
   const node = document.getElementById("__keel_seed")
   if (!node?.textContent) throw new Error("Keel: missing #__keel_seed")
   const seed = JSON.parse(node.textContent) as KeelSeed
-  await applySeed(seed, { replace: true }, true, { initial: true })
+  await applySeed(seed, { replace: true }, true, {
+    initial: true,
+    target: { url: seed.path, method: "get", replace: true, source: "visit" },
+  })
 }

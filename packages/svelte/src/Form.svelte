@@ -11,6 +11,8 @@
     replace = false,
     resetOnSuccess = false,
     headers,
+    force = false,
+    onBefore,
     class: className = "",
     children,
     ...rest
@@ -33,6 +35,8 @@
       preserveState,
       replace,
       headers,
+      force,
+      onBefore,
       onSuccess() {
         if (resetOnSuccess) form.reset()
       },
