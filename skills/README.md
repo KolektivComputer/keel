@@ -11,6 +11,27 @@ layout.
 | `keel-pack` | Pack: Svelte pages, `+head.svelte`, contracts, navigation guards, action effects, `.feb` |
 | `keel-scaffold` | `keel-scaffold <origin> <dir>` from `GET /__keel/schema` |
 
+## Shipped source vs local installs
+
+`skills/` is the published source of truth, installable with
+`npx skills add KolektivComputer/keel`. The CLI writes consumer copies into
+agent directories (`.agents/skills/`, `.claude/skills/`, etc.) plus
+`skills-lock.json`; those are local installs only. This repository gitignores
+them so installed copies are never discovered or shipped from here.
+
+## Companion skills
+
+Styling a pack with Tailwind 4 + daisyUI 5? Install the official daisyUI
+skill alongside the Keel skills:
+
+```bash
+npx skills add saadeghi/daisyui -s daisyui -a kilo -y
+```
+
+That repository also ships `daisyui-install`, `daisyui-config`,
+`daisyui-colors`, and `daisyui-usage`. Our docs site and Harbor sample use
+daisyUI.
+
 ## Install
 
 ```bash
