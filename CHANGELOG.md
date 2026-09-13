@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Repository moved to the KolektivComputer organization; remote, docs/SCM
   links, package metadata, and the skills install command now use
   `KolektivComputer/keel`.
+- Installed agent-skill copies (`skills-lock.json`, `.agents/skills/`, other
+  agent skill dirs) are gitignored so only `skills/` ships; documented and
+  installed the official daisyUI companion skill.
 
 ### Fixed
 

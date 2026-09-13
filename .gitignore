@@ -81,5 +81,14 @@ coverage/
 /.aiignore
 
 .claude/settings.local.json
+
+# Installed agent skills (source of truth: skills/; installs are local only)
+.agents/
+.claude/skills/
+.kilo/
+.kilocode/
+.opencode/
+skills-lock.json
+
 packages/svelte/test/.compiled/
 packages/svelte/.svelte-kit/

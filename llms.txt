@@ -45,4 +45,4 @@ Docs: https://keel.mey.cat/  (GitHub Pages; local `pnpm dev` is http://127.0.0.1
 - [keel-pack](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-pack/SKILL.md): author a frontend pack — Svelte pages, `+head.svelte`, navigation guards, `.feb` builds
 - [keel-scaffold](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-scaffold/SKILL.md): scaffold a blank pack from `/__keel/schema`
 
-Install: `npx skills add KolektivComputer/keel`. Or copy `skills/*` into `.claude/skills/`, `.grok/skills/`, or `.agents/skills/`. See `skills/README.md`.
+Install: `npx skills add KolektivComputer/keel`. Styling packs with Tailwind 4 + daisyUI 5: install the companion `npx skills add saadeghi/daisyui -s daisyui -a kilo -y`. Or copy `skills/*` into `.claude/skills/`, `.grok/skills/`, or `.agents/skills/`. See `skills/README.md`.
