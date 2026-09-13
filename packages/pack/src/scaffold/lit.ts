@@ -12,10 +12,11 @@ import {
 } from "./provider.ts"
 
 function rootLayout(): string {
-  return `import { LitElement, html } from "lit"
+  return `import { html } from "lit"
+import { KeelElement } from "@kolektiv/keel-lit"
 import "../styles.css"
 
-export default class Layout extends LitElement {
+export default class Layout extends KeelElement {
   render() {
     return html\`<div class="shell"><slot></slot></div>\`
   }
@@ -24,17 +25,15 @@ export default class Layout extends LitElement {
 }
 
 function pageTs(page: ScaffoldPage): string {
-  return `import { LitElement, html } from "lit"
-import { page } from "@kolektiv/keel-lit"
+  return `import { html } from "lit"
+import { KeelElement } from "@kolektiv/keel-lit"
 import type { ${page.typeName} } from "${page.typesImport}"
 
-export default class Page extends LitElement {
-  private readonly ctx = page<${page.typeName}>()
-
+export default class Page extends KeelElement<${page.typeName}> {
   render() {
     return html\`
       <p class="lede">${page.id} · <code>${page.path}</code></p>
-      <pre>\${JSON.stringify(this.ctx.data, null, 2)}</pre>
+      <pre>\${JSON.stringify(this.page.data, null, 2)}</pre>
     \`
   }
 }
@@ -51,7 +50,6 @@ export function litScaffoldProvider(): ScaffoldProvider {
         {
           "@kolektiv/keel": "workspace:*",
           "@kolektiv/keel-lit": "workspace:*",
-          "@tanstack/lit-query": "^5.66.0",
           "@tanstack/query-core": "^5.66.0",
           lit: "^3.2.1",
         },

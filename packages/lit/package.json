@@ -1,0 +1,54 @@
+{
+  "name": "@kolektiv/keel-lit",
+  "version": "0.0.2-SNAPSHOT.4",
+  "description": "Keel Lit 3 bindings — page/form/action controllers, link/form/head helpers, and createPage.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "sideEffects": ["./dist/index.js", "./dist/mount.js"],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://repo.yuri.capital/repository/keel-npm/"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./mount": {
+      "types": "./dist/mount.d.ts",
+      "import": "./dist/mount.js",
+      "default": "./dist/mount.js"
+    },
+    "./bootstrap": {
+      "types": "./dist/bootstrap.d.ts",
+      "import": "./dist/bootstrap.js",
+      "default": "./dist/bootstrap.js"
+    }
+  },
+  "files": ["dist", "CHANGELOG.md"],
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "prepare": "pnpm build",
+    "prepack": "node -e \"require('fs').copyFileSync(require('path').join('..','..','CHANGELOG.md'),'CHANGELOG.md')\"",
+    "test": "pnpm build && node --experimental-strip-types --conditions=browser --test --test-force-exit test/*.test.ts"
+  },
+  "dependencies": {
+    "@lit/context": "^1.1.6"
+  },
+  "peerDependencies": {
+    "@kolektiv/keel": "workspace:*",
+    "@tanstack/query-core": "^5.0.0",
+    "lit": "^3.0.0"
+  },
+  "devDependencies": {
+    "@kolektiv/keel": "workspace:*",
+    "@lit/context": "^1.1.6",
+    "@tanstack/query-core": "^5.66.0",
+    "happy-dom": "^20.0.0",
+    "lit": "^3.3.1",
+    "typescript": "^5.7.0",
+    "vite": "^6.2.0"
+  }
+}

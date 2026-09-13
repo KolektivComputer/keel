@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `usePage`/`useForm`/`useAction`/`useKeelPageQuery`, `Link`/`Form`/`Head`,
   `useKeelAnchor`, navigation/unload guards, `createPage`, and `bootstrap`
   (#46).
+- `@kolektiv/keel-lit`: Lit 3 binding with reactive page/form state,
+  query/action controllers over TanStack, link/form/head elements or helpers,
+  navigation/unload guards, `createPage`, and `bootstrap` (#47).
 
 ### Changed
 

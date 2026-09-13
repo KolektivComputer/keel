@@ -297,6 +297,31 @@ test("preact provider pages use the usePage hook", async () => {
   assert.equal(bootstrap, `import { bootstrap } from "@kolektiv/keel-preact"\n\nvoid bootstrap()\n`)
 })
 
+test("lit provider pages extend the KeelElement base class", async () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-lit-"))
+  const out = join(root, "pack")
+  await scaffoldPack({ outDir: out, schema, id: "harbor", framework: "lit" })
+  const page = readFileSync(join(out, "src/pages/harbor/home/+page.ts"), "utf8")
+  assert.match(page, /import \{ html \} from "lit"/)
+  assert.match(page, /import \{ KeelElement \} from "@kolektiv\/keel-lit"/)
+  assert.match(page, /export default class Page extends KeelElement<HomePage>/)
+  assert.match(page, /this\.page\.data/)
+  assert.doesNotMatch(page, /\bpage<HomePage>/)
+  const layout = readFileSync(join(out, "src/pages/+layout.ts"), "utf8")
+  assert.match(layout, /import \{ KeelElement \} from "@kolektiv\/keel-lit"/)
+  assert.match(layout, /export default class Layout extends KeelElement/)
+  assert.match(layout, /<slot><\/slot>/)
+  const bootstrap = readFileSync(join(out, "src/bootstrap.ts"), "utf8")
+  assert.equal(bootstrap, `import { bootstrap } from "@kolektiv/keel-lit"\n\nvoid bootstrap()\n`)
+  const manifest = JSON.parse(readFileSync(join(out, "package.json"), "utf8")) as {
+    dependencies: Record<string, string>
+  }
+  assert.equal(manifest.dependencies["@kolektiv/keel-lit"], ownPackage.version)
+  assert.equal(manifest.dependencies.lit, "^3.2.1")
+  assert.equal(manifest.dependencies["@tanstack/query-core"], "^5.66.0")
+  assert.equal(manifest.dependencies["@tanstack/lit-query"], undefined)
+})
+
 test("scaffoldPack writes published @kolektiv versions instead of workspace protocol", async () => {
   const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
   const out = join(root, "pack")
