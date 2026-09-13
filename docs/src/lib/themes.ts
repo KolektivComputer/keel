@@ -1,11 +1,23 @@
-export const SITE_THEMES = [
-  { id: "catppuccin-latte", label: "Latte", scheme: "light", swatch: "#eff1f5" },
-  { id: "catppuccin-frappe", label: "Frappé", scheme: "dark", swatch: "#303446" },
-  { id: "catppuccin-macchiato", label: "Macchiato", scheme: "dark", swatch: "#24273a" },
-  { id: "catppuccin-mocha", label: "Mocha", scheme: "dark", swatch: "#1e1e2e" },
+import { getTheme } from "@kolektiv/themes"
+
+const SITE_THEME_IDS = [
+  "catppuccin-latte",
+  "catppuccin-frappe",
+  "catppuccin-macchiato",
+  "catppuccin-mocha",
 ] as const
 
-export type SiteTheme = (typeof SITE_THEMES)[number]["id"]
+export type SiteTheme = (typeof SITE_THEME_IDS)[number]
+
+export const SITE_THEMES = SITE_THEME_IDS.map((id) => {
+  const theme = getTheme(id)
+  return {
+    id,
+    label: theme?.label.replace("Catppuccin ", "") ?? id,
+    scheme: theme?.scheme ?? "dark",
+    swatch: theme?.colors["base-100"] ?? "#1e1e2e",
+  }
+})
 
 export const CODE_THEMES = [
   { id: "follow", label: "Follow site theme" },
@@ -17,6 +29,7 @@ export const CODE_THEMES = [
 
 export type CodeTheme = (typeof CODE_THEMES)[number]["id"]
 
+// Astro's <Code themes> wants Shiki preset names as literals.
 export const SHIKI_THEMES = {
   mocha: "catppuccin-mocha",
   macchiato: "catppuccin-macchiato",
