@@ -10,8 +10,15 @@ import Callout from "../../../components/Callout.astro"
 import { path } from "../../../lib/paths"
 
 Host artifacts live on Nexus at `repo.yuri.capital`. Pick **one** Maven
-repository: releases for numbered versions, or snapshots for `*-SNAPSHOT*`.
-Do not add both — Gradle will mix channels.
+repository:
+
+- `maven-releases` — numbered releases such as `0.0.1`
+- `maven-snapshots` — canonical `*-SNAPSHOT` builds
+- `keel-maven` — the unique pre-release line such as `0.0.2-SNAPSHOT.1`
+
+A version like `0.0.2-SNAPSHOT.1` is **not** a canonical Maven snapshot:
+snapshots end in `-SNAPSHOT`, and `maven-snapshots` rejects every other
+version. Do not add more than one — Gradle will mix channels.
 
 This page is **core** only (`dev.kolektiv.keel:core`). It has no Ktor
 dependency. Protocol format `keel/1`. Seed version `1`.
@@ -57,18 +64,21 @@ dependencies {
   That wiring lives on the <a href={path("/docs/getting-started/host")}>Host (Ktor)</a> page — not here.
 </Callout>
 
-## Snapshots instead
+## Unique pre-release instead
 
-Current snapshot: `0.0.2-SNAPSHOT.1`. If you are tracking `*-SNAPSHOT*`
-builds, swap the URL. Do not keep releases on the classpath at the same
-time.
+Current pre-release: `0.0.2-SNAPSHOT.1`. The `-SNAPSHOT.1` suffix is part of
+a literal, unique version — not a canonical Maven snapshot — so point Gradle
+at `keel-maven`:
 
 ```
-https://repo.yuri.capital/repository/maven-snapshots/
+https://repo.yuri.capital/repository/keel-maven/
 ```
 
-Publishers write to `keel-maven` (grouped) plus one of those two. You only
-need the consumer URL you chose.
+That is the advertised repository for the pre-release line. Canonical
+`*-SNAPSHOT` builds, when published, resolve from `maven-snapshots`.
+Publishers always write to `keel-maven`, plus `maven-releases` for numbered
+releases or `maven-snapshots` for canonical snapshots. You only need the
+consumer URL you chose.
 
 Next: <a href={path("/docs/getting-started/client")}>Client Setup</a> for
 the router, or skip ahead to
