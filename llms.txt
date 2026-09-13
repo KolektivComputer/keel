@@ -43,7 +43,9 @@ Docs: https://keel.mey.cat/  (GitHub Pages; local `pnpm dev` is http://127.0.0.1
 ## Skills
 
 - [keel-host](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-host/SKILL.md): implement a Keel host — pages, actions, call-site packs, document head, CSP, hot reload
-- [keel-pack](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-pack/SKILL.md): author a frontend pack — Svelte pages, `+head.svelte`, navigation guards, `.feb` builds
-- [keel-scaffold](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-scaffold/SKILL.md): scaffold a blank pack from `/__keel/schema`
+- [keel-pack](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-pack/SKILL.md): author a frontend pack — Svelte, React, Vue, Solid, Preact, Lit, or Angular pages, `+head.html`/`+head.svelte`, navigation guards, `.feb` builds
+- [keel-scaffold](https://raw.githubusercontent.com/KolektivComputer/keel/main/skills/keel-scaffold/SKILL.md): scaffold a blank pack for any adapter (`--framework`) from `/__keel/schema`
+
+Skills cover the full framework adapter matrix: Svelte, React, Vue, Solid, Preact, Lit, and Angular.
 
 Install: `npx skills add KolektivComputer/keel`. Styling packs with Tailwind 4 + daisyUI 5: install the companion `npx skills add saadeghi/daisyui -s daisyui -a kilo -y`. Or copy `skills/*` into `.claude/skills/`, `.grok/skills/`, or `.agents/skills/`. See `skills/README.md`.

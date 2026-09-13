@@ -3,13 +3,14 @@
 Canonical Agent Skills for implementing Keel from either side of the wire.
 Each folder is a valid skill (`SKILL.md` with YAML frontmatter) for Claude
 Code, Grok, and any consumer of the [Agent Skills](https://agentskills.io)
-layout.
+layout. Pack, scaffold, and host guidance covers all seven adapters —
+Svelte (default), React, Vue, Solid, Preact, Lit, and Angular.
 
 | Skill | When |
 | --- | --- |
-| `keel-host` | Server: pages, actions, CSRF, schema, pack-at-render, head, CSP, pack hot reload |
-| `keel-pack` | Pack: Svelte pages, `+head.svelte`, contracts, navigation guards, action effects, `.feb` |
-| `keel-scaffold` | `keel-scaffold <origin> <dir>` from `GET /__keel/schema` |
+| `keel-host` | Server: pages, actions, CSRF, schema, pack-at-render for any adapter, head, CSP, pack hot reload |
+| `keel-pack` | Pack: `+page.svelte` / `.tsx` / `.vue` / `.ts`, `+head.svelte` / `+head.html`, contracts, navigation guards, action effects, `.feb` |
+| `keel-scaffold` | `keel-scaffold <origin> <dir> --framework <name>` from `GET /__keel/schema` |
 
 ## Shipped source vs local installs
 
