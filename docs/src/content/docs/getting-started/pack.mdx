@@ -8,6 +8,7 @@ order: 5
 import CodeBlock from "../../../components/CodeBlock.astro"
 import CodePair from "../../../components/CodePair.astro"
 import Callout from "../../../components/Callout.astro"
+import FrameworkPanel from "../../../components/FrameworkPanel.astro"
 import { path } from "../../../lib/paths"
 
 This is the **frontend** half. A pack implements page ids. It never owns
@@ -28,9 +29,41 @@ the schema, plus `page-types.ts`, Vite, and `keelPack`.
 
 ```bash
 pnpm add -D @kolektiv/keel-pack
+```
+
+Pick the adapter with `--framework`. Default is Svelte when you omit it.
+
+<FrameworkPanel frameworks="svelte">
+```bash
 pnpm exec keel-scaffold 127.0.0.1:8090 ./pack --id app --framework svelte
 cd pack && pnpm install && pnpm build
 ```
+You get `+page.svelte` / `+layout.svelte`, `+page.ts` for id overrides, and `+head.svelte`.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="react preact solid">
+```bash
+pnpm exec keel-scaffold 127.0.0.1:8090 ./pack --id app --framework react
+cd pack && pnpm install && pnpm build
+```
+Swap `react` for `preact` or `solid`. Pages are `+page.tsx` / `+layout.tsx`, id in `+page.ts`, head in `+head.html`.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="vue">
+```bash
+pnpm exec keel-scaffold 127.0.0.1:8090 ./pack --id app --framework vue
+cd pack && pnpm install && pnpm build
+```
+Pages are `+page.vue` / `+layout.vue`, id in `+page.ts`, head in `+head.html`.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="lit angular">
+```bash
+pnpm exec keel-scaffold 127.0.0.1:8090 ./pack --id app --framework lit
+cd pack && pnpm install && pnpm build
+```
+Swap `lit` for `angular`. Pages are `+page.ts` / `+layout.ts`, id override in `+page.id.ts`, head in `+head.html`. Angular also emits `tsconfig.app.json` and pins `typescript@~5.8.3`.
+</FrameworkPanel>
 
 `localhost` / `127.*` use `http://`; other hosts default to `https://`.
 `--framework` accepts `angular`, `lit`, `preact`, `react`, `solid`, `svelte`
@@ -39,11 +72,7 @@ directory), `--version` pins the manifest version (default `0.1.0`), and
 `--schema <file.json>` scaffolds from a saved contract with no host running.
 Re-run with `--force` to overwrite.
 
-For Svelte you get `src/pages/app/home/+page.ts` (`export const id =
-"app.home"`) and `+page.svelte` per id, a root `+layout.svelte`,
-`src/bootstrap.ts`, `src/lib/page-types.ts` / `.json`, and `dist/app.feb`
-after `pnpm build`. Other frameworks change the component and head file
-extensions, not the layout:
+File layout by adapter (same id-keyed folders):
 
 | Framework | Page / layout | Id override | Head template |
 | --- | --- | --- | --- |
@@ -64,12 +93,12 @@ watch mode; a host with `watchPacks = true` swaps the result — see
 
 ## Option B — Vite plugin by hand
 
-Same result, files you type. The example below is the Svelte plugin; each
-adapter pairs with its own Vite plugin — `@vitejs/plugin-react` for React,
-`@vitejs/plugin-vue` for Vue, `vite-plugin-solid` for Solid,
-`@preact/preset-vite` for Preact, and `@analogjs/vite-plugin-angular` (with
-`@angular/build`) for Angular. After
-<a href={path("/docs/getting-started/client")}>Client Setup</a>:
+Same result, files you type. After
+<a href={path("/docs/getting-started/client")}>Client setup</a>:
+
+<FrameworkPanel frameworks="svelte">
+Option B below uses the Svelte Vite plugin. For other adapters, pair `keelPack` with that framework’s Vite plugin from Client setup, and set `framework` in `keelPack({ … })` to match.
+</FrameworkPanel>
 
 <CodePair
   title="vite.config.ts"

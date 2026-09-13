@@ -5,12 +5,18 @@ category: implementing
 order: 5
 ---
 
+import FrameworkPanel from "../../../components/FrameworkPanel.astro"
 import { path } from "../../../lib/paths"
 
 A pack adapter turns ordinary framework components into the `PageModule`
 contract the host loads: `mount`, `unmount`, and an optional `update`. Keel
 ships seven of them. They all speak the same protocol — the differences are
 how each framework expresses reactivity, forms, and DOM access.
+
+
+<FrameworkPanel frameworks="svelte">
+Svelte is the docs default. Sections below for other frameworks still apply when you pick them in the navbar; scroll to that heading or keep this page as the full matrix.
+</FrameworkPanel>
 
 | Framework | Package | Page state | Action / query | Components / directives | Guards | Mount |
 | --- | --- | --- | --- | --- | --- | --- |
