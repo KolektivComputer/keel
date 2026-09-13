@@ -30,6 +30,7 @@ yarn-error.log*
 pnpm-debug.log*
 .pnpm-store/
 packages/**/dist/
+packages/*/CHANGELOG.md
 samples/**/dist/
 pnpm-lock.yaml.bak
 

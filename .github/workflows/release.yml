@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag (for example v0.0.2-SNAPSHOT.1)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag
+        id: tag
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+        run: |
+          tag="${INPUT_TAG:-$GITHUB_REF_NAME}"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.tag.outputs.tag }}
+      - name: Extract changelog section
+        run: bash .github/scripts/changelog-section.sh "${{ steps.tag.outputs.version }}" > release-notes.md
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ steps.tag.outputs.tag }}"
+          if gh release view "${tag}" >/dev/null 2>&1; then
+            echo "release ${tag} exists, updating body and changelog asset"
+            gh release edit "${tag}" --title "${tag}" --notes-file release-notes.md
+            gh release upload "${tag}" CHANGELOG.md --clobber
+          else
+            echo "creating release ${tag}"
+            gh release create "${tag}" CHANGELOG.md \
+              --verify-tag \
+              --title "${tag}" \
+              --notes-file release-notes.md
+          fi

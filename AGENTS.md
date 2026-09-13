@@ -114,3 +114,22 @@ one of those groups; add `keel-npm` as a group member in Nexus. Workflow:
 
 Consumers add **either** the releases repo **or** the snapshots repo, not
 both, and not the grouped `keel-maven` / `keel-npm` URLs.
+
+## Changelog and releases
+
+`CHANGELOG.md` (Keep a Changelog) is the versioned list of user-facing changes.
+Every user-facing PR adds a bullet under `[Unreleased]` in the matching
+`Added` / `Changed` / `Fixed` / `Removed` / `Security` list and pastes that
+section into the PR body.
+
+At release time, move the `[Unreleased]` entries under the new
+`## [version] - YYYY-MM-DD` heading; use that section as the tag message and the
+GitHub Release body. `.github/scripts/changelog-section.sh <version>` prints the
+section, and `.github/workflows/release.yml` runs it on `v*` tags (or
+`workflow_dispatch`) to create or update the Release with the full changelog
+attached.
+
+The full changelog ships in every artifact: `META-INF/CHANGELOG.md` in the
+`core` / `ktor` jars, `CHANGELOG.md` in the `@kolektiv/keel` /
+`@kolektiv/keel-svelte` / `@kolektiv/keel-pack` npm tarballs, and as a GitHub
+Release asset.

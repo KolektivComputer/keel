@@ -29,11 +29,12 @@
       "default": "./dist/bootstrap.js"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "CHANGELOG.md"],
   "scripts": {
     "typecheck": "svelte-package -i src -o dist",
     "build": "svelte-package -i src -o dist",
     "prepare": "pnpm build",
+    "prepack": "node -e \"require('fs').copyFileSync(require('path').join('..','..','CHANGELOG.md'),'CHANGELOG.md')\"",
     "test": "node --experimental-strip-types --test test/*.test.ts"
   },
   "peerDependencies": {
