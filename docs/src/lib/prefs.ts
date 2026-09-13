@@ -142,6 +142,9 @@ const SITE_LABEL: Record<SiteTheme, string> = {
   "catppuccin-frappe": "Frappé",
   "catppuccin-macchiato": "Macchiato",
   "catppuccin-mocha": "Mocha",
+  nord: "Nord",
+  "kolektiv-light": "Kolektiv Light",
+  "kolektiv-dark": "Kolektiv Dark",
 }
 
 const CODE_LABEL: Record<Exclude<CodeTheme, "follow">, string> = {
@@ -149,6 +152,9 @@ const CODE_LABEL: Record<Exclude<CodeTheme, "follow">, string> = {
   frappe: "Frappé",
   macchiato: "Macchiato",
   mocha: "Mocha",
+  nord: "Nord",
+  "kolektiv-light": "Kolektiv Light",
+  "kolektiv-dark": "Kolektiv Dark",
 }
 
 export function copyFromFigure(root: HTMLElement): string {

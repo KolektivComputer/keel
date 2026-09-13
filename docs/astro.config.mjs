@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url"
 import { defineConfig } from "astro/config"
 import mdx from "@astrojs/mdx"
 import tailwindcss from "@tailwindcss/vite"
+import { kolektivDark, kolektivLight } from "@kolektiv/themes/shiki"
 
 const sandboxPlugin = fileURLToPath(new URL("../scripts/grok-pwa-plugin.mjs", import.meta.url))
 /** @type {any[]} */
@@ -52,6 +53,9 @@ export default defineConfig({
         macchiato: "catppuccin-macchiato",
         frappe: "catppuccin-frappe",
         latte: "catppuccin-latte",
+        nord: "nord",
+        "kolektiv-light": kolektivLight,
+        "kolektiv-dark": kolektivDark,
       },
       defaultColor: false,
       wrap: true,

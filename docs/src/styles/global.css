@@ -300,6 +300,36 @@ html[data-code-theme="latte"] .astro-code span {
   color: var(--shiki-latte) !important;
 }
 
+html[data-code-theme="follow"][data-theme="nord"] .astro-code,
+html[data-code-theme="nord"] .astro-code {
+  background-color: var(--shiki-nord-bg, #2e3440) !important;
+}
+
+html[data-code-theme="follow"][data-theme="nord"] .astro-code span,
+html[data-code-theme="nord"] .astro-code span {
+  color: var(--shiki-nord) !important;
+}
+
+html[data-code-theme="follow"][data-theme="kolektiv-light"] .astro-code,
+html[data-code-theme="kolektiv-light"] .astro-code {
+  background-color: var(--shiki-kolektiv-light-bg, #fff6ff) !important;
+}
+
+html[data-code-theme="follow"][data-theme="kolektiv-light"] .astro-code span,
+html[data-code-theme="kolektiv-light"] .astro-code span {
+  color: var(--shiki-kolektiv-light) !important;
+}
+
+html[data-code-theme="follow"][data-theme="kolektiv-dark"] .astro-code,
+html[data-code-theme="kolektiv-dark"] .astro-code {
+  background-color: var(--shiki-kolektiv-dark-bg, #10030d) !important;
+}
+
+html[data-code-theme="follow"][data-theme="kolektiv-dark"] .astro-code span,
+html[data-code-theme="kolektiv-dark"] .astro-code span {
+  color: var(--shiki-kolektiv-dark) !important;
+}
+
 @layer base {
   button:not(:disabled),
   [role="button"]:not(:disabled) {

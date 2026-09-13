@@ -1,10 +1,14 @@
 import { getTheme } from "@kolektiv/themes"
+import { kolektivDark, kolektivLight } from "@kolektiv/themes/shiki"
 
 const SITE_THEME_IDS = [
-  "catppuccin-latte",
-  "catppuccin-frappe",
-  "catppuccin-macchiato",
   "catppuccin-mocha",
+  "catppuccin-macchiato",
+  "catppuccin-frappe",
+  "catppuccin-latte",
+  "nord",
+  "kolektiv-dark",
+  "kolektiv-light",
 ] as const
 
 export type SiteTheme = (typeof SITE_THEME_IDS)[number]
@@ -25,16 +29,23 @@ export const CODE_THEMES = [
   { id: "frappe", label: "Frappé" },
   { id: "macchiato", label: "Macchiato" },
   { id: "mocha", label: "Mocha" },
+  { id: "nord", label: "Nord" },
+  { id: "kolektiv-light", label: "Kolektiv Light" },
+  { id: "kolektiv-dark", label: "Kolektiv Dark" },
 ] as const
 
 export type CodeTheme = (typeof CODE_THEMES)[number]["id"]
 
-// Astro's <Code themes> wants Shiki preset names as literals.
+// Keys become `--shiki-<key>` variables; Astro accepts preset names or theme
+// registrations (the Kolektiv themes come from @kolektiv/themes/shiki).
 export const SHIKI_THEMES = {
   mocha: "catppuccin-mocha",
   macchiato: "catppuccin-macchiato",
   frappe: "catppuccin-frappe",
   latte: "catppuccin-latte",
+  nord: "nord",
+  "kolektiv-light": kolektivLight,
+  "kolektiv-dark": kolektivDark,
 } as const
 
 export const DEFAULT_SITE_THEME: SiteTheme = "catppuccin-mocha"
