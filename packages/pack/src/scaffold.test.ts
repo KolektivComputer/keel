@@ -252,6 +252,21 @@ test("react provider pages use the usePage hook", async () => {
   assert.equal(bootstrap, `import { bootstrap } from "@kolektiv/keel-react"\n\nvoid bootstrap()\n`)
 })
 
+test("vue provider pages use the usePage composable", async () => {
+  const root = mkdtempSync(join(tmpdir(), "keel-scaffold-vue-"))
+  const out = join(root, "pack")
+  await scaffoldPack({ outDir: out, schema, id: "harbor", framework: "vue" })
+  const page = readFileSync(join(out, "src/pages/harbor/home/+page.vue"), "utf8")
+  assert.match(page, /import \{ Head, usePage \} from "@kolektiv\/keel-vue"/)
+  assert.match(page, /const seed = usePage<HomePage>\(\)/)
+  assert.match(page, /seed\.data/)
+  assert.doesNotMatch(page, /\bpage<HomePage>/)
+  const layout = readFileSync(join(out, "src/pages/+layout.vue"), "utf8")
+  assert.match(layout, /<slot \/>/)
+  const bootstrap = readFileSync(join(out, "src/bootstrap.ts"), "utf8")
+  assert.equal(bootstrap, `import { bootstrap } from "@kolektiv/keel-vue"\n\nvoid bootstrap()\n`)
+})
+
 test("scaffoldPack writes published @kolektiv versions instead of workspace protocol", async () => {
   const root = mkdtempSync(join(tmpdir(), "keel-scaffold-"))
   const out = join(root, "pack")
