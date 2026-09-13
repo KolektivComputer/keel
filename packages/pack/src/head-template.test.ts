@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
-import { compileHeadTemplate } from "./head-template.ts"
+import { compileHeadTemplate, compileHtmlHeadTemplate } from "./head-template.ts"
 
 test("compiles {seed.path} interpolations to host placeholders", () => {
   assert.equal(
@@ -56,6 +56,31 @@ test("rejects block and html mustaches", () => {
 test("rejects interpolations that are not seed paths", () => {
   assert.throws(() => compileHeadTemplate("<title>{title}</title>"), /must be seed\.\* paths/)
   assert.throws(() => compileHeadTemplate(`<title>{data.title}</title>`), /must be seed\.\* paths/)
+})
+
+test("compiles a framework-neutral +head.html template", () => {
+  const source = `<title>{seed.data.title} — Harbor</title>
+<meta name="description" content="{{data.description}}" />
+<link rel="canonical" href="{seed?.path}" />`
+  assert.equal(
+    compileHtmlHeadTemplate(source),
+    `<title>{{data.title}} — Harbor</title>
+<meta name="description" content="{{data.description}}" />
+<link rel="canonical" href="{{path}}" />`,
+  )
+})
+
+test("+head.html strips comments, scripts, and styles", () => {
+  const source = `<script type="application/ld+json">{"@type":"Thing"}</script>
+<style>head { color: red }</style>
+<!-- ignore me -->
+<title>Harbor</title>`
+  assert.equal(compileHtmlHeadTemplate(source), "<title>Harbor</title>")
+})
+
+test("+head.html rejects non-seed interpolations and empty output", () => {
+  assert.throws(() => compileHtmlHeadTemplate("<title>{title}</title>"), /must be seed\.\* paths/)
+  assert.throws(() => compileHtmlHeadTemplate("<!-- nothing -->"), /\+head\.html produced no head markup/)
 })
 
 test("rejects an unterminated mustache", () => {

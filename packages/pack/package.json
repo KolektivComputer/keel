@@ -27,6 +27,36 @@
       "types": "./dist/svelte.d.ts",
       "import": "./dist/svelte.js",
       "default": "./dist/svelte.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "default": "./dist/react.js"
+    },
+    "./vue": {
+      "types": "./dist/vue.d.ts",
+      "import": "./dist/vue.js",
+      "default": "./dist/vue.js"
+    },
+    "./solid": {
+      "types": "./dist/solid.d.ts",
+      "import": "./dist/solid.js",
+      "default": "./dist/solid.js"
+    },
+    "./preact": {
+      "types": "./dist/preact.d.ts",
+      "import": "./dist/preact.js",
+      "default": "./dist/preact.js"
+    },
+    "./lit": {
+      "types": "./dist/lit.d.ts",
+      "import": "./dist/lit.js",
+      "default": "./dist/lit.js"
+    },
+    "./angular": {
+      "types": "./dist/angular.d.ts",
+      "import": "./dist/angular.js",
+      "default": "./dist/angular.js"
     }
   },
   "files": ["dist", "CHANGELOG.md"],
