@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- npm publishing now targets the `keel-npm` registry for the `@kolektiv`
+  scope: the publish script swaps the committed repo-root `.npmrc`
+  (`npm-public`) for the publish config and restores it afterwards.
+
 ## [0.1.0] - 2026-09-14
 
 ### Added
