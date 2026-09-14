@@ -1,8 +1,10 @@
 ---
-import "../styles/global.css"
+import BaseLayout from "@kolektiv/common-docs-chrome/astro/BaseLayout.astro"
+import KeelBehavior from "../components/KeelBehavior.astro"
+import { docs } from "../docs-chrome"
 import { allDocs } from "../lib/docs"
-import { DEFAULT_CODE_THEME, DEFAULT_SITE_THEME } from "../lib/themes"
 import { path } from "../lib/paths"
+import "../styles/global.css"
 
 interface Props {
   title?: string
@@ -13,201 +15,16 @@ const {
   title = "Keel",
   description = "Host-owned routing and render-time frontend packs for Kotlin servers. Svelte, React, Vue, Solid, Preact, Lit, and Angular adapters.",
 } = Astro.props
-const pageTitle = title === "Keel" ? "Keel" : `${title} · Keel`
-const docs = await allDocs()
-const previewPaths = [path("/"), path("/docs"), ...docs.map((entry) => path(`/docs/${entry.id}`))]
-const site = Astro.site ?? new URL("http://localhost:8080/")
-const pageUrl = new URL(Astro.url.pathname, site).href
-const ogImage = new URL(path("/logo.svg"), site).href
+
+const entries = await allDocs()
+const previewPaths = [
+  path("/"),
+  path("/docs"),
+  ...entries.map((entry) => path(`/docs/${entry.id}`)),
+]
 ---
 
-<!doctype html>
-<html
-  lang="en"
-  data-theme={DEFAULT_SITE_THEME}
-  data-code-theme={DEFAULT_CODE_THEME}
-  data-lang="ts"
-  data-frontend="svelte"
-  data-backend="ktor"
-  class="antialiased"
->
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
-    <meta name="theme-color" content="#1e1e2e" />
-    <title>{pageTitle}</title>
-    <link rel="canonical" href={pageUrl} />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Keel" />
-    <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={pageUrl} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:type" content="image/svg+xml" />
-    <meta property="og:image:width" content="1024" />
-    <meta property="og:image:height" content="1024" />
-    <meta property="og:image:alt" content="Keel" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
-    <meta name="twitter:image:alt" content="Keel" />
-    <link rel="icon" type="image/svg+xml" href={path("/favicon.svg")} />
-    <link rel="apple-touch-icon" href={path("/logo.svg")} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400&display=swap"
-    />
-    <script is:inline>
-      (() => {
-        try {
-          const stored = localStorage.getItem("keel:theme")
-          const theme =
-            stored === "keel-light"
-              ? "catppuccin-latte"
-              : stored === "keel-dark"
-                ? "catppuccin-mocha"
-                : stored || "catppuccin-mocha"
-          const codeTheme = localStorage.getItem("keel:code-theme") || "follow"
-          const lang = localStorage.getItem("keel:lang") || "ts"
-          const frontend = localStorage.getItem("keel:frontend")
-          const frontends = ["svelte", "react", "vue", "solid", "preact", "lit", "angular"]
-          const root = document.documentElement
-          root.setAttribute("data-theme", theme)
-          root.dataset.codeTheme = codeTheme
-          root.dataset.lang = lang
-          root.dataset.frontend = frontends.includes(frontend) ? frontend : "svelte"
-          root.dataset.backend = "ktor"
-        } catch {}
-      })()
-    </script>
-    <script id="keel-preview-paths" type="application/json" is:inline set:html={JSON.stringify(previewPaths)} />
-  </head>
-  <body class="min-h-dvh bg-base-100 text-base-content font-sans flex flex-col">
-    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 btn btn-sm">
-      Skip to content
-    </a>
-    <slot />
-    <script>
-      import {
-        applyPrefs,
-        readPrefs,
-        syncControls,
-        syncFrameworkTargets,
-        copyFromFigure,
-      } from "../lib/prefs"
-      import { installPreviewBridge } from "../lib/preview-bridge"
-      import type { Prefs } from "../lib/prefs"
-
-      const initialPrefs = readPrefs()
-      applyPrefs(initialPrefs)
-      syncControls()
-      syncFrameworkTargets(initialPrefs.frontend)
-
-      let currentFrontend = initialPrefs.frontend
-      document.addEventListener("keel:prefs", (event) => {
-        const detail = (event as CustomEvent<Prefs>).detail
-        if (!detail || detail.frontend === currentFrontend) return
-        currentFrontend = detail.frontend
-        syncFrameworkTargets(detail.frontend)
-      })
-
-      const pathNode = document.getElementById("keel-preview-paths")
-      const paths: string[] = pathNode?.textContent ? JSON.parse(pathNode.textContent) : ["/", "/docs"]
-      installPreviewBridge(paths)
-
-      document.addEventListener("click", (event) => {
-        const target = event.target as HTMLElement
-        const copy = target.closest<HTMLButtonElement>("[data-copy]")
-        if (copy) {
-          const root = copy.closest<HTMLElement>("figure, .keel-deck")
-          if (!root) return
-          const text = copyFromFigure(root)
-          copy.textContent = "Copied"
-          void navigator.clipboard.writeText(text).catch(() => undefined)
-          window.setTimeout(() => {
-            copy.textContent = "Copy"
-          }, 1200)
-          return
-        }
-
-        const fileBtn = target.closest<HTMLButtonElement>("[data-file-btn]")
-        if (fileBtn) {
-          const deck = fileBtn.closest<HTMLElement>(".keel-deck")
-          if (!deck) return
-          const index = fileBtn.dataset.fileBtn ?? "0"
-          deck.dataset.file = index
-          deck.querySelectorAll<HTMLButtonElement>("[data-file-btn]").forEach((el) => {
-            const on = el.dataset.fileBtn === index
-            el.classList.toggle("btn-active", on)
-            el.setAttribute("aria-selected", String(on))
-          })
-          return
-        }
-
-        const hide = target.closest<HTMLButtonElement>("[data-code-hide]")
-        if (hide) {
-          const showcase = hide.closest<HTMLElement>("[data-showcase]")
-          if (showcase) {
-            showcase.setAttribute("data-code-open", "false")
-            showcase.querySelector("[data-code-show] button")?.setAttribute("aria-expanded", "false")
-            showcase.querySelectorAll("[data-code-hide]").forEach((el) => el.setAttribute("aria-expanded", "false"))
-            showcase.querySelector("[data-code-overlay]")?.setAttribute("aria-hidden", "true")
-          }
-          return
-        }
-
-        const show = target.closest("[data-code-show]")
-        if (show) {
-          const showcase = show.closest<HTMLElement>("[data-showcase]")
-          if (showcase) {
-            showcase.setAttribute("data-code-open", "true")
-            showcase.querySelector("[data-code-show] button")?.setAttribute("aria-expanded", "true")
-            showcase.querySelectorAll("[data-code-hide]").forEach((el) => el.setAttribute("aria-expanded", "true"))
-            showcase.querySelector("[data-code-overlay]")?.setAttribute("aria-hidden", "false")
-          }
-          return
-        }
-
-        const btn = target.closest<HTMLButtonElement>("[data-lang-btn]")
-        if (!btn?.dataset.langBtn) return
-        const block = btn.closest<HTMLElement>(".keel-code")
-        if (block && btn.dataset.langScope === "block") {
-          block.dataset.lang = btn.dataset.langBtn
-          syncControls(block)
-          return
-        }
-        applyPrefs({ lang: btn.dataset.langBtn === "js" ? "js" : "ts" })
-        syncControls()
-      })
-
-      document.addEventListener("change", (event) => {
-        const el = event.target as HTMLInputElement | HTMLSelectElement
-        if (el.matches("[data-local-framework]")) {
-          const root = el.closest<HTMLElement>(".keel-deck, .keel-code")
-          if (root) {
-            root.dataset.framework = el.value
-            root.querySelectorAll<HTMLSelectElement>("[data-local-framework]").forEach((select) => {
-              select.value = el.value
-            })
-            const index = root.dataset.file ?? "0"
-            root.querySelectorAll<HTMLButtonElement>("[data-file-btn]").forEach((btn) => {
-              const on = btn.dataset.fileBtn === index
-              btn.classList.toggle("btn-active", on)
-              btn.setAttribute("aria-selected", String(on))
-            })
-          }
-          return
-        }
-        if (el.matches("[data-pref]")) {
-          const key = (el as HTMLInputElement).dataset.pref as keyof Prefs
-          applyPrefs({ [key]: el.value })
-          syncControls()
-        }
-      })
-    </script>
-  </body>
-</html>
+<BaseLayout config={docs} title={title} description={description}>
+  <slot />
+  <KeelBehavior previewPaths={previewPaths} />
+</BaseLayout>

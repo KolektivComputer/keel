@@ -1,6 +1,6 @@
 ---
 import ShikiCode from "./ShikiCode.astro"
-import LangToggle from "./LangToggle.astro"
+import LangButtons from "./LangButtons.astro"
 
 interface FrameworkOption {
   id: string
@@ -54,7 +54,7 @@ const defaultFramework = frameworks?.[0]?.id ?? "svelte"
           {item.ts ? (
             <div class="keel-code">
               <div class="flex justify-end border-b border-base-300 bg-base-200 px-3 py-1">
-                <LangToggle scope="block" />
+                <LangButtons />
               </div>
               <div data-lang-panel="ts">
                 <ShikiCode code={item.ts} lang="ts" />

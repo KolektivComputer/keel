@@ -1,10 +1,13 @@
 ---
+/**
+ * Block-scoped TypeScript/JavaScript toggle used inside Keel's content code
+ * components. The global language switch lives in the shared chrome navbar.
+ */
 interface Props {
   size?: "xs" | "sm"
-  scope?: "global" | "block"
 }
 
-const { size = "xs", scope = "global" } = Astro.props
+const { size = "xs" } = Astro.props
 const btn = size === "xs" ? "btn btn-xs min-h-8 sm:min-h-7" : "btn btn-sm min-h-10"
 ---
 
@@ -13,14 +16,14 @@ const btn = size === "xs" ? "btn btn-xs min-h-8 sm:min-h-7" : "btn btn-sm min-h-
     type="button"
     class:list={[btn, "join-item px-3 text-base-content"]}
     data-lang-btn="ts"
-    data-lang-scope={scope}
+    data-lang-scope="block"
     aria-pressed="true">TS</button
   >
   <button
     type="button"
     class:list={[btn, "join-item px-3 text-base-content"]}
     data-lang-btn="js"
-    data-lang-scope={scope}
+    data-lang-scope="block"
     aria-pressed="false">JS</button
   >
 </div>

@@ -1,7 +1,5 @@
 ---
 import Base from "../layouts/Base.astro"
-import Navbar from "../components/Navbar.astro"
-import Footer from "../components/Footer.astro"
 import CodeDeck from "../components/CodeDeck.astro"
 import CodeBlock from "../components/CodeBlock.astro"
 import BrowserPreview from "../components/BrowserPreview.astro"
@@ -161,8 +159,7 @@ export default class Home {
   title="Keel"
   description="Host-owned routing for Kotlin MPAs. The server owns URLs, page ids, and payload types; the call site passes the pack that renders them. Packs implement ids, never paths, and ship as .feb bundles."
 >
-  <Navbar />
-  <main id="main">
+  <div>
     <section class="overflow-visible">
       <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-12 lg:py-20 xl:max-w-7xl xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
         <div>
@@ -460,6 +457,5 @@ export default class Home {
         </div>
       </div>
     </section>
-  </main>
-  <Footer />
+  </div>
 </Base>

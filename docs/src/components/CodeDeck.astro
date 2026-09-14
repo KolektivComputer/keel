@@ -1,6 +1,6 @@
 ---
 import ShikiCode from "./ShikiCode.astro"
-import LangToggle from "./LangToggle.astro"
+import LangButtons from "./LangButtons.astro"
 
 interface FileSnippet {
   title: string
@@ -104,7 +104,7 @@ const initial = frameworks[0]?.id ?? "svelte"
               <>
                 {!overlay && (
                   <div class="flex justify-end border-b border-base-300 bg-base-200 px-3 py-1">
-                    <LangToggle scope="block" />
+                    <LangButtons />
                   </div>
                 )}
                 <div data-lang-panel="ts" class:list={[overlay && "overflow-auto lg:h-36"]}>
