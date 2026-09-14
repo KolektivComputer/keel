@@ -5,14 +5,15 @@ category: core-concepts
 order: 5
 ---
 
-import CodePair from "../../../components/CodePair.astro"
+import CodeBlock from "../../../components/CodeBlock.astro"
 import { path } from "../../../lib/paths"
 
 The router lives in `@kolektiv/keel`. `@kolektiv/keel-svelte` wraps it, and
 React, Vue, Solid, Preact, Lit, and Angular adapters expose the same surface
-through their own idioms. The table and examples here use Svelte; see
+through their own idioms. The table lists the core exports; the examples below
+show each adapter's spelling. See
 <a href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>
-for the per-framework names.
+for the full matrix.
 
 | Export | Kind | Notes |
 | --- | --- | --- |
@@ -26,10 +27,13 @@ for the per-framework names.
 | `useAction` | function | TanStack mutation: action, then reload the seed |
 | `Head` | component | Reads `page().head`; props override |
 
-<CodePair
-  fw="svelte"
+<CodeBlock
   title="Link, page, visit"
-  ts={`<script lang="ts">
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      ts: `<script lang="ts">
   import { Link, page, router } from "@kolektiv/keel-svelte"
   import type { HomePage } from "@app/page-types"
 
@@ -40,23 +44,243 @@ for the per-framework names.
 <a href="/u/ada" use:keel={{ prefetch: "hover" }}>Ada</a>
 <button type="button" onclick={() => router.visit("/settings", { preserveScroll: true })}>
   Settings
-</button>`}
-  js={`<script>
+</button>`,
+      js: `<script>
   import { Link, page, router } from "@kolektiv/keel-svelte"
 
   const ctx = page()
 </script>
 
 <Link href="/u/ada" prefetch="hover">{ctx.data.viewer?.displayName}</Link>
+<a href="/u/ada" use:keel={{ prefetch: "hover" }}>Ada</a>
 <button type="button" onclick={() => router.visit("/settings", { preserveScroll: true })}>
   Settings
-</button>`}
+</button>`,
+    },
+    {
+      id: "react",
+      label: "React",
+      ts: `import { Link, router, useKeelAnchor, usePage } from "@kolektiv/keel-react"
+import type { HomePage } from "@app/page-types"
+
+export default function Viewer() {
+  const seed = usePage<HomePage>()
+  const anchor = useKeelAnchor({ href: "/u/ada", prefetch: "hover" })
+  return (
+    <>
+      <Link href="/u/ada" prefetch="hover">{seed.data.viewer?.displayName}</Link>
+      <a {...anchor}>Ada</a>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+      js: `import { Link, router, useKeelAnchor, usePage } from "@kolektiv/keel-react"
+
+export default function Viewer() {
+  const seed = usePage()
+  const anchor = useKeelAnchor({ href: "/u/ada", prefetch: "hover" })
+  return (
+    <>
+      <Link href="/u/ada" prefetch="hover">{seed.data.viewer?.displayName}</Link>
+      <a {...anchor}>Ada</a>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      ts: `<script setup lang="ts">
+import { Link, router, useKeelAnchor, usePage } from "@kolektiv/keel-vue"
+import type { HomePage } from "@app/page-types"
+
+const seed = usePage<HomePage>()
+const anchor = useKeelAnchor({ href: "/u/ada", prefetch: "hover" })
+</script>
+
+<template>
+  <Link href="/u/ada" prefetch="hover">{{ seed.data.viewer?.displayName }}</Link>
+  <a v-bind="anchor">Ada</a>
+  <button type="button" @click="router.visit('/settings', { preserveScroll: true })">
+    Settings
+  </button>
+</template>`,
+      js: `<script setup>
+import { Link, router, useKeelAnchor, usePage } from "@kolektiv/keel-vue"
+
+const seed = usePage()
+const anchor = useKeelAnchor({ href: "/u/ada", prefetch: "hover" })
+</script>
+
+<template>
+  <Link href="/u/ada" prefetch="hover">{{ seed.data.viewer?.displayName }}</Link>
+  <a v-bind="anchor">Ada</a>
+  <button type="button" @click="router.visit('/settings', { preserveScroll: true })">
+    Settings
+  </button>
+</template>`,
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      ts: `import { Link, router, useKeelAnchor, usePage } from "@kolektiv/keel-solid"
+import type { HomePage } from "@app/page-types"
+
+export default function Viewer() {
+  const seed = usePage<HomePage>()
+  const anchor = useKeelAnchor({ href: "/u/ada", prefetch: "hover" })
+  return (
+    <>
+      <Link href="/u/ada" prefetch="hover">{seed().data.viewer?.displayName}</Link>
+      <a {...anchor}>Ada</a>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+      js: `import { Link, router, useKeelAnchor, usePage } from "@kolektiv/keel-solid"
+
+export default function Viewer() {
+  const seed = usePage()
+  const anchor = useKeelAnchor({ href: "/u/ada", prefetch: "hover" })
+  return (
+    <>
+      <Link href="/u/ada" prefetch="hover">{seed().data.viewer?.displayName}</Link>
+      <a {...anchor}>Ada</a>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      ts: `import { Link, router, useKeelAnchor, usePage } from "@kolektiv/keel-preact"
+import type { HomePage } from "@app/page-types"
+
+export default function Viewer() {
+  const seed = usePage<HomePage>()
+  const anchor = useKeelAnchor({ href: "/u/ada", prefetch: "hover" })
+  return (
+    <>
+      <Link href="/u/ada" prefetch="hover">{seed.data.viewer?.displayName}</Link>
+      <a {...anchor}>Ada</a>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+      js: `import { Link, router, useKeelAnchor, usePage } from "@kolektiv/keel-preact"
+
+export default function Viewer() {
+  const seed = usePage()
+  const anchor = useKeelAnchor({ href: "/u/ada", prefetch: "hover" })
+  return (
+    <>
+      <Link href="/u/ada" prefetch="hover">{seed.data.viewer?.displayName}</Link>
+      <a {...anchor}>Ada</a>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      ts: `import { html } from "lit"
+import { KeelElement, keelAnchor, router } from "@kolektiv/keel-lit"
+import type { HomePage } from "@app/page-types"
+
+export default class Viewer extends KeelElement<HomePage> {
+  render() {
+    return html\`
+      <keel-link href="/u/ada" prefetch="hover">\${this.page.data.viewer?.displayName}</keel-link>
+      <a \${keelAnchor({ href: "/u/ada", prefetch: "hover" })}>Ada</a>
+      <button type="button" @click=\${() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    \`
+  }
+}`,
+      js: `import { html } from "lit"
+import { KeelElement, keelAnchor, router } from "@kolektiv/keel-lit"
+
+export default class Viewer extends KeelElement {
+  render() {
+    return html\`
+      <keel-link href="/u/ada" prefetch="hover">\${this.page.data.viewer?.displayName}</keel-link>
+      <a \${keelAnchor({ href: "/u/ada", prefetch: "hover" })}>Ada</a>
+      <button type="button" @click=\${() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    \`
+  }
+}`,
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      ts: `import { Component } from "@angular/core"
+import { KeelAnchorDirective, KeelLink, injectKeelPage, router } from "@kolektiv/keel-angular"
+import type { HomePage } from "@app/page-types"
+
+@Component({
+  selector: "app-viewer",
+  standalone: true,
+  imports: [KeelAnchorDirective, KeelLink],
+  template: \`
+    <keel-link href="/u/ada" prefetch="hover">{{ page().data.viewer?.displayName }}</keel-link>
+    <a [keelAnchor]="{ href: '/u/ada', prefetch: 'hover' }">Ada</a>
+    <button type="button" (click)="navigate.visit('/settings', { preserveScroll: true })">
+      Settings
+    </button>
+  \`,
+})
+export default class Viewer {
+  readonly page = injectKeelPage<HomePage>()
+  readonly navigate = router
+}`,
+      js: `import { Component } from "@angular/core"
+import { KeelAnchorDirective, KeelLink, injectKeelPage, router } from "@kolektiv/keel-angular"
+
+@Component({
+  selector: "app-viewer",
+  standalone: true,
+  imports: [KeelAnchorDirective, KeelLink],
+  template: \`
+    <keel-link href="/u/ada" prefetch="hover">{{ page().data.viewer?.displayName }}</keel-link>
+    <a [keelAnchor]="{ href: '/u/ada', prefetch: 'hover' }">Ada</a>
+    <button type="button" (click)="navigate.visit('/settings', { preserveScroll: true })">
+      Settings
+    </button>
+  \`,
+})
+export default class Viewer {
+  readonly page = injectKeelPage()
+  readonly navigate = router
+}`,
+    },
+  ]}
 />
 
-<CodePair
-  fw="svelte"
+<CodeBlock
   title="Form and useForm"
-  ts={`<script lang="ts">
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      ts: `<script lang="ts">
   import { Form, useForm } from "@kolektiv/keel-svelte"
 
   const comment = useForm({ body: "" })
@@ -65,8 +289,8 @@ for the per-framework names.
 <Form action="/p/hello/comments" method="post" resetOnSuccess>
   <textarea name="body"></textarea>
   <button type="submit">Post</button>
-</Form>`}
-  js={`<script>
+</Form>`,
+      js: `<script>
   import { Form, useForm } from "@kolektiv/keel-svelte"
 
   const comment = useForm({ body: "" })
@@ -75,7 +299,238 @@ for the per-framework names.
 <Form action="/p/hello/comments" method="post" resetOnSuccess>
   <textarea name="body"></textarea>
   <button type="submit">Post</button>
-</Form>`}
+</Form>`,
+    },
+    {
+      id: "react",
+      label: "React",
+      ts: `import { Form, useForm } from "@kolektiv/keel-react"
+
+export default function CommentForm() {
+  const comment = useForm({ body: "" })
+  return (
+    <Form action="/p/hello/comments" method="post" resetOnSuccess>
+      <textarea
+        name="body"
+        value={comment.data.body}
+        onInput={(event) => comment.set("body", event.currentTarget.value)}
+      />
+      <button type="submit">Post</button>
+    </Form>
+  )
+}`,
+      js: `import { Form, useForm } from "@kolektiv/keel-react"
+
+export default function CommentForm() {
+  const comment = useForm({ body: "" })
+  return (
+    <Form action="/p/hello/comments" method="post" resetOnSuccess>
+      <textarea
+        name="body"
+        value={comment.data.body}
+        onInput={(event) => comment.set("body", event.currentTarget.value)}
+      />
+      <button type="submit">Post</button>
+    </Form>
+  )
+}`,
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      ts: `<script setup lang="ts">
+import { Form, useForm } from "@kolektiv/keel-vue"
+
+const comment = useForm({ body: "" })
+</script>
+
+<template>
+  <Form action="/p/hello/comments" method="post" reset-on-success>
+    <textarea
+      name="body"
+      :value="comment.data.body"
+      @input="comment.set('body', $event.target.value)"
+    ></textarea>
+    <button type="submit">Post</button>
+  </Form>
+</template>`,
+      js: `<script setup>
+import { Form, useForm } from "@kolektiv/keel-vue"
+
+const comment = useForm({ body: "" })
+</script>
+
+<template>
+  <Form action="/p/hello/comments" method="post" reset-on-success>
+    <textarea
+      name="body"
+      :value="comment.data.body"
+      @input="comment.set('body', $event.target.value)"
+    ></textarea>
+    <button type="submit">Post</button>
+  </Form>
+</template>`,
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      ts: `import { Form, useForm } from "@kolektiv/keel-solid"
+
+export default function CommentForm() {
+  const comment = useForm({ body: "" })
+  return (
+    <Form action="/p/hello/comments" method="post" resetOnSuccess>
+      <textarea
+        name="body"
+        value={comment.data.body}
+        onInput={(event) => comment.set("body", event.currentTarget.value)}
+      />
+      <button type="submit">Post</button>
+    </Form>
+  )
+}`,
+      js: `import { Form, useForm } from "@kolektiv/keel-solid"
+
+export default function CommentForm() {
+  const comment = useForm({ body: "" })
+  return (
+    <Form action="/p/hello/comments" method="post" resetOnSuccess>
+      <textarea
+        name="body"
+        value={comment.data.body}
+        onInput={(event) => comment.set("body", event.currentTarget.value)}
+      />
+      <button type="submit">Post</button>
+    </Form>
+  )
+}`,
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      ts: `import { Form, useForm } from "@kolektiv/keel-preact"
+
+export default function CommentForm() {
+  const comment = useForm({ body: "" })
+  return (
+    <Form action="/p/hello/comments" method="post" resetOnSuccess>
+      <textarea
+        name="body"
+        value={comment.data.body}
+        onInput={(event) => comment.set("body", event.currentTarget.value)}
+      />
+      <button type="submit">Post</button>
+    </Form>
+  )
+}`,
+      js: `import { Form, useForm } from "@kolektiv/keel-preact"
+
+export default function CommentForm() {
+  const comment = useForm({ body: "" })
+  return (
+    <Form action="/p/hello/comments" method="post" resetOnSuccess>
+      <textarea
+        name="body"
+        value={comment.data.body}
+        onInput={(event) => comment.set("body", event.currentTarget.value)}
+      />
+      <button type="submit">Post</button>
+    </Form>
+  )
+}`,
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      ts: `import { html } from "lit"
+import { KeelElement, form, useForm } from "@kolektiv/keel-lit"
+
+export default class CommentForm extends KeelElement {
+  readonly comment = useForm(this, { body: "" })
+
+  render() {
+    return form(
+      { action: "/p/hello/comments", method: "post", resetOnSuccess: true },
+      html\`
+        <textarea
+          name="body"
+          .value=\${this.comment.data.body}
+          @input=\${(event: Event) =>
+            this.comment.set("body", (event.target as HTMLTextAreaElement).value)}
+        ></textarea>
+        <button type="submit">Post</button>
+      \`,
+    )
+  }
+}`,
+      js: `import { html } from "lit"
+import { KeelElement, form, useForm } from "@kolektiv/keel-lit"
+
+export default class CommentForm extends KeelElement {
+  readonly comment = useForm(this, { body: "" })
+
+  render() {
+    return form(
+      { action: "/p/hello/comments", method: "post", resetOnSuccess: true },
+      html\`
+        <textarea
+          name="body"
+          .value=\${this.comment.data.body}
+          @input=\${(event) => this.comment.set("body", event.target.value)}
+        ></textarea>
+        <button type="submit">Post</button>
+      \`,
+    )
+  }
+}`,
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      ts: `import { Component } from "@angular/core"
+import { KeelFormDirective, injectKeelForm } from "@kolektiv/keel-angular"
+
+@Component({
+  selector: "app-comment-form",
+  standalone: true,
+  imports: [KeelFormDirective],
+  template: \`
+    <form [keelForm]="{ action: '/p/hello/comments', method: 'post', resetOnSuccess: true }">
+      <textarea
+        name="body"
+        [value]="comment.data.body"
+        (input)="comment.set('body', $any($event.target).value)"
+      ></textarea>
+      <button type="submit">Post</button>
+    </form>
+  \`,
+})
+export default class CommentForm {
+  readonly comment = injectKeelForm({ body: "" })
+}`,
+      js: `import { Component } from "@angular/core"
+import { KeelFormDirective, injectKeelForm } from "@kolektiv/keel-angular"
+
+@Component({
+  selector: "app-comment-form",
+  standalone: true,
+  imports: [KeelFormDirective],
+  template: \`
+    <form [keelForm]="{ action: '/p/hello/comments', method: 'post', resetOnSuccess: true }">
+      <textarea
+        name="body"
+        [value]="comment.data.body"
+        (input)="comment.set('body', $any($event.target).value)"
+      ></textarea>
+      <button type="submit">Post</button>
+    </form>
+  \`,
+})
+export default class CommentForm {
+  readonly comment = injectKeelForm({ body: "" })
+}`,
+    },
+  ]}
 />
 
 ## Visit options

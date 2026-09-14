@@ -55,7 +55,6 @@ is **200** `{ "data": … }`. CSRF and status codes are on
 The pack calls the id — never a URL it invented:
 
 <CodePair
-  fw="svelte"
   title="action()"
   ts={`import { action } from "@kolektiv/keel"
 
@@ -71,10 +70,13 @@ const out = await action("harbor.setName", {
 
 `useAction(id)` wraps that in a mutation that reloads the current seed:
 
-<CodePair
-  fw="svelte"
+<CodeBlock
   title="useAction"
-  ts={`<script lang="ts">
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      ts: `<script lang="ts">
   import { ActionError, page, useAction } from "@kolektiv/keel-svelte"
   import type { HomePage, SetNameIn, SetNameOut } from "@app/page-types"
 
@@ -94,8 +96,8 @@ const out = await action("harbor.setName", {
     <p>{setName.error.errors.displayName?.join(" ")}</p>
   {/if}
   <button type="submit" disabled={setName.isPending}>Save</button>
-</form>`}
-  js={`<script>
+</form>`,
+      js: `<script>
   import { ActionError, page, useAction } from "@kolektiv/keel-svelte"
 
   const ctx = page()
@@ -110,8 +112,346 @@ const out = await action("harbor.setName", {
 
 <form onsubmit={onSetName}>
   <input bind:value={displayName} />
+  {#if setName.error instanceof ActionError}
+    <p>{setName.error.errors.displayName?.join(" ")}</p>
+  {/if}
   <button type="submit" disabled={setName.isPending}>Save</button>
-</form>`}
+</form>`,
+    },
+    {
+      id: "react",
+      label: "React",
+      ts: `import { useState, type FormEvent } from "react"
+import { ActionError, useAction, usePage } from "@kolektiv/keel-react"
+import type { HomePage, SetNameIn, SetNameOut } from "@app/page-types"
+
+export default function SetName() {
+  const seed = usePage<HomePage>()
+  const setName = useAction<SetNameIn, SetNameOut>("harbor.setName")
+  const [displayName, setDisplayName] = useState(seed.data.viewer?.displayName ?? "")
+
+  function onSetName(event: FormEvent) {
+    event.preventDefault()
+    void setName.mutateAsync({ displayName }).catch(() => undefined)
+  }
+
+  return (
+    <form onSubmit={onSetName}>
+      <input value={displayName} onInput={(event) => setDisplayName(event.currentTarget.value)} />
+      {setName.error instanceof ActionError && (
+        <p>{setName.error.errors.displayName?.join(" ")}</p>
+      )}
+      <button type="submit" disabled={setName.isPending}>Save</button>
+    </form>
+  )
+}`,
+      js: `import { useState } from "react"
+import { ActionError, useAction, usePage } from "@kolektiv/keel-react"
+
+export default function SetName() {
+  const seed = usePage()
+  const setName = useAction("harbor.setName")
+  const [displayName, setDisplayName] = useState(seed.data.viewer?.displayName ?? "")
+
+  function onSetName(event) {
+    event.preventDefault()
+    void setName.mutateAsync({ displayName }).catch(() => undefined)
+  }
+
+  return (
+    <form onSubmit={onSetName}>
+      <input value={displayName} onInput={(event) => setDisplayName(event.currentTarget.value)} />
+      {setName.error instanceof ActionError && (
+        <p>{setName.error.errors.displayName?.join(" ")}</p>
+      )}
+      <button type="submit" disabled={setName.isPending}>Save</button>
+    </form>
+  )
+}`,
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      ts: `<script setup lang="ts">
+import { computed, ref } from "vue"
+import { ActionError, useAction, usePage } from "@kolektiv/keel-vue"
+import type { HomePage, SetNameIn, SetNameOut } from "@app/page-types"
+
+const seed = usePage<HomePage>()
+const setName = useAction<SetNameIn, SetNameOut>("harbor.setName")
+const displayName = ref(seed.value.data.viewer?.displayName ?? "")
+const errorText = computed(() => {
+  const error = setName.error.value
+  return error instanceof ActionError ? error.errors.displayName?.join(" ") : undefined
+})
+
+function onSetName() {
+  void setName.mutateAsync({ displayName: displayName.value }).catch(() => undefined)
+}
+</script>
+
+<template>
+  <form @submit.prevent="onSetName">
+    <input v-model="displayName" />
+    <p v-if="errorText">{{ errorText }}</p>
+    <button type="submit" :disabled="setName.isPending">Save</button>
+  </form>
+</template>`,
+      js: `<script setup>
+import { computed, ref } from "vue"
+import { ActionError, useAction, usePage } from "@kolektiv/keel-vue"
+
+const seed = usePage()
+const setName = useAction("harbor.setName")
+const displayName = ref(seed.value.data.viewer?.displayName ?? "")
+const errorText = computed(() => {
+  const error = setName.error.value
+  return error instanceof ActionError ? error.errors.displayName?.join(" ") : undefined
+})
+
+function onSetName() {
+  void setName.mutateAsync({ displayName: displayName.value }).catch(() => undefined)
+}
+</script>
+
+<template>
+  <form @submit.prevent="onSetName">
+    <input v-model="displayName" />
+    <p v-if="errorText">{{ errorText }}</p>
+    <button type="submit" :disabled="setName.isPending">Save</button>
+  </form>
+</template>`,
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      ts: `import { createSignal } from "solid-js"
+import { ActionError, useAction, usePage } from "@kolektiv/keel-solid"
+import type { HomePage, SetNameIn, SetNameOut } from "@app/page-types"
+
+export default function SetName() {
+  const seed = usePage<HomePage>()
+  const setName = useAction<SetNameIn, SetNameOut>("harbor.setName")
+  const [displayName, setDisplayName] = createSignal(seed().data.viewer?.displayName ?? "")
+
+  function onSetName(event: SubmitEvent) {
+    event.preventDefault()
+    void setName.mutateAsync({ displayName: displayName() }).catch(() => undefined)
+  }
+
+  return (
+    <form onSubmit={onSetName}>
+      <input value={displayName()} onInput={(event) => setDisplayName(event.currentTarget.value)} />
+      {setName.error instanceof ActionError && (
+        <p>{setName.error.errors.displayName?.join(" ")}</p>
+      )}
+      <button type="submit" disabled={setName.isPending}>Save</button>
+    </form>
+  )
+}`,
+      js: `import { createSignal } from "solid-js"
+import { ActionError, useAction, usePage } from "@kolektiv/keel-solid"
+
+export default function SetName() {
+  const seed = usePage()
+  const setName = useAction("harbor.setName")
+  const [displayName, setDisplayName] = createSignal(seed().data.viewer?.displayName ?? "")
+
+  function onSetName(event) {
+    event.preventDefault()
+    void setName.mutateAsync({ displayName: displayName() }).catch(() => undefined)
+  }
+
+  return (
+    <form onSubmit={onSetName}>
+      <input value={displayName()} onInput={(event) => setDisplayName(event.currentTarget.value)} />
+      {setName.error instanceof ActionError && (
+        <p>{setName.error.errors.displayName?.join(" ")}</p>
+      )}
+      <button type="submit" disabled={setName.isPending}>Save</button>
+    </form>
+  )
+}`,
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      ts: `import { useState } from "preact/hooks"
+import { ActionError, useAction, usePage } from "@kolektiv/keel-preact"
+import type { HomePage, SetNameIn, SetNameOut } from "@app/page-types"
+
+export default function SetName() {
+  const seed = usePage<HomePage>()
+  const setName = useAction<SetNameIn, SetNameOut>("harbor.setName")
+  const [displayName, setDisplayName] = useState(seed.data.viewer?.displayName ?? "")
+
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        void setName.mutateAsync({ displayName }).catch(() => undefined)
+      }}
+    >
+      <input value={displayName} onInput={(event) => setDisplayName(event.currentTarget.value)} />
+      {setName.error instanceof ActionError && (
+        <p>{setName.error.errors.displayName?.join(" ")}</p>
+      )}
+      <button type="submit" disabled={setName.isPending}>Save</button>
+    </form>
+  )
+}`,
+      js: `import { useState } from "preact/hooks"
+import { ActionError, useAction, usePage } from "@kolektiv/keel-preact"
+
+export default function SetName() {
+  const seed = usePage()
+  const setName = useAction("harbor.setName")
+  const [displayName, setDisplayName] = useState(seed.data.viewer?.displayName ?? "")
+
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        void setName.mutateAsync({ displayName }).catch(() => undefined)
+      }}
+    >
+      <input value={displayName} onInput={(event) => setDisplayName(event.currentTarget.value)} />
+      {setName.error instanceof ActionError && (
+        <p>{setName.error.errors.displayName?.join(" ")}</p>
+      )}
+      <button type="submit" disabled={setName.isPending}>Save</button>
+    </form>
+  )
+}`,
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      ts: `import { html } from "lit"
+import { ActionError, KeelElement, useAction } from "@kolektiv/keel-lit"
+import type { HomePage, SetNameIn, SetNameOut } from "@app/page-types"
+
+export default class SetName extends KeelElement<HomePage> {
+  readonly setName = useAction<SetNameIn, SetNameOut>(this, "harbor.setName")
+  private displayName = this.page.data.viewer?.displayName ?? ""
+
+  render() {
+    return html\`
+      <form
+        @submit=\${(event: SubmitEvent) => {
+          event.preventDefault()
+          void this.setName.mutateAsync({ displayName: this.displayName }).catch(() => undefined)
+        }}
+      >
+        <input
+          .value=\${this.displayName}
+          @input=\${(event: Event) =>
+            (this.displayName = (event.target as HTMLInputElement).value)}
+        />
+        \${this.setName.error instanceof ActionError
+          ? html\`<p>\${this.setName.error.errors.displayName?.join(" ")}</p>\`
+          : ""}
+        <button type="submit" ?disabled=\${this.setName.isPending}>Save</button>
+      </form>
+    \`
+  }
+}`,
+      js: `import { html } from "lit"
+import { ActionError, KeelElement, useAction } from "@kolektiv/keel-lit"
+
+export default class SetName extends KeelElement {
+  readonly setName = useAction(this, "harbor.setName")
+  displayName = this.page.data.viewer?.displayName ?? ""
+
+  render() {
+    return html\`
+      <form
+        @submit=\${(event) => {
+          event.preventDefault()
+          void this.setName.mutateAsync({ displayName: this.displayName }).catch(() => undefined)
+        }}
+      >
+        <input
+          .value=\${this.displayName}
+          @input=\${(event) => (this.displayName = event.target.value)}
+        />
+        \${this.setName.error instanceof ActionError
+          ? html\`<p>\${this.setName.error.errors.displayName?.join(" ")}</p>\`
+          : ""}
+        <button type="submit" ?disabled=\${this.setName.isPending}>Save</button>
+      </form>
+    \`
+  }
+}`,
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      ts: `import { Component } from "@angular/core"
+import { ActionError, injectKeelAction, injectKeelPage } from "@kolektiv/keel-angular"
+import type { HomePage, SetNameIn, SetNameOut } from "@app/page-types"
+
+@Component({
+  selector: "app-set-name",
+  standalone: true,
+  template: \`
+    <form (submit)="onSetName($event)">
+      <input [value]="displayName" (input)="displayName = $any($event.target).value" />
+      @if (errorText) {
+        <p>{{ errorText }}</p>
+      }
+      <button type="submit" [disabled]="setName.isPending()">Save</button>
+    </form>
+  \`,
+})
+export default class SetName {
+  readonly page = injectKeelPage<HomePage>()
+  readonly setName = injectKeelAction<SetNameIn, SetNameOut>("harbor.setName")
+  displayName = this.page().data.viewer?.displayName ?? ""
+
+  get errorText(): string | undefined {
+    const error = this.setName.error()
+    return error instanceof ActionError ? error.errors.displayName?.join(" ") : undefined
+  }
+
+  onSetName(event: Event) {
+    event.preventDefault()
+    void this.setName.mutateAsync({ displayName: this.displayName }).catch(() => undefined)
+  }
+}`,
+      js: `import { Component } from "@angular/core"
+import { ActionError, injectKeelAction, injectKeelPage } from "@kolektiv/keel-angular"
+
+@Component({
+  selector: "app-set-name",
+  standalone: true,
+  template: \`
+    <form (submit)="onSetName($event)">
+      <input [value]="displayName" (input)="displayName = $any($event.target).value" />
+      @if (errorText) {
+        <p>{{ errorText }}</p>
+      }
+      <button type="submit" [disabled]="setName.isPending()">Save</button>
+    </form>
+  \`,
+})
+export default class SetName {
+  readonly page = injectKeelPage()
+  readonly setName = injectKeelAction("harbor.setName")
+  displayName = this.page().data.viewer?.displayName ?? ""
+
+  get errorText() {
+    const error = this.setName.error()
+    return error instanceof ActionError ? error.errors.displayName?.join(" ") : undefined
+  }
+
+  onSetName(event) {
+    event.preventDefault()
+    void this.setName.mutateAsync({ displayName: this.displayName }).catch(() => undefined)
+  }
+}`,
+    },
+  ]}
 />
 
 Typegen emits the in/out types next to the page map:

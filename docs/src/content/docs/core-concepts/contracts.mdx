@@ -7,7 +7,7 @@ order: 2
 
 import Callout from "../../../components/Callout.astro"
 import CodeBlock from "../../../components/CodeBlock.astro"
-import CodePair from "../../../components/CodePair.astro"
+import CodeDeck from "../../../components/CodeDeck.astro"
 
 The host registry is the contract: a **stable page id**, a **payload type**,
 and a **path the host owns**. Packs implement ids. They never own URLs.
@@ -58,13 +58,19 @@ export interface HarborActions {
 }
 ```
 
-A Svelte page is keyed by id. `pages/harbor/home/+page.svelte` implements
-`harbor.home`.
+A page is keyed by id: `pages/harbor/home/+page.svelte` implements
+`harbor.home`. The file extension follows the adapter, and the page is still
+just a function of the typed seed.
 
-<CodePair
-  fw="svelte"
-  title="pages/harbor/home/+page.svelte"
-  ts={`<script lang="ts">
+<CodeDeck
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      files: [
+        {
+          title: "+page.svelte",
+          ts: `<script lang="ts">
   import { Head, Link, page } from "@kolektiv/keel-svelte"
   import type { HomePage } from "../../../lib/page-types"
 
@@ -78,8 +84,8 @@ A Svelte page is keyed by id. `pages/harbor/home/+page.svelte` implements
     <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
     {item.body}
   </p>
-{/each}`}
-  js={`<script>
+{/each}`,
+          js: `<script>
   import { Head, Link, page } from "@kolektiv/keel-svelte"
 
   const ctx = page()
@@ -92,7 +98,277 @@ A Svelte page is keyed by id. `pages/harbor/home/+page.svelte` implements
     <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
     {item.body}
   </p>
-{/each}`}
+{/each}`,
+        },
+      ],
+    },
+    {
+      id: "react",
+      label: "React",
+      files: [
+        {
+          title: "+page.tsx",
+          ts: `import { Head, Link, usePage } from "@kolektiv/keel-react"
+import type { HomePage } from "../../../lib/page-types"
+
+export default function Home() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <Head />
+      <h1>Harbor</h1>
+      {seed.data.feed.map((item) => (
+        <p key={item.id}>
+          <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+          {item.body}
+        </p>
+      ))}
+    </>
+  )
+}`,
+          js: `import { Head, Link, usePage } from "@kolektiv/keel-react"
+
+export default function Home() {
+  const seed = usePage()
+  return (
+    <>
+      <Head />
+      <h1>Harbor</h1>
+      {seed.data.feed.map((item) => (
+        <p key={item.id}>
+          <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+          {item.body}
+        </p>
+      ))}
+    </>
+  )
+}`,
+        },
+      ],
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      files: [
+        {
+          title: "+page.vue",
+          ts: `<script setup lang="ts">
+import { Head, Link, usePage } from "@kolektiv/keel-vue"
+import type { HomePage } from "../../../lib/page-types"
+
+const seed = usePage<HomePage>()
+</script>
+
+<template>
+  <Head />
+  <h1>Harbor</h1>
+  <p v-for="item in seed.data.feed" :key="item.id">
+    <Link :href="\`/u/\${item.userId}\`">{{ item.displayName }}</Link>
+    {{ item.body }}
+  </p>
+</template>`,
+          js: `<script setup>
+import { Head, Link, usePage } from "@kolektiv/keel-vue"
+
+const seed = usePage()
+</script>
+
+<template>
+  <Head />
+  <h1>Harbor</h1>
+  <p v-for="item in seed.data.feed" :key="item.id">
+    <Link :href="\`/u/\${item.userId}\`">{{ item.displayName }}</Link>
+    {{ item.body }}
+  </p>
+</template>`,
+        },
+      ],
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      files: [
+        {
+          title: "+page.tsx",
+          ts: `import { Head, Link, usePage } from "@kolektiv/keel-solid"
+import type { HomePage } from "../../../lib/page-types"
+
+export default function Home() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <Head />
+      <h1>Harbor</h1>
+      {seed().data.feed.map((item) => (
+        <p>
+          <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+          {item.body}
+        </p>
+      ))}
+    </>
+  )
+}`,
+          js: `import { Head, Link, usePage } from "@kolektiv/keel-solid"
+
+export default function Home() {
+  const seed = usePage()
+  return (
+    <>
+      <Head />
+      <h1>Harbor</h1>
+      {seed().data.feed.map((item) => (
+        <p>
+          <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+          {item.body}
+        </p>
+      ))}
+    </>
+  )
+}`,
+        },
+      ],
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      files: [
+        {
+          title: "+page.tsx",
+          ts: `import { Head, Link, usePage } from "@kolektiv/keel-preact"
+import type { HomePage } from "../../../lib/page-types"
+
+export default function Home() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <Head />
+      <h1>Harbor</h1>
+      {seed.data.feed.map((item) => (
+        <p key={item.id}>
+          <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+          {item.body}
+        </p>
+      ))}
+    </>
+  )
+}`,
+          js: `import { Head, Link, usePage } from "@kolektiv/keel-preact"
+
+export default function Home() {
+  const seed = usePage()
+  return (
+    <>
+      <Head />
+      <h1>Harbor</h1>
+      {seed.data.feed.map((item) => (
+        <p key={item.id}>
+          <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+          {item.body}
+        </p>
+      ))}
+    </>
+  )
+}`,
+        },
+      ],
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      files: [
+        {
+          title: "+page.ts",
+          ts: `import { html } from "lit"
+import { KeelElement } from "@kolektiv/keel-lit"
+import type { HomePage } from "../../../lib/page-types"
+
+export default class Home extends KeelElement<HomePage> {
+  render() {
+    return html\`
+      <keel-head></keel-head>
+      <h1>Harbor</h1>
+      \${this.page.data.feed.map(
+        (item) => html\`<p>
+          <keel-link href="/u/\${item.userId}">\${item.displayName}</keel-link>
+          \${item.body}
+        </p>\`,
+      )}
+    \`
+  }
+}`,
+          js: `import { html } from "lit"
+import { KeelElement } from "@kolektiv/keel-lit"
+
+export default class Home extends KeelElement {
+  render() {
+    return html\`
+      <keel-head></keel-head>
+      <h1>Harbor</h1>
+      \${this.page.data.feed.map(
+        (item) => html\`<p>
+          <keel-link href="/u/\${item.userId}">\${item.displayName}</keel-link>
+          \${item.body}
+        </p>\`,
+      )}
+    \`
+  }
+}`,
+        },
+      ],
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      files: [
+        {
+          title: "+page.ts",
+          ts: `import { Component } from "@angular/core"
+import { KeelHead, KeelLink, injectKeelPage } from "@kolektiv/keel-angular"
+import type { HomePage } from "../../../lib/page-types"
+
+@Component({
+  selector: "app-harbor-home",
+  standalone: true,
+  imports: [KeelHead, KeelLink],
+  template: \`
+    <keel-head />
+    <h1>Harbor</h1>
+    @for (item of page().data.feed; track item.id) {
+      <p>
+        <keel-link href="/u/{{ item.userId }}">{{ item.displayName }}</keel-link>
+        {{ item.body }}
+      </p>
+    }
+  \`,
+})
+export default class Home {
+  readonly page = injectKeelPage<HomePage>()
+}`,
+          js: `import { Component } from "@angular/core"
+import { KeelHead, KeelLink, injectKeelPage } from "@kolektiv/keel-angular"
+
+@Component({
+  selector: "app-harbor-home",
+  standalone: true,
+  imports: [KeelHead, KeelLink],
+  template: \`
+    <keel-head />
+    <h1>Harbor</h1>
+    @for (item of page().data.feed; track item.id) {
+      <p>
+        <keel-link href="/u/{{ item.userId }}">{{ item.displayName }}</keel-link>
+        {{ item.body }}
+      </p>
+    }
+  \`,
+})
+export default class Home {
+  readonly page = injectKeelPage()
+}`,
+        },
+      ],
+    },
+  ]}
 />
 
 A pack declares which ids it implements. It may implement a subset —
