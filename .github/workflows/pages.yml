@@ -27,10 +27,6 @@ jobs:
         with:
           node-version: "22"
           cache: pnpm
-      # NOTE: docs depends on @kolektiv/common-docs-chrome, currently linked to a
-      # sibling checkout via `link:` until it is published to keel-npm. This
-      # frozen install (and therefore CI) only works once the dependency is
-      # switched to a published version (see docs/README.md).
       - name: Install
         run: pnpm install --frozen-lockfile
       - name: Build docs
