@@ -326,3 +326,14 @@ html[data-code-theme="latte"] .astro-code span {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Non-docs pages (home, 404) render through the shared chrome BaseLayout,
+ * whose <main id="main"> wraps content in `mx-auto max-w-4xl` (56rem). The
+ * homepage grid is designed for max-w-6xl with an xl 7xl hero, so widen the
+ * container here. Docs pages use the chrome DocsLayout (main nested in
+ * .drawer, prose at max-w-3xl) and are intentionally untouched.
+ */
+body > main#main > div {
+  max-width: 80rem;
+}
