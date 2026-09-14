@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@kolektiv/keel-angular`: Angular 19 binding with signal-based page/form
   state, query/action injectables, link/form/head directives,
   navigation/unload guards, `createPage`, and `bootstrap` (#48).
+- docs: the shared chrome navbar is customizable (visibility flags, extra
+  links, brand/navbar slots) and Keel forwards per-page overrides.
 
 ### Changed
 

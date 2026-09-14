@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@kolektiv/common-docs-chrome/astro/BaseLayout.astro"
+import type { NavbarConfig } from "@kolektiv/common-docs-chrome"
 import KeelBehavior from "../components/KeelBehavior.astro"
 import { docs } from "../docs-chrome"
 import { allDocs } from "../lib/docs"
@@ -9,11 +10,13 @@ import "../styles/global.css"
 interface Props {
   title?: string
   description?: string
+  navbar?: Partial<NavbarConfig>
 }
 
 const {
   title = "Keel",
   description = "Host-owned routing and render-time frontend packs for Kotlin servers. Svelte, React, Vue, Solid, Preact, Lit, and Angular adapters.",
+  navbar,
 } = Astro.props
 
 const entries = await allDocs()
@@ -24,7 +27,7 @@ const previewPaths = [
 ]
 ---
 
-<BaseLayout config={docs} title={title} description={description}>
+<BaseLayout config={docs} title={title} description={description} navbar={navbar}>
   <slot />
   <KeelBehavior previewPaths={previewPaths} />
 </BaseLayout>

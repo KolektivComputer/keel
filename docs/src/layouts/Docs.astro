@@ -1,5 +1,6 @@
 ---
 import DocsLayout from "@kolektiv/common-docs-chrome/astro/DocsLayout.astro"
+import type { NavbarConfig } from "@kolektiv/common-docs-chrome"
 import KeelBehavior from "../components/KeelBehavior.astro"
 import { docs } from "../docs-chrome"
 import { allDocs } from "../lib/docs"
@@ -10,9 +11,10 @@ import "../styles/global.css"
 interface Props {
   title: string
   description: string
+  navbar?: Partial<NavbarConfig>
 }
 
-const { title, description } = Astro.props
+const { title, description, navbar } = Astro.props
 const entries = await allDocs()
 const config = { ...docs, nav: navFromEntries(entries) }
 const previewPaths = [
@@ -22,7 +24,13 @@ const previewPaths = [
 ]
 ---
 
-<DocsLayout config={config} title={title} description={description} currentPath={Astro.url.pathname}>
+<DocsLayout
+  config={config}
+  title={title}
+  description={description}
+  currentPath={Astro.url.pathname}
+  navbar={navbar}
+>
   <slot />
   <KeelBehavior previewPaths={previewPaths} />
 </DocsLayout>
