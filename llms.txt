@@ -6,7 +6,7 @@ Keel is a protocol plus Kotlin/JS libraries. Format `keel/1`. First host adapter
 
 Live contract: `GET /__keel/schema` on any Keel host. Scaffold a pack with `keel-scaffold <origin> <dir>`.
 
-Docs: https://keel.mey.cat/  (GitHub Pages; local `pnpm dev` is http://127.0.0.1:8080/)
+Docs: https://keel.mey.cat/  (Cloudflare Pages; local `pnpm dev` is http://127.0.0.1:8080/)
 
 ## Docs
 

@@ -66,7 +66,6 @@ names as env, or `keel.publishing.yuriCapitalRepoUsername` /
 
 The pnpm workspace lives at the repository root (`packages/*` and `docs`).
 
-Docs deploy from `.github/workflows/pages.yml` to GitHub Pages at
-[keel.kolektiv.computer](https://keel.kolektiv.computer/). Enable **Settings → Pages → Source:
-GitHub Actions** and the custom domain. Pages on a private repo needs GitHub
-Pro; it will serve publicly once the repository is public.
+Docs deploy to Cloudflare Pages through its Git integration (project `keel-docs`)
+at [keel.kolektiv.computer](https://keel.kolektiv.computer/). The Pages production
+branch is `docs/v0.1.0-release-scrub` until this work merges to `main`.
