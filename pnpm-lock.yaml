@@ -29,8 +29,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@kolektiv/common-docs-chrome':
-        specifier: ^0.0.1-SNAPSHOT.5
-        version: 0.0.1-SNAPSHOT.5(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)
+        specifier: ^0.0.1-SNAPSHOT.8
+        version: 0.0.1-SNAPSHOT.8(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)
       '@kolektiv/themes':
         specifier: ^0.0.1-SNAPSHOT.2
         version: 0.0.1-SNAPSHOT.2
@@ -1120,8 +1120,8 @@ packages:
   '@kolektiv/brand-core@0.1.0':
     resolution: {integrity: sha512-PO+95Kv6H8py4BiNFag1jx5CQHupoTYrPgKgchn6DQKulwkuJWouukQJ5DaE4T2jwQN3KMBAmiTGTY7UaPaJSA==}
 
-  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.5':
-    resolution: {integrity: sha512-xmwNV/YPmFEEhdQ4AaiNZ+SXdOMhu8BkxTe/mgY7j2o83dtbJo4HJMixQJRUjzvlw+OSqaoVjU9bT8Yt7aYnLQ==}
+  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.8':
+    resolution: {integrity: sha512-74IzIoARulpeV5o58sZAEfZ6ex/IDnL/Z8wL+cN7IRVaskxufVGmHEBlDPIQbfdio37BXncwClrPj74K9zsxfA==}
     engines: {node: '>=22'}
     peerDependencies:
       astro: '>=5'
@@ -4053,7 +4053,7 @@ snapshots:
 
   '@kolektiv/brand-core@0.1.0': {}
 
-  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.5(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)':
+  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.8(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)':
     dependencies:
       '@kolektiv/brand-core': 0.1.0
       '@kolektiv/themes': 0.0.1-SNAPSHOT.2

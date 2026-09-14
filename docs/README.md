@@ -14,8 +14,16 @@ pnpm --filter @kolektiv/keel-docs check      # astro check
 ## Shared chrome dependency
 
 `@kolektiv/common-docs-chrome` is consumed from the `@kolektiv` registry as a
-versioned range (`^0.0.1-SNAPSHOT.5`). Run `pnpm install` after changing it to
+versioned range (`^0.0.1-SNAPSHOT.8`). Run `pnpm install` after changing it to
 refresh `pnpm-lock.yaml`.
+
+Chrome `0.0.1-SNAPSHOT.8` brings the canonical grouped theme picker: site
+themes are grouped by family (Catppuccin, Kolektiv, Nordic, daisyUI) and code
+themes are curated to the Catppuccin flavours plus Nord, Kolektiv, and
+`follow`. Its footer renders an enlarged built-by mark above the copyright, the
+active sidebar link stays readable under `kolektiv-dark`, nord, and light
+themes, and the source-control menu is driven by the `repo.remotes` list
+(Keel points it at GitHub and `git.yuri.capital`).
 
 Chrome owns the switcher state. It renders one navbar control per configured
 `switcher`, persists the choice, sets `<html data-<id>>`, and injects CSS that

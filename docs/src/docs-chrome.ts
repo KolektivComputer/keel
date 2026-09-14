@@ -26,11 +26,11 @@ export const docs = defineDocsChrome({
   repo: {
     url: "https://github.com/KolektivComputer/keel",
     branch: "main",
+    remotes: [
+      { label: "GitHub", href: "https://github.com/KolektivComputer/keel" },
+      { label: "yuri.capital", href: "https://git.yuri.capital/kolektiv/keel" },
+    ],
   },
-  scm: [
-    { label: "GitHub", href: "https://github.com/KolektivComputer/keel" },
-    { label: "yuri.capital", href: "https://git.yuri.capital/kolektiv/keel" },
-  ],
   langs: [
     { id: "ts", label: "TypeScript" },
     { id: "js", label: "JavaScript" },
