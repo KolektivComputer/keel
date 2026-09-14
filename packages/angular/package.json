@@ -1,6 +1,6 @@
 {
   "name": "@kolektiv/keel-angular",
-  "version": "0.0.2-SNAPSHOT.4",
+  "version": "0.1.0",
   "description": "Keel Angular 19 bindings \u2014 signal page/form state, query/action injectables, link/form/head directives, and createPage.",
   "type": "module",
   "license": "Apache-2.0",

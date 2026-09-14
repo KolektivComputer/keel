@@ -1,6 +1,6 @@
 {
   "name": "@kolektiv/keel-lit",
-  "version": "0.0.2-SNAPSHOT.4",
+  "version": "0.1.0",
   "description": "Keel Lit 3 bindings — page/form/action controllers, link/form/head helpers, and createPage.",
   "type": "module",
   "license": "Apache-2.0",
