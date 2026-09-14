@@ -7,6 +7,7 @@ order: 6
 
 import CodeBlock from "../../../components/CodeBlock.astro"
 import CodePair from "../../../components/CodePair.astro"
+import FrameworkPanel from "../../../components/FrameworkPanel.astro"
 import { path } from "../../../lib/paths"
 
 A page has a **stable id**, a **payload type**, and a **host path**. The pack
@@ -38,9 +39,26 @@ The registry is the source of truth for ids and payload serializers. Ktor (or
 any host) walks it to bind routes. Typegen walks it to emit `.d.ts` — publish
 that file for pack authors.
 
-The pack file tree is keyed by **page id**, not URL. `pages/home/+page.svelte`
-implements `home`; `pages/harbor/home/+page.svelte` implements `harbor.home`.
-Folders are id segments. They are not routes.
+The pack file tree is keyed by **page id**, not URL. `pages/home/` implements
+`home`; `pages/harbor/home/` implements `harbor.home`. Folders are id segments.
+They are not routes.
+
+
+<FrameworkPanel frameworks="svelte">
+The sample below is Svelte (`page()`, `<Head />`). Use the navbar frontend picker for the matching adapter API (`usePage`, `injectKeelPage`, and so on). See <a href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="react preact solid">
+Implement `home` as `pages/home/+page.tsx`. Use `usePage()` (or Solid’s accessor) and `<Head />` from that adapter package. Folders are page-id segments, not routes.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="vue">
+Implement `home` as `pages/home/+page.vue`. Use `usePage()` and the Vue `Head` SFC from `@kolektiv/keel-vue`.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="lit angular">
+Implement `home` as `pages/home/+page.ts`. Lit: extend `KeelElement` / `usePage` controller. Angular: `injectKeelPage()` and `KeelHead`. Id override file is `+page.id.ts`.
+</FrameworkPanel>
 
 <CodePair
   fw="svelte"

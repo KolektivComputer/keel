@@ -6,7 +6,7 @@ order: 3
 ---
 
 import { path } from "../../../lib/paths"
-import CodePair from "../../../components/CodePair.astro"
+import CodeBlock from "../../../components/CodeBlock.astro"
 
 The seed is the only **read** model. Document GET places it in
 `#__keel_seed`. Visits return it as JSON (`X-Keel-Visit: true`). Bootstrap
@@ -36,12 +36,16 @@ parses it and passes a typed context into `mount()`.
 }
 ```
 
-A Svelte page reads that payload with `page()`. No second fetch.
+Each adapter reads that payload from its page store (`page()` in Svelte,
+`usePage()` elsewhere). No second fetch.
 
-<CodePair
-  fw="svelte"
-  title="page()"
-  ts={`<script lang="ts">
+<CodeBlock
+  title="Reading the seed"
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      ts: `<script lang="ts">
   import { page } from "@kolektiv/keel-svelte"
   import type { HomePage } from "@app/page-types"
 
@@ -50,14 +54,196 @@ A Svelte page reads that payload with `page()`. No second fetch.
 
 <p>{ctx.data.viewer?.displayName ?? "Anonymous"}</p>
 <p>{ctx.path}</p>
-<p>{ctx.page}</p>`}
-  js={`<script>
+<p>{ctx.page}</p>`,
+      js: `<script>
   import { page } from "@kolektiv/keel-svelte"
 
   const ctx = page()
 </script>
 
-<p>{ctx.data.viewer?.displayName ?? "Anonymous"}</p>`}
+<p>{ctx.data.viewer?.displayName ?? "Anonymous"}</p>
+<p>{ctx.path}</p>
+<p>{ctx.page}</p>`,
+    },
+    {
+      id: "react",
+      label: "React",
+      ts: `import { usePage } from "@kolektiv/keel-react"
+import type { HomePage } from "@app/page-types"
+
+export default function Whoami() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <p>{seed.data.viewer?.displayName ?? "Anonymous"}</p>
+      <p>{seed.path}</p>
+      <p>{seed.page}</p>
+    </>
+  )
+}`,
+      js: `import { usePage } from "@kolektiv/keel-react"
+
+export default function Whoami() {
+  const seed = usePage()
+  return (
+    <>
+      <p>{seed.data.viewer?.displayName ?? "Anonymous"}</p>
+      <p>{seed.path}</p>
+      <p>{seed.page}</p>
+    </>
+  )
+}`,
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      ts: `<script setup lang="ts">
+import { usePage } from "@kolektiv/keel-vue"
+import type { HomePage } from "@app/page-types"
+
+const seed = usePage<HomePage>()
+</script>
+
+<template>
+  <p>{{ seed.data.viewer?.displayName ?? "Anonymous" }}</p>
+  <p>{{ seed.path }}</p>
+  <p>{{ seed.page }}</p>
+</template>`,
+      js: `<script setup>
+import { usePage } from "@kolektiv/keel-vue"
+
+const seed = usePage()
+</script>
+
+<template>
+  <p>{{ seed.data.viewer?.displayName ?? "Anonymous" }}</p>
+  <p>{{ seed.path }}</p>
+  <p>{{ seed.page }}</p>
+</template>`,
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      ts: `import { usePage } from "@kolektiv/keel-solid"
+import type { HomePage } from "@app/page-types"
+
+export default function Whoami() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <p>{seed().data.viewer?.displayName ?? "Anonymous"}</p>
+      <p>{seed().path}</p>
+      <p>{seed().page}</p>
+    </>
+  )
+}`,
+      js: `import { usePage } from "@kolektiv/keel-solid"
+
+export default function Whoami() {
+  const seed = usePage()
+  return (
+    <>
+      <p>{seed().data.viewer?.displayName ?? "Anonymous"}</p>
+      <p>{seed().path}</p>
+      <p>{seed().page}</p>
+    </>
+  )
+}`,
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      ts: `import { usePage } from "@kolektiv/keel-preact"
+import type { HomePage } from "@app/page-types"
+
+export default function Whoami() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <p>{seed.data.viewer?.displayName ?? "Anonymous"}</p>
+      <p>{seed.path}</p>
+      <p>{seed.page}</p>
+    </>
+  )
+}`,
+      js: `import { usePage } from "@kolektiv/keel-preact"
+
+export default function Whoami() {
+  const seed = usePage()
+  return (
+    <>
+      <p>{seed.data.viewer?.displayName ?? "Anonymous"}</p>
+      <p>{seed.path}</p>
+      <p>{seed.page}</p>
+    </>
+  )
+}`,
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      ts: `import { html } from "lit"
+import { KeelElement } from "@kolektiv/keel-lit"
+import type { HomePage } from "@app/page-types"
+
+export default class Whoami extends KeelElement<HomePage> {
+  render() {
+    return html\`
+      <p>\${this.page.data.viewer?.displayName ?? "Anonymous"}</p>
+      <p>\${this.page.path}</p>
+      <p>\${this.page.page}</p>
+    \`
+  }
+}`,
+      js: `import { html } from "lit"
+import { KeelElement } from "@kolektiv/keel-lit"
+
+export default class Whoami extends KeelElement {
+  render() {
+    return html\`
+      <p>\${this.page.data.viewer?.displayName ?? "Anonymous"}</p>
+      <p>\${this.page.path}</p>
+      <p>\${this.page.page}</p>
+    \`
+  }
+}`,
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      ts: `import { Component } from "@angular/core"
+import { injectKeelPage } from "@kolektiv/keel-angular"
+import type { HomePage } from "@app/page-types"
+
+@Component({
+  selector: "app-whoami",
+  standalone: true,
+  template: \`
+    <p>{{ page().data.viewer?.displayName ?? "Anonymous" }}</p>
+    <p>{{ page().path }}</p>
+    <p>{{ page().page }}</p>
+  \`,
+})
+export default class Whoami {
+  readonly page = injectKeelPage<HomePage>()
+}`,
+      js: `import { Component } from "@angular/core"
+import { injectKeelPage } from "@kolektiv/keel-angular"
+
+@Component({
+  selector: "app-whoami",
+  standalone: true,
+  template: \`
+    <p>{{ page().data.viewer?.displayName ?? "Anonymous" }}</p>
+    <p>{{ page().path }}</p>
+    <p>{{ page().page }}</p>
+  \`,
+})
+export default class Whoami {
+  readonly page = injectKeelPage()
+}`,
+    },
+  ]}
 />
 
 `theme` is the serving pack's `{ id, version }`; `entry`, `css`, and `build`

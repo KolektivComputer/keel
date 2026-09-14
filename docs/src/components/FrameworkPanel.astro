@@ -1,0 +1,22 @@
+---
+/**
+ * Gate docs prose/callouts on the shared chrome framework switcher.
+ *
+ * `data-fw` is Keel's own gating: the panel is hidden unless the html-level
+ * `data-framework` is listed (or `data-fw` includes `all`). The extra
+ * `data-framework-panel="all"` makes the navbar framework dropdown relevant on
+ * this page: chrome hides every `[data-framework-panel]` and reveals the ones
+ * matching the active framework (`all` included), and only shows a control on
+ * pages that contain a matching panel. Provide a Svelte panel as the fallback
+ * when a topic has no other coverage.
+ */
+interface Props {
+  /** One or more framework ids, space-separated (e.g. "react preact"), or "all". */
+  frameworks: string
+}
+const { frameworks } = Astro.props
+---
+
+<div data-fw={frameworks} data-framework-panel="all">
+  <slot />
+</div>

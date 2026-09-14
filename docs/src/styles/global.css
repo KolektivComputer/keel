@@ -1,13 +1,18 @@
 @import "tailwindcss";
+@import "@kolektiv/common-docs-chrome/styles/chrome.css";
+@import "@kolektiv/common-docs-chrome/styles/brand-fonts.css";
 @import "@fontsource/iosevka/latin-400.css";
 @import "@fontsource/iosevka/latin-500.css";
-@import "@kolektiv/themes/theme.css";
-@plugin "daisyui" {
-  themes: light --default, dark --prefersdark;
-  logs: false;
-}
+@import "@fontsource/source-serif-4/latin-400.css";
+@import "@fontsource/source-serif-4/latin-600.css";
+@import "@fontsource/source-serif-4/latin-700.css";
 
-/* Palette colours come from @kolektiv/themes. Keel owns its own shape/density. */
+/*
+ * `chrome.css` owns the daisyUI plugin declaration and imports
+ * `@kolektiv/themes/theme.css`, so neither is repeated here.
+ * Palette colours come from @kolektiv/themes. Keel owns its own shape/density
+ * and brand typography on top of the shared chrome.
+ */
 :root {
   --radius-selector: 0.25rem;
   --radius-field: 0.5rem;
@@ -23,10 +28,6 @@
   --font-display: "Source Serif 4", "Iowan Old Style", Palatino, "Times New Roman", serif;
   --font-sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --font-mono: "Iosevka", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --color-swatch-latte: #eff1f5;
-  --color-swatch-frappe: #303446;
-  --color-swatch-macchiato: #24273a;
-  --color-swatch-mocha: #1e1e2e;
 }
 
 html {
@@ -148,49 +149,28 @@ p {
   color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
 }
 
-html[data-lang="ts"] .keel-code:not([data-lang]) [data-lang-panel="js"],
-html[data-lang="js"] .keel-code:not([data-lang]) [data-lang-panel="ts"],
-.keel-code[data-lang="ts"] [data-lang-panel="js"],
-.keel-code[data-lang="js"] [data-lang-panel="ts"] {
-  display: none;
-}
-
-html[data-frontend="svelte"] [data-fw]:not([data-fw~="svelte"]):not([data-fw~="all"]),
-html[data-frontend="react"] [data-fw]:not([data-fw~="react"]):not([data-fw~="all"]),
-html[data-frontend="vue"] [data-fw]:not([data-fw~="vue"]):not([data-fw~="all"]),
-html[data-frontend="solid"] [data-fw]:not([data-fw~="solid"]):not([data-fw~="all"]),
-html[data-frontend="preact"] [data-fw]:not([data-fw~="preact"]):not([data-fw~="all"]),
-html[data-frontend="lit"] [data-fw]:not([data-fw~="lit"]):not([data-fw~="all"]),
-html[data-frontend="angular"] [data-fw]:not([data-fw~="angular"]):not([data-fw~="all"]) {
+/*
+ * Keel content panel visibility.
+ *
+ * The shared chrome injects `visibilityCss(config)` from `BaseHead`, which
+ * sets every `[data-<id>-panel]` (including `[data-lang-panel]` and
+ * `[data-framework-panel]`) to `display:none` and reveals the panels matching
+ * the html-level switcher value (or `="all"`). Keel's code components only
+ * emit the panel markers; chrome owns the active language and framework.
+ * Keel's own `[data-fw]` gating rules follow below.
+ */
+html[data-framework="svelte"] [data-fw]:not([data-fw~="svelte"]):not([data-fw~="all"]),
+html[data-framework="react"] [data-fw]:not([data-fw~="react"]):not([data-fw~="all"]),
+html[data-framework="vue"] [data-fw]:not([data-fw~="vue"]):not([data-fw~="all"]),
+html[data-framework="solid"] [data-fw]:not([data-fw~="solid"]):not([data-fw~="all"]),
+html[data-framework="preact"] [data-fw]:not([data-fw~="preact"]):not([data-fw~="all"]),
+html[data-framework="lit"] [data-fw]:not([data-fw~="lit"]):not([data-fw~="all"]),
+html[data-framework="angular"] [data-fw]:not([data-fw~="angular"]):not([data-fw~="all"]) {
   display: none;
 }
 
 html[data-backend="ktor"] [data-bw]:not([data-bw~="ktor"]):not([data-bw~="all"]) {
   display: none;
-}
-
-.keel-deck[data-framework] [data-framework-panel],
-.keel-code[data-framework] [data-framework-panel] {
-  display: none;
-}
-
-.keel-deck[data-framework="svelte"] [data-framework-panel="svelte"],
-.keel-code[data-framework="svelte"] [data-framework-panel="svelte"],
-.keel-deck[data-framework="react"] [data-framework-panel="react"],
-.keel-code[data-framework="react"] [data-framework-panel="react"],
-.keel-deck[data-framework="vue"] [data-framework-panel="vue"],
-.keel-code[data-framework="vue"] [data-framework-panel="vue"],
-.keel-deck[data-framework="solid"] [data-framework-panel="solid"],
-.keel-code[data-framework="solid"] [data-framework-panel="solid"],
-.keel-deck[data-framework="preact"] [data-framework-panel="preact"],
-.keel-code[data-framework="preact"] [data-framework-panel="preact"],
-.keel-deck[data-framework="lit"] [data-framework-panel="lit"],
-.keel-code[data-framework="lit"] [data-framework-panel="lit"],
-.keel-deck[data-framework="angular"] [data-framework-panel="angular"],
-.keel-code[data-framework="angular"] [data-framework-panel="angular"],
-.keel-code[data-framework="kts"] [data-framework-panel="kts"],
-.keel-code[data-framework="groovy"] [data-framework-panel="groovy"] {
-  display: block;
 }
 
 .keel-deck[data-file="0"] [data-file-panel]:not([data-file-panel="0"]),
@@ -254,50 +234,79 @@ html[data-backend="ktor"] [data-bw]:not([data-bw~="ktor"]):not([data-bw~="all"])
   }
 }
 
-.keel-docs-menu :where(li > a) {
-  justify-content: flex-start;
-  justify-items: start;
-  text-align: start;
-}
-
+/*
+ * Per-theme Shiki overrides. The shared chrome injects the same rules from
+ * `shikiThemeCss`; these keep Keel's fallback hex backgrounds if the variables
+ * are ever missing. Theme keys are the shared chrome theme ids.
+ */
 html[data-code-theme="follow"][data-theme="catppuccin-mocha"] .astro-code,
-html[data-code-theme="mocha"] .astro-code {
-  background-color: var(--shiki-mocha-bg, #1e1e2e) !important;
+html[data-code-theme="catppuccin-mocha"] .astro-code {
+  background-color: var(--shiki-catppuccin-mocha-bg, #1e1e2e) !important;
 }
 
 html[data-code-theme="follow"][data-theme="catppuccin-mocha"] .astro-code span,
-html[data-code-theme="mocha"] .astro-code span {
-  color: var(--shiki-mocha) !important;
+html[data-code-theme="catppuccin-mocha"] .astro-code span {
+  color: var(--shiki-catppuccin-mocha) !important;
 }
 
 html[data-code-theme="follow"][data-theme="catppuccin-macchiato"] .astro-code,
-html[data-code-theme="macchiato"] .astro-code {
-  background-color: var(--shiki-macchiato-bg, #24273a) !important;
+html[data-code-theme="catppuccin-macchiato"] .astro-code {
+  background-color: var(--shiki-catppuccin-macchiato-bg, #24273a) !important;
 }
 
 html[data-code-theme="follow"][data-theme="catppuccin-macchiato"] .astro-code span,
-html[data-code-theme="macchiato"] .astro-code span {
-  color: var(--shiki-macchiato) !important;
+html[data-code-theme="catppuccin-macchiato"] .astro-code span {
+  color: var(--shiki-catppuccin-macchiato) !important;
 }
 
 html[data-code-theme="follow"][data-theme="catppuccin-frappe"] .astro-code,
-html[data-code-theme="frappe"] .astro-code {
-  background-color: var(--shiki-frappe-bg, #303446) !important;
+html[data-code-theme="catppuccin-frappe"] .astro-code {
+  background-color: var(--shiki-catppuccin-frappe-bg, #303446) !important;
 }
 
 html[data-code-theme="follow"][data-theme="catppuccin-frappe"] .astro-code span,
-html[data-code-theme="frappe"] .astro-code span {
-  color: var(--shiki-frappe) !important;
+html[data-code-theme="catppuccin-frappe"] .astro-code span {
+  color: var(--shiki-catppuccin-frappe) !important;
 }
 
 html[data-code-theme="follow"][data-theme="catppuccin-latte"] .astro-code,
-html[data-code-theme="latte"] .astro-code {
-  background-color: var(--shiki-latte-bg, #eff1f5) !important;
+html[data-code-theme="catppuccin-latte"] .astro-code {
+  background-color: var(--shiki-catppuccin-latte-bg, #eff1f5) !important;
 }
 
 html[data-code-theme="follow"][data-theme="catppuccin-latte"] .astro-code span,
-html[data-code-theme="latte"] .astro-code span {
-  color: var(--shiki-latte) !important;
+html[data-code-theme="catppuccin-latte"] .astro-code span {
+  color: var(--shiki-catppuccin-latte) !important;
+}
+
+html[data-code-theme="follow"][data-theme="nord"] .astro-code,
+html[data-code-theme="nord"] .astro-code {
+  background-color: var(--shiki-nord-bg, #2e3440) !important;
+}
+
+html[data-code-theme="follow"][data-theme="nord"] .astro-code span,
+html[data-code-theme="nord"] .astro-code span {
+  color: var(--shiki-nord) !important;
+}
+
+html[data-code-theme="follow"][data-theme="kolektiv-light"] .astro-code,
+html[data-code-theme="kolektiv-light"] .astro-code {
+  background-color: var(--shiki-kolektiv-light-bg, #fff6ff) !important;
+}
+
+html[data-code-theme="follow"][data-theme="kolektiv-light"] .astro-code span,
+html[data-code-theme="kolektiv-light"] .astro-code span {
+  color: var(--shiki-kolektiv-light) !important;
+}
+
+html[data-code-theme="follow"][data-theme="kolektiv-dark"] .astro-code,
+html[data-code-theme="kolektiv-dark"] .astro-code {
+  background-color: var(--shiki-kolektiv-dark-bg, #10030d) !important;
+}
+
+html[data-code-theme="follow"][data-theme="kolektiv-dark"] .astro-code span,
+html[data-code-theme="kolektiv-dark"] .astro-code span {
+  color: var(--shiki-kolektiv-dark) !important;
 }
 
 @layer base {

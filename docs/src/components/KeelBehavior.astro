@@ -1,0 +1,80 @@
+---
+import { path } from "../lib/paths"
+
+interface Props {
+  /** Absolute paths the preview bridge may navigate to. */
+  previewPaths?: string[]
+}
+
+const { previewPaths = [path("/"), path("/docs")] } = Astro.props
+---
+
+<script
+  id="keel-preview-paths"
+  type="application/json"
+  is:inline
+  set:html={JSON.stringify(previewPaths)}
+/>
+
+<script>
+  import { copyFromFigure, syncFileButtons } from "../lib/content"
+  import { installPreviewBridge } from "../lib/preview-bridge"
+
+  const root = document.documentElement
+  // Keel only ever renders against a Ktor host; keep `[data-bw]` gating exact.
+  root.dataset.backend = "ktor"
+
+  const pathNode = document.getElementById("keel-preview-paths")
+  const previewPaths: string[] = pathNode?.textContent ? JSON.parse(pathNode.textContent) : []
+  installPreviewBridge(previewPaths)
+
+  document.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement
+
+    const copy = target.closest<HTMLButtonElement>("[data-copy]")
+    if (copy) {
+      const figure = copy.closest<HTMLElement>("figure, .keel-deck")
+      if (!figure) return
+      const text = copyFromFigure(figure)
+      copy.textContent = "Copied"
+      void navigator.clipboard.writeText(text).catch(() => undefined)
+      window.setTimeout(() => {
+        copy.textContent = "Copy"
+      }, 1200)
+      return
+    }
+
+    const fileBtn = target.closest<HTMLButtonElement>("[data-file-btn]")
+    if (fileBtn) {
+      const deck = fileBtn.closest<HTMLElement>(".keel-deck")
+      if (!deck) return
+      deck.dataset.file = fileBtn.dataset.fileBtn ?? "0"
+      syncFileButtons(deck)
+      return
+    }
+
+    const hide = target.closest<HTMLButtonElement>("[data-code-hide]")
+    if (hide) {
+      const showcase = hide.closest<HTMLElement>("[data-showcase]")
+      if (showcase) {
+        showcase.setAttribute("data-code-open", "false")
+        showcase.querySelector("[data-code-show] button")?.setAttribute("aria-expanded", "false")
+        showcase.querySelectorAll("[data-code-hide]").forEach((el) => el.setAttribute("aria-expanded", "false"))
+        showcase.querySelector("[data-code-overlay]")?.setAttribute("aria-hidden", "true")
+      }
+      return
+    }
+
+    const show = target.closest("[data-code-show]")
+    if (show) {
+      const showcase = show.closest<HTMLElement>("[data-showcase]")
+      if (showcase) {
+        showcase.setAttribute("data-code-open", "true")
+        showcase.querySelector("[data-code-show] button")?.setAttribute("aria-expanded", "true")
+        showcase.querySelectorAll("[data-code-hide]").forEach((el) => el.setAttribute("aria-expanded", "true"))
+        showcase.querySelector("[data-code-overlay]")?.setAttribute("aria-hidden", "false")
+      }
+      return
+    }
+  })
+</script>

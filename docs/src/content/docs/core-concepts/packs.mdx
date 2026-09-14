@@ -7,7 +7,7 @@ order: 4
 
 import { path } from "../../../lib/paths"
 import CodeBlock from "../../../components/CodeBlock.astro"
-import CodePair from "../../../components/CodePair.astro"
+import FrameworkPanel from "../../../components/FrameworkPanel.astro"
 
 A pack is a `.feb`: a zip whose root is `manifest.json` plus the modules it
 names. The manifest maps **page ids** to modules — the pack's implementation
@@ -17,6 +17,8 @@ Authors write a file tree of pages (ids, not URL routes). The tree below is
 Svelte; other adapters swap the component and head extensions and keep the
 same folder ids — see
 <a href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>:
+
+<FrameworkPanel frameworks="svelte">
 
 ```
 src/pages/
@@ -29,6 +31,16 @@ src/pages/
     notFound/+page.svelte    → harbor.notFound
 ```
 
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="react vue solid preact lit angular">
+The folder ids are identical. React, Solid, and Preact use `+layout.tsx` and
+`+page.tsx`; Vue uses `+layout.vue` and `+page.vue`; Lit and Angular use
+`+layout.ts` and `+page.ts`. All six carry the head in a sibling `+head.html`.
+Lit and Angular page modules have no component extension, so a page that needs
+a different id adds a sibling `+page.id.ts`.
+</FrameworkPanel>
+
 The id is the directory path with `/` turned into `.`. A sibling `+page.ts`
 may `export const id = "harbor.home"` when the folder name should not be the
 id. `+layout.svelte` files wrap descendant pages, root-first. Route params
@@ -37,24 +49,72 @@ like `[slug]` are not ids — the host owns URLs. A sibling `+head.svelte`
 `head` — see
 <a href={path("/docs/core-concepts/head")}>Document head and SEO</a>.
 
-<CodePair
-  fw="svelte"
+<CodeBlock
   title="src/bootstrap.ts"
-  ts={`import { bootstrap } from "@kolektiv/keel-svelte"
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      code: `import { bootstrap } from "@kolektiv/keel-svelte"
 
-void bootstrap()`}
-  js={`import { bootstrap } from "@kolektiv/keel-svelte"
+void bootstrap()`,
+    },
+    {
+      id: "react",
+      label: "React",
+      code: `import { bootstrap } from "@kolektiv/keel-react"
 
-void bootstrap()`}
+void bootstrap()`,
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      code: `import { bootstrap } from "@kolektiv/keel-vue"
+
+void bootstrap()`,
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      code: `import { bootstrap } from "@kolektiv/keel-solid"
+
+void bootstrap()`,
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      code: `import { bootstrap } from "@kolektiv/keel-preact"
+
+void bootstrap()`,
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      code: `import { bootstrap } from "@kolektiv/keel-lit"
+
+void bootstrap()`,
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      code: `import { bootstrap } from "@kolektiv/keel-angular"
+
+void bootstrap()`,
+    },
+  ]}
 />
 
 `keelPack` discovers those files, emits a module per id, writes the
 manifest, and can zip the `.feb`.
 
-<CodePair
-  fw="svelte"
+<CodeBlock
   title="vite.config.ts"
-  ts={`import { svelte } from "@sveltejs/vite-plugin-svelte"
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      lang: "ts",
+      code: `import { svelte } from "@sveltejs/vite-plugin-svelte"
 import { keelPack } from "@kolektiv/keel-pack/vite"
 import { defineConfig } from "vite"
 
@@ -72,18 +132,23 @@ export default defineConfig({
       pack: "dist/harbor.feb",
     }),
   ],
-})`}
-  js={`import { svelte } from "@sveltejs/vite-plugin-svelte"
+})`,
+    },
+    {
+      id: "react",
+      label: "React",
+      lang: "ts",
+      code: `import react from "@vitejs/plugin-react"
 import { keelPack } from "@kolektiv/keel-pack/vite"
 import { defineConfig } from "vite"
 
 export default defineConfig({
   plugins: [
-    svelte(),
+    react(),
     keelPack({
       id: "harbor",
       version: "0.1.0",
-      framework: "svelte",
+      framework: "react",
       pagesDir: "src/pages",
       bootstrap: "src/bootstrap.ts",
       contract: "src/lib/page-types.json",
@@ -91,7 +156,127 @@ export default defineConfig({
       pack: "dist/harbor.feb",
     }),
   ],
-})`}
+})`,
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      lang: "ts",
+      code: `import vue from "@vitejs/plugin-vue"
+import { keelPack } from "@kolektiv/keel-pack/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    keelPack({
+      id: "harbor",
+      version: "0.1.0",
+      framework: "vue",
+      pagesDir: "src/pages",
+      bootstrap: "src/bootstrap.ts",
+      contract: "src/lib/page-types.json",
+      notFound: "harbor.notFound",
+      pack: "dist/harbor.feb",
+    }),
+  ],
+})`,
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      lang: "ts",
+      code: `import solid from "vite-plugin-solid"
+import { keelPack } from "@kolektiv/keel-pack/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [
+    solid(),
+    keelPack({
+      id: "harbor",
+      version: "0.1.0",
+      framework: "solid",
+      pagesDir: "src/pages",
+      bootstrap: "src/bootstrap.ts",
+      contract: "src/lib/page-types.json",
+      notFound: "harbor.notFound",
+      pack: "dist/harbor.feb",
+    }),
+  ],
+})`,
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      lang: "ts",
+      code: `import preact from "@preact/preset-vite"
+import { keelPack } from "@kolektiv/keel-pack/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [
+    preact(),
+    keelPack({
+      id: "harbor",
+      version: "0.1.0",
+      framework: "preact",
+      pagesDir: "src/pages",
+      bootstrap: "src/bootstrap.ts",
+      contract: "src/lib/page-types.json",
+      notFound: "harbor.notFound",
+      pack: "dist/harbor.feb",
+    }),
+  ],
+})`,
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      lang: "ts",
+      code: `import { keelPack } from "@kolektiv/keel-pack/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [
+    keelPack({
+      id: "harbor",
+      version: "0.1.0",
+      framework: "lit",
+      pagesDir: "src/pages",
+      bootstrap: "src/bootstrap.ts",
+      contract: "src/lib/page-types.json",
+      notFound: "harbor.notFound",
+      pack: "dist/harbor.feb",
+    }),
+  ],
+})`,
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      lang: "ts",
+      code: `import analog from "@analogjs/vite-plugin-angular"
+import { keelPack } from "@kolektiv/keel-pack/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [
+    analog({ tsconfig: "tsconfig.app.json" }),
+    keelPack({
+      id: "harbor",
+      version: "0.1.0",
+      framework: "angular",
+      pagesDir: "src/pages",
+      bootstrap: "src/bootstrap.ts",
+      contract: "src/lib/page-types.json",
+      notFound: "harbor.notFound",
+      pack: "dist/harbor.feb",
+    }),
+  ],
+})`,
+    },
+  ]}
 />
 
 The host loads that artifact as a `FrontendBundle` from a **jar resource**, a

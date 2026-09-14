@@ -1,6 +1,6 @@
 ---
 title: Choosing a pack
-description: Which pack renders a page is the call site's concern — pass an opened pack into render.
+description: Which pack renders a page is the call site's concern, pass an opened pack into render.
 category: advanced
 order: 1
 ---
@@ -9,14 +9,14 @@ import Callout from "../../../components/Callout.astro"
 import { path } from "../../../lib/paths"
 
 A pack is a versioned frontend keyed by page id. One pack is an app UI. Many
-packs are installed apps or themes against the same typed contract — and Keel
+packs are installed apps or themes against the same typed contract, and Keel
 does not choose between them. The call site does.
 
 ## Pass the pack you want
 
 `respondPage(pack, pageId, data, …)` is the canonical form: open a
 `FrontendBundle` once and pass it into render. Keel loads that pack's page
-module and CSS, and records its `{ id, version }` as the seed's `theme` — the
+module and CSS, and records its `{ id, version }` as the seed's `theme`, the
 identity of the pack that served the page.
 
 ```kotlin
@@ -44,13 +44,13 @@ pass the pack explicitly or scope the route.
 
 ## The call site is the policy
 
-- **Tenant** — one host process, a pack per tenant; pick the pack from the
+- **Tenant**, one host process, a pack per tenant; pick the pack from the
   tenant record before rendering.
-- **A/B** — choose the pack per request branch. The seed's `theme.id` records
+- **A/B**, choose the pack per request branch. The seed's `theme.id` records
   which one served.
-- **Override** — an admin or preview route passes a draft pack typed for the
+- **Override**, an admin or preview route passes a draft pack typed for the
   same ids.
-- **Admin** — scope an admin subtree to an admin pack with `route.keel`.
+- **Admin**, scope an admin subtree to an admin pack with `route.keel`.
 
 None of this is a request header or a cookie. There is no resolver and no
 chain: Keel never scans installed packs for one that implements the page, and
@@ -67,7 +67,7 @@ packs never read a visitor theme from the browser.
 The seed's `theme` field is the serving pack's `{ id, version }`, alongside
 the `entry` module and `css` URLs from that pack. The same values also go out
 as the `X-Keel-Theme` and `X-Keel-Version` response headers. They are
-responses, not request overrides — a visitor cannot select a pack with a
+responses, not request overrides, a visitor cannot select a pack with a
 header.
 
 ## Missing pages
@@ -79,9 +79,9 @@ pack can declare its own `notFound` module for those documents.
 
 ## See also
 
-- <a href={path("/docs/implementing/host-adapter")}>Host adapter</a> — the
+- <a href={path("/docs/implementing/host-adapter")}>Host adapter</a>, the
   server checklist and the `KeelConfig` knobs.
-- <a href={path("/docs/advanced/pack-hot-reload")}>Pack hot reload</a> — swap
+- <a href={path("/docs/advanced/pack-hot-reload")}>Pack hot reload</a>, swap
   an opened pack without a JVM restart while iterating.
-- <a href={path("/docs/core-concepts/head")}>Document head and SEO</a> — how
+- <a href={path("/docs/core-concepts/head")}>Document head and SEO</a>, how
   the serving pack's `theme` flows into the document head.

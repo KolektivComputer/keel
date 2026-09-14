@@ -1,16 +1,18 @@
 ---
-title: Client Setup
+title: Client setup
 description: Point the @kolektiv npm scope at Nexus releases and install the router plus a framework adapter.
 category: getting-started
 order: 3
 ---
 
 import CodeBlock from "../../../components/CodeBlock.astro"
+import FrameworkPanel from "../../../components/FrameworkPanel.astro"
+import Callout from "../../../components/Callout.astro"
 import { path } from "../../../lib/paths"
 
 Keel ships a framework-neutral router (`@kolektiv/keel`) and seven pack
 adapters: Svelte 5, React 18/19, Vue 3, Solid 1.9, Preact 10, Lit 3, and
-Angular 19. Svelte is the default in the examples, not the only option — see
+Angular 19. Svelte is the default in the examples, not the only option, see
 <a href={path("/docs/implementing/framework-adapters")}>Framework adapters</a>.
 
 Client packages live in the hosted `keel-npm` repository on Nexus at
@@ -26,11 +28,11 @@ Resolving does not require Nexus credentials; publishing does.
 
 ## Releases (recommended)
 
-Current release: `0.0.1`. Every adapter is versioned in lockstep with
+Current release: `0.1.0`. Every adapter is versioned in lockstep with
 `@kolektiv/keel`, so pin the same version everywhere. Pick your framework:
 
 <CodeBlock
-  title="package.json — by framework"
+  title="package.json, by framework"
   frameworks={[
     {
       id: "svelte",
@@ -38,12 +40,12 @@ Current release: `0.0.1`. Every adapter is versioned in lockstep with
       lang: "json",
       code: `{
   "dependencies": {
-    "@kolektiv/keel": "0.0.1",
-    "@kolektiv/keel-svelte": "0.0.1",
+    "@kolektiv/keel": "0.1.0",
+    "@kolektiv/keel-svelte": "0.1.0",
     "svelte": "^5.16.0"
   },
   "devDependencies": {
-    "@kolektiv/keel-pack": "0.0.1",
+    "@kolektiv/keel-pack": "0.1.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "vite": "^6.2.0"
   }
@@ -55,14 +57,14 @@ Current release: `0.0.1`. Every adapter is versioned in lockstep with
       lang: "json",
       code: `{
   "dependencies": {
-    "@kolektiv/keel": "0.0.1",
-    "@kolektiv/keel-react": "0.0.1",
+    "@kolektiv/keel": "0.1.0",
+    "@kolektiv/keel-react": "0.1.0",
     "@tanstack/react-query": "^5.66.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@kolektiv/keel-pack": "0.0.1",
+    "@kolektiv/keel-pack": "0.1.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
@@ -76,13 +78,13 @@ Current release: `0.0.1`. Every adapter is versioned in lockstep with
       lang: "json",
       code: `{
   "dependencies": {
-    "@kolektiv/keel": "0.0.1",
-    "@kolektiv/keel-vue": "0.0.1",
+    "@kolektiv/keel": "0.1.0",
+    "@kolektiv/keel-vue": "0.1.0",
     "@tanstack/vue-query": "^5.66.0",
     "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@kolektiv/keel-pack": "0.0.1",
+    "@kolektiv/keel-pack": "0.1.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "vite": "^6.2.0",
     "vue-tsc": "^2.2.0"
@@ -95,13 +97,13 @@ Current release: `0.0.1`. Every adapter is versioned in lockstep with
       lang: "json",
       code: `{
   "dependencies": {
-    "@kolektiv/keel": "0.0.1",
-    "@kolektiv/keel-solid": "0.0.1",
+    "@kolektiv/keel": "0.1.0",
+    "@kolektiv/keel-solid": "0.1.0",
     "@tanstack/solid-query": "^5.66.0",
     "solid-js": "^1.9.4"
   },
   "devDependencies": {
-    "@kolektiv/keel-pack": "0.0.1",
+    "@kolektiv/keel-pack": "0.1.0",
     "vite": "^6.2.0",
     "vite-plugin-solid": "^2.11.1"
   }
@@ -113,13 +115,13 @@ Current release: `0.0.1`. Every adapter is versioned in lockstep with
       lang: "json",
       code: `{
   "dependencies": {
-    "@kolektiv/keel": "0.0.1",
-    "@kolektiv/keel-preact": "0.0.1",
+    "@kolektiv/keel": "0.1.0",
+    "@kolektiv/keel-preact": "0.1.0",
     "@tanstack/preact-query": "^5.66.0",
     "preact": "^10.25.4"
   },
   "devDependencies": {
-    "@kolektiv/keel-pack": "0.0.1",
+    "@kolektiv/keel-pack": "0.1.0",
     "@preact/preset-vite": "^2.10.1",
     "vite": "^6.2.0"
   }
@@ -131,13 +133,13 @@ Current release: `0.0.1`. Every adapter is versioned in lockstep with
       lang: "json",
       code: `{
   "dependencies": {
-    "@kolektiv/keel": "0.0.1",
-    "@kolektiv/keel-lit": "0.0.1",
+    "@kolektiv/keel": "0.1.0",
+    "@kolektiv/keel-lit": "0.1.0",
     "@tanstack/query-core": "^5.66.0",
     "lit": "^3.2.1"
   },
   "devDependencies": {
-    "@kolektiv/keel-pack": "0.0.1",
+    "@kolektiv/keel-pack": "0.1.0",
     "vite": "^6.2.0"
   }
 }`,
@@ -151,8 +153,8 @@ Current release: `0.0.1`. Every adapter is versioned in lockstep with
     "@angular/common": "^19.0.0",
     "@angular/core": "^19.0.0",
     "@angular/platform-browser": "^19.0.0",
-    "@kolektiv/keel": "0.0.1",
-    "@kolektiv/keel-angular": "0.0.1",
+    "@kolektiv/keel": "0.1.0",
+    "@kolektiv/keel-angular": "0.1.0",
     "@tanstack/angular-query-experimental": "^5.66.0",
     "@tanstack/query-core": "^5.66.0",
     "rxjs": "^7.8.0"
@@ -161,7 +163,7 @@ Current release: `0.0.1`. Every adapter is versioned in lockstep with
     "@analogjs/vite-plugin-angular": "^1.10.0",
     "@angular/build": "^19.0.0",
     "@angular/compiler-cli": "^19.0.0",
-    "@kolektiv/keel-pack": "0.0.1",
+    "@kolektiv/keel-pack": "0.1.0",
     "typescript": "~5.8.3",
     "vite": "^6.2.0"
   }
@@ -170,11 +172,30 @@ Current release: `0.0.1`. Every adapter is versioned in lockstep with
   ]}
 />
 
-Angular 19 rejects TypeScript ≥ 5.9, so its scaffold pins `~5.8.3`;
-build that pack with the Analog Vite plugin (`@analogjs/vite-plugin-angular`
-plus `@angular/build`). Lit and Angular take `@tanstack/query-core` directly
-because those adapters build their own controllers/injectables over it — the
-other four use the framework-specific TanStack Query package.
+<FrameworkPanel frameworks="svelte react vue solid preact">
+TanStack Query ships as the framework-specific package (`@tanstack/react-query`,
+`@tanstack/vue-query`, and so on). Pin it with the adapter above.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="lit angular">
+Lit and Angular take `@tanstack/query-core` directly because those adapters
+build their own controllers/injectables over it.
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="angular">
+<Callout title="Angular TypeScript pin">
+  Angular 19 rejects TypeScript ≥ 5.9, so its scaffold pins `~5.8.3`. Build that
+  pack with the Analog Vite plugin (`@analogjs/vite-plugin-angular` plus
+  `@angular/build`).
+</Callout>
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="svelte">
+<Callout title="Svelte is the docs default">
+  Examples without a framework-specific panel fall back to Svelte. Change the
+  navbar frontend picker to switch install steps and snippets site-wide.
+</Callout>
+</FrameworkPanel>
 
 `@kolektiv/keel` is the host router (visits, history, prefetch, `action()`).
 The adapter package is the framework binding. `@kolektiv/keel-pack` is the
@@ -253,7 +274,7 @@ zoneless application before core applies the seed.
 
 Current pre-release: `0.0.2-SNAPSHOT.4`. The `-SNAPSHOT.4` suffix is part of
 a literal, unique version, and the same `keel-npm` registry serves it. Swap
-the `0.0.1` pins above for `0.0.2-SNAPSHOT.4` to track the pre-release line —
+the `0.1.0` pins above for `0.0.2-SNAPSHOT.4` to track the pre-release line.
 all seven adapter packages share the version.
 
 Next: <a href={path("/docs/getting-started/pack")}>scaffold a pack</a>.

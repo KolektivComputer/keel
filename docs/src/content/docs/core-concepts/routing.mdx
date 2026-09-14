@@ -7,7 +7,6 @@ order: 1
 
 import { path } from "../../../lib/paths"
 import CodeBlock from "../../../components/CodeBlock.astro"
-import CodePair from "../../../components/CodePair.astro"
 
 URLs are a host concern. A pack is addressed by **page id** (`harbor.home`),
 not by `/` or `/u/{id}`. The registry is the router.
@@ -68,10 +67,13 @@ grammar, status codes, and headers live on
 
 The pack never invents routes. It visits host URLs:
 
-<CodePair
-  fw="svelte"
+<CodeBlock
   title="Link and router.visit"
-  ts={`<script lang="ts">
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      ts: `<script lang="ts">
   import { Link, page, router } from "@kolektiv/keel-svelte"
   import type { HomePage } from "@app/page-types"
 
@@ -87,8 +89,8 @@ The pack never invents routes. It visits host URLs:
 
 <button type="button" onclick={() => router.visit("/settings", { preserveScroll: true })}>
   Settings
-</button>`}
-  js={`<script>
+</button>`,
+      js: `<script>
   import { Link, page, router } from "@kolektiv/keel-svelte"
 
   const ctx = page()
@@ -96,11 +98,270 @@ The pack never invents routes. It visits host URLs:
 
 <nav>
   <Link href="/" prefetch="hover">Harbor</Link>
+  {#each ctx.data.feed as item (item.id)}
+    <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+  {/each}
 </nav>
 
 <button type="button" onclick={() => router.visit("/settings", { preserveScroll: true })}>
   Settings
-</button>`}
+</button>`,
+    },
+    {
+      id: "react",
+      label: "React",
+      ts: `import { Link, router, usePage } from "@kolektiv/keel-react"
+import type { HomePage } from "@app/page-types"
+
+export default function Nav() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <nav>
+        <Link href="/" prefetch="hover">Harbor</Link>
+        {seed.data.feed.map((item) => (
+          <Link key={item.id} href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+        ))}
+      </nav>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+      js: `import { Link, router, usePage } from "@kolektiv/keel-react"
+
+export default function Nav() {
+  const seed = usePage()
+  return (
+    <>
+      <nav>
+        <Link href="/" prefetch="hover">Harbor</Link>
+        {seed.data.feed.map((item) => (
+          <Link key={item.id} href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+        ))}
+      </nav>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      ts: `<script setup lang="ts">
+import { Link, router, usePage } from "@kolektiv/keel-vue"
+import type { HomePage } from "@app/page-types"
+
+const seed = usePage<HomePage>()
+</script>
+
+<template>
+  <nav>
+    <Link href="/" prefetch="hover">Harbor</Link>
+    <Link v-for="item in seed.data.feed" :key="item.id" :href="\`/u/\${item.userId}\`">
+      {{ item.displayName }}
+    </Link>
+  </nav>
+  <button type="button" @click="router.visit('/settings', { preserveScroll: true })">
+    Settings
+  </button>
+</template>`,
+      js: `<script setup>
+import { Link, router, usePage } from "@kolektiv/keel-vue"
+
+const seed = usePage()
+</script>
+
+<template>
+  <nav>
+    <Link href="/" prefetch="hover">Harbor</Link>
+    <Link v-for="item in seed.data.feed" :key="item.id" :href="\`/u/\${item.userId}\`">
+      {{ item.displayName }}
+    </Link>
+  </nav>
+  <button type="button" @click="router.visit('/settings', { preserveScroll: true })">
+    Settings
+  </button>
+</template>`,
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      ts: `import { Link, router, usePage } from "@kolektiv/keel-solid"
+import type { HomePage } from "@app/page-types"
+
+export default function Nav() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <nav>
+        <Link href="/" prefetch="hover">Harbor</Link>
+        {seed().data.feed.map((item) => (
+          <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+        ))}
+      </nav>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+      js: `import { Link, router, usePage } from "@kolektiv/keel-solid"
+
+export default function Nav() {
+  const seed = usePage()
+  return (
+    <>
+      <nav>
+        <Link href="/" prefetch="hover">Harbor</Link>
+        {seed().data.feed.map((item) => (
+          <Link href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+        ))}
+      </nav>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      ts: `import { Link, router, usePage } from "@kolektiv/keel-preact"
+import type { HomePage } from "@app/page-types"
+
+export default function Nav() {
+  const seed = usePage<HomePage>()
+  return (
+    <>
+      <nav>
+        <Link href="/" prefetch="hover">Harbor</Link>
+        {seed.data.feed.map((item) => (
+          <Link key={item.id} href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+        ))}
+      </nav>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+      js: `import { Link, router, usePage } from "@kolektiv/keel-preact"
+
+export default function Nav() {
+  const seed = usePage()
+  return (
+    <>
+      <nav>
+        <Link href="/" prefetch="hover">Harbor</Link>
+        {seed.data.feed.map((item) => (
+          <Link key={item.id} href={\`/u/\${item.userId}\`}>{item.displayName}</Link>
+        ))}
+      </nav>
+      <button type="button" onClick={() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    </>
+  )
+}`,
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      ts: `import { html } from "lit"
+import { KeelElement, router } from "@kolektiv/keel-lit"
+import type { HomePage } from "@app/page-types"
+
+export default class Nav extends KeelElement<HomePage> {
+  render() {
+    return html\`
+      <nav>
+        <keel-link href="/" prefetch="hover">Harbor</keel-link>
+        \${this.page.data.feed.map(
+          (item) => html\`<keel-link href="/u/\${item.userId}">\${item.displayName}</keel-link>\`,
+        )}
+      </nav>
+      <button type="button" @click=\${() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    \`
+  }
+}`,
+      js: `import { html } from "lit"
+import { KeelElement, router } from "@kolektiv/keel-lit"
+
+export default class Nav extends KeelElement {
+  render() {
+    return html\`
+      <nav>
+        <keel-link href="/" prefetch="hover">Harbor</keel-link>
+        \${this.page.data.feed.map(
+          (item) => html\`<keel-link href="/u/\${item.userId}">\${item.displayName}</keel-link>\`,
+        )}
+      </nav>
+      <button type="button" @click=\${() => router.visit("/settings", { preserveScroll: true })}>
+        Settings
+      </button>
+    \`
+  }
+}`,
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      ts: `import { Component } from "@angular/core"
+import { KeelLink, injectKeelPage, router } from "@kolektiv/keel-angular"
+import type { HomePage } from "@app/page-types"
+
+@Component({
+  selector: "app-nav",
+  standalone: true,
+  imports: [KeelLink],
+  template: \`
+    <nav>
+      <a [keelLink]="'/'" prefetch="hover">Harbor</a>
+      @for (item of page().data.feed; track item.id) {
+        <a [keelLink]="'/u/' + item.userId">{{ item.displayName }}</a>
+      }
+    </nav>
+    <button type="button" (click)="navigate.visit('/settings', { preserveScroll: true })">
+      Settings
+    </button>
+  \`,
+})
+export default class Nav {
+  readonly page = injectKeelPage<HomePage>()
+  readonly navigate = router
+}`,
+      js: `import { Component } from "@angular/core"
+import { KeelLink, injectKeelPage, router } from "@kolektiv/keel-angular"
+
+@Component({
+  selector: "app-nav",
+  standalone: true,
+  imports: [KeelLink],
+  template: \`
+    <nav>
+      <a [keelLink]="'/'" prefetch="hover">Harbor</a>
+      @for (item of page().data.feed; track item.id) {
+        <a [keelLink]="'/u/' + item.userId">{{ item.displayName }}</a>
+      }
+    </nav>
+    <button type="button" (click)="navigate.visit('/settings', { preserveScroll: true })">
+      Settings
+    </button>
+  \`,
+})
+export default class Nav {
+  readonly page = injectKeelPage()
+  readonly navigate = router
+}`,
+    },
+  ]}
 />
 
 `replace` swaps the current history entry (login, redirects).

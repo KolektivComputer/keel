@@ -1,6 +1,5 @@
 ---
 import ShikiCode from "./ShikiCode.astro"
-import LangToggle from "./LangToggle.astro"
 
 interface FileSnippet {
   title: string
@@ -22,7 +21,6 @@ interface Props {
 }
 
 const { frameworks, overlay = false } = Astro.props
-const initial = frameworks[0]?.id ?? "svelte"
 ---
 
 <div
@@ -30,19 +28,11 @@ const initial = frameworks[0]?.id ?? "svelte"
     "keel-deck overflow-hidden rounded-box border-2 border-base-300 bg-base-100",
     overlay && "keel-deck-overlay",
   ]}
-  data-framework={initial}
   data-file="0"
 >
   {
     !overlay && (
       <div class="flex items-center gap-2 border-b-2 border-base-300 bg-base-200 px-3 py-2">
-        {frameworks.length > 1 && (
-          <select class="select select-xs min-h-8" data-local-framework aria-label="Frontend framework">
-            {frameworks.map((group) => (
-              <option value={group.id}>{group.label}</option>
-            ))}
-          </select>
-        )}
         <div class="ml-auto flex items-center gap-1">
           <button type="button" class="btn btn-ghost btn-xs min-h-8" data-copy>
             Copy
@@ -73,13 +63,6 @@ const initial = frameworks[0]?.id ?? "svelte"
           </div>
           {overlay && (
             <div class="ml-auto hidden items-center gap-1 lg:flex">
-              {frameworks.length > 1 && (
-                <select class="select min-h-11 lg:select-xs lg:min-h-8" data-local-framework aria-label="Frontend framework">
-                  {frameworks.map((item) => (
-                    <option value={item.id}>{item.label}</option>
-                  ))}
-                </select>
-              )}
               <button type="button" class="btn btn-ghost min-h-11 lg:btn-xs lg:min-h-8" data-copy>
                 Copy
               </button>
@@ -102,11 +85,6 @@ const initial = frameworks[0]?.id ?? "svelte"
           <div data-file-panel={String(index)} class="keel-code">
             {file.ts ? (
               <>
-                {!overlay && (
-                  <div class="flex justify-end border-b border-base-300 bg-base-200 px-3 py-1">
-                    <LangToggle scope="block" />
-                  </div>
-                )}
                 <div data-lang-panel="ts" class:list={[overlay && "overflow-auto lg:h-36"]}>
                   <ShikiCode code={file.ts} lang="ts" />
                 </div>

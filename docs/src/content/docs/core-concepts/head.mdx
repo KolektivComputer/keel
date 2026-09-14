@@ -8,22 +8,36 @@ order: 7
 import { path } from "../../../lib/paths"
 import Callout from "../../../components/Callout.astro"
 import CodeBlock from "../../../components/CodeBlock.astro"
-import CodePair from "../../../components/CodePair.astro"
+import CodeDeck from "../../../components/CodeDeck.astro"
+import FrameworkPanel from "../../../components/FrameworkPanel.astro"
 
 Crawlers and share bots **GET the real host URL**. That document is the SEO
-unit. A visit (`X-Keel-Visit`) is `pushState` plus JSON — social crawlers do
+unit. A visit (`X-Keel-Visit`) is `pushState` plus JSON, social crawlers do
 not run JS, and visits are not the SEO unit.
 
 ## The pack authors the head
 
-A page declares its head in a sibling `+head.svelte`, next to
-`+page.svelte`. Non-Svelte adapters compile the neutral `+head.html`
-instead; the placeholder grammar is the same:
+A page declares its head in a sibling file next to `+page.svelte`. The
+placeholder grammar is the same in both templates:
 
-<CodePair
-  fw="svelte"
-  title="pages/harbor/user/+head.svelte"
-  ts={`<script lang="ts">
+<FrameworkPanel frameworks="svelte">
+Svelte pages author a sibling `+head.svelte` next to `+page.svelte`:
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="react vue solid preact lit angular">
+The other six adapters compile a neutral `+head.html` with the same `{seed.*}`
+placeholders and no component wrapper:
+</FrameworkPanel>
+
+<CodeDeck
+  frameworks={[
+    {
+      id: "svelte",
+      label: "Svelte",
+      files: [
+        {
+          title: "+head.svelte",
+          ts: `<script lang="ts">
   import type { KeelSeed } from "@kolektiv/keel"
   import type { UserPage } from "@app/page-types"
 
@@ -31,13 +45,89 @@ instead; the placeholder grammar is the same:
 </script>
 
 <title>{seed.data.user.displayName} — Harbor</title>
-<meta name="description" content="Messages from {seed.data.user.displayName}." />`}
-  js={`<script>
+<meta name="description" content="Messages from {seed.data.user.displayName}." />`,
+          js: `<script>
   let { seed } = $props()
 </script>
 
 <title>{seed.data.user.displayName} — Harbor</title>
-<meta name="description" content="Messages from {seed.data.user.displayName}." />`}
+<meta name="description" content="Messages from {seed.data.user.displayName}." />`,
+        },
+      ],
+    },
+    {
+      id: "react",
+      label: "React",
+      files: [
+        {
+          title: "+head.html",
+          lang: "html",
+          code: `<title>{seed.data.user.displayName} — Harbor</title>
+<meta name="description" content="Messages from {seed.data.user.displayName}." />`,
+        },
+      ],
+    },
+    {
+      id: "vue",
+      label: "Vue",
+      files: [
+        {
+          title: "+head.html",
+          lang: "html",
+          code: `<title>{seed.data.user.displayName} — Harbor</title>
+<meta name="description" content="Messages from {seed.data.user.displayName}." />`,
+        },
+      ],
+    },
+    {
+      id: "solid",
+      label: "Solid",
+      files: [
+        {
+          title: "+head.html",
+          lang: "html",
+          code: `<title>{seed.data.user.displayName} — Harbor</title>
+<meta name="description" content="Messages from {seed.data.user.displayName}." />`,
+        },
+      ],
+    },
+    {
+      id: "preact",
+      label: "Preact",
+      files: [
+        {
+          title: "+head.html",
+          lang: "html",
+          code: `<title>{seed.data.user.displayName} — Harbor</title>
+<meta name="description" content="Messages from {seed.data.user.displayName}." />`,
+        },
+      ],
+    },
+    {
+      id: "lit",
+      label: "Lit",
+      files: [
+        {
+          title: "+head.html",
+          lang: "html",
+          code: `<title>{seed.data.user.displayName} — Harbor</title>
+<meta name="description" content="Messages from {seed.data.user.displayName}." />`,
+        },
+      ],
+    },
+    {
+      id: "angular",
+      label: "Angular",
+      files: [
+        {
+          title: "+head.html",
+          lang: "html",
+          code: `<title>{seed.data.user.displayName} — Harbor</title>
+<meta name="description" content="Messages from {seed.data.user.displayName}." />`,
+        },
+      ],
+    },
+  ]}
 />
 
 `@kolektiv/keel-pack` compiles it at pack build time into the page's `head`
@@ -53,7 +143,7 @@ JS runs on the Kotlin host. The manifest field is specified on
 ## The host renders it
 
 On a document GET the host substitutes the placeholders from the seed
-(`page`, `path`, `params`, `data`, `shared`, `theme` — the serving pack),
+(`page`, `path`, `params`, `data`, `shared`, `theme`, the serving pack),
 allowlists tags and attributes, drops unsafe URLs, and writes real tags into
 `<head>`. A tag whose placeholder has no value in the seed is dropped whole —
 other tags still render, and a document GET never throws. A tag that carries

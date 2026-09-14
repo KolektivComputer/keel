@@ -16,12 +16,24 @@ importers:
       '@astrojs/mdx':
         specifier: ^8.0.0
         version: 8.0.0(@astrojs/markdown-satteri@0.4.0)(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))
+      '@fontsource/inclusive-sans':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource/iosevka':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource/source-sans-3':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/source-serif-4':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@kolektiv/common-docs-chrome':
+        specifier: ^0.0.1-SNAPSHOT.9
+        version: 0.0.1-SNAPSHOT.9(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)
       '@kolektiv/themes':
-        specifier: ^0.0.1-SNAPSHOT.1
-        version: 0.0.1-SNAPSHOT.1
+        specifier: ^0.0.1-SNAPSHOT.2
+        version: 0.0.1-SNAPSHOT.2
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))
@@ -931,8 +943,17 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@fontsource/inclusive-sans@5.3.0':
+    resolution: {integrity: sha512-DSnSommqBXS25QPYACA2FqabNIgMDW93sBXVAHM7TETFVOHo18zltPslzeKguWCUa60dD9wqG79FwLxpNsKPJQ==}
+
   '@fontsource/iosevka@5.3.0':
     resolution: {integrity: sha512-RcG0v/65e4PTuThR/d7n9jj6PLlex7YUGaLa4ZpL+NnqArWQmD8Z+6gYBTxPMVWxYMRcEw6OF4rdt8XisnC5zA==}
+
+  '@fontsource/source-sans-3@5.3.0':
+    resolution: {integrity: sha512-VrWixSgF93kOVSEkwjs9ImnAbxrBew4PgcnaJYEitG9TyJSwxjFUNJIgzB1XFP/acyAWcTDg7+sWe7JI8LTB9w==}
+
+  '@fontsource/source-serif-4@5.3.0':
+    resolution: {integrity: sha512-yQz8xmIgMzks8zQbpuca3UYtjxK798XCyQAGdDXmzBgvV7sdoK6d0YvE9F9kiYxORCEMRBgGZDZsSYcXj5KvwA==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -1096,8 +1117,19 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kolektiv/themes@0.0.1-SNAPSHOT.1':
-    resolution: {integrity: sha512-BgIUIBLgVvMwr7xG2lu3Ya5MW8geQ831t72/79RS2qsurSoP5oRPny4vypt2GW4EoqAtmYjo7xNFW4m7LHQvVQ==}
+  '@kolektiv/brand-core@0.1.0':
+    resolution: {integrity: sha512-PO+95Kv6H8py4BiNFag1jx5CQHupoTYrPgKgchn6DQKulwkuJWouukQJ5DaE4T2jwQN3KMBAmiTGTY7UaPaJSA==}
+
+  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.9':
+    resolution: {integrity: sha512-sEqfaYz03Mzg7hfZgAAeyt7aS527+9ICTgpdUcozMF/7BCwA03jvJnHk0cVL9vvImb3BFN0LrGG6PALiDMidmQ==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      astro: '>=5'
+      daisyui: ^5
+      tailwindcss: ^4
+
+  '@kolektiv/themes@0.0.1-SNAPSHOT.2':
+    resolution: {integrity: sha512-4vEkdHZeUcVsldRET+eb5Xbjo1JDwv/A2qVAOBv0pvLmcT91S+FVK/eJ/NsbXBG2gCxMvhoYrcgQ78uxQqH7JQ==}
 
   '@lit-labs/ssr-dom-shim@1.6.0':
     resolution: {integrity: sha512-VHb0ALPMTlgKjM6yIxxoQNnpKyUKLD04VzeQdsiXkMqkvYlAHxq9glGLmgbb889/1GsohSOAjvQYoiBppXFqrQ==}
@@ -3885,7 +3917,13 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
+  '@fontsource/inclusive-sans@5.3.0': {}
+
   '@fontsource/iosevka@5.3.0': {}
+
+  '@fontsource/source-sans-3@5.3.0': {}
+
+  '@fontsource/source-serif-4@5.3.0': {}
 
   '@img/colour@1.1.0':
     optional: true
@@ -4013,7 +4051,17 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@kolektiv/themes@0.0.1-SNAPSHOT.1': {}
+  '@kolektiv/brand-core@0.1.0': {}
+
+  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.9(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)':
+    dependencies:
+      '@kolektiv/brand-core': 0.1.0
+      '@kolektiv/themes': 0.0.1-SNAPSHOT.2
+      astro: 7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0)
+      daisyui: 5.7.27
+      tailwindcss: 4.3.3
+
+  '@kolektiv/themes@0.0.1-SNAPSHOT.2': {}
 
   '@lit-labs/ssr-dom-shim@1.6.0': {}
 

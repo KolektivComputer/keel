@@ -9,24 +9,23 @@ import Callout from "../../../components/Callout.astro"
 import { path } from "../../../lib/paths"
 
 Keel is a protocol and a small set of libraries for serving MPAs with a
-frameworked UI from Kotlin. The **host** owns URLs, page ids, payload types,
-and **which pack to render with**. A **pack** is a versioned frontend that
+frameworked UI from Kotlin. The host owns URLs, page ids, and payload types.
+The call site passes which pack to render. A pack is a versioned frontend that
 implements those ids.
 
 You always do the same two things: declare a contract on the host, then pass
 a pack that implements it into render.
 
 **Glue an app.** Register pages, write one frontend with any supported
-adapter — Svelte, React, Vue, Solid, Preact, Lit, or Angular — and ship that
-pack. Keel is the router between Ktor and the UI — visits, seeds, forms —
+adapter (Svelte, React, Vue, Solid, Preact, Lit, or Angular), and ship that
+pack. Keel is the router between Ktor and the UI (visits, seeds, forms)
 without a client-side router owning the URL.
 
 **Install themes.** Keep the same registry. Publish the page ids and
-serializers as the contract. Authors provide packs typed for that data that
-implement the ids the host expects, and the call site passes the pack it
-wants at render. Visitors never store a theme.
+serializers as the contract. Authors provide packs typed for that data. The
+call site passes the pack it wants at render. Visitors never store a theme.
 
-The first host is Ktor. Keel ships seven pack adapters — Svelte 5, React
+The first host is Ktor. Keel ships seven pack adapters. Svelte 5, React
 18/19, Vue 3, Solid 1.9, Preact 10, Lit 3, and Angular 19; Svelte was the
 first. See <a href={path("/docs/implementing/framework-adapters")}>Framework
 adapters</a> for the matrix.
@@ -43,15 +42,15 @@ Inertia4J speaks the Inertia SPA protocol over Ktor or Spring. Kinetica and Kilu
 
 ## The split
 
-- **Keel** — product, CLI, Maven group `dev.kolektiv.keel`
-- **Pack** — a versioned frontend (`.feb` zip + manifest) keyed by page id, not path
-- **Adapter** — `mount` / `unmount` / `update` for a framework (Svelte, React,
+- **Keel**, product, CLI, Maven group `dev.kolektiv.keel`
+- **Pack**, a versioned frontend (`.feb` zip + manifest) keyed by page id, not path
+- **Adapter**, `mount` / `unmount` / `update` for a framework (Svelte, React,
   Vue, Solid, Preact, Lit, Angular)
 
 ## What the host does
 
-- Declares `page<T>(id, path)` — id + payload type + path
-- Declares `action<I, O>(id)` — typed writes, JSON in / JSON out
+- Declares `page<T>(id, path)`, id + payload type + path
+- Declares `action<I, O>(id)`, typed writes, JSON in / JSON out
 - Passes the pack that implements that id into render (one pack, or one of
   several installed packs)
 - Renders a shell with `#__keel_seed` (and `seed.head` in the document) or answers a visit (`X-Keel-Visit`) with the same JSON
@@ -59,7 +58,7 @@ Inertia4J speaks the Inertia SPA protocol over Ktor or Spring. Kinetica and Kilu
 ## What a pack must not do
 
 - Own URL patterns
-- Fetch its own page payload as a second source of truth — **actions are writes; reads stay the seed**
+- Fetch its own page payload as a second source of truth, **actions are writes; reads stay the seed**
 - Parse the seed outside bootstrap
 - Choose its own pack, or read a visitor theme preference from the browser
 
@@ -75,16 +74,21 @@ Inertia4J speaks the Inertia SPA protocol over Ktor or Spring. Kinetica and Kilu
     "id": "harbor",
     "version": "1.0.0"
   },
-  "entry": "/themes/harbor/pages/home.js",
+  "entry": "/__keel/pack/harbor/pages/harbor.home.js",
   "host": "#__keel_root"
 }
 ```
+
+<Callout title="Harbor is a testbench">
+  Harbor samples in these docs are a testbench app, not the product path.
+  Build against the host API. Cite Harbor only where it covers the example.
+</Callout>
 
 `theme` is the serving pack's `{ id, version }`; `entry` is the page module
 Keel loads from that pack.
 
 <Callout title="One pack or many">
   A single-pack app passes its one pack to render. Adding a second installed
-  pack does not change the host API — it stays installed until a call site
+  pack does not change the host API, it stays installed until a call site
   passes it or a route scopes it with `route.keel(pack)`.
 </Callout>

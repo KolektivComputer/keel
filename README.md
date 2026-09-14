@@ -1,6 +1,12 @@
+<p align="center">
+  <img src="public/logo.svg" alt="Keel" width="96" height="96" />
+</p>
+
 # Keel
 
 Host-owned routing and render-time frontend packs for Kotlin servers.
+
+**Docs:** [Getting started](https://keel.kolektiv.computer/docs/getting-started/) · [keel.kolektiv.computer](https://keel.kolektiv.computer/)
 
 | Coordinate | Name |
 | --- | --- |
@@ -8,20 +14,28 @@ Host-owned routing and render-time frontend packs for Kotlin servers.
 | npm router | `@kolektiv/keel` |
 | npm adapters | `@kolektiv/keel-svelte`, `@kolektiv/keel-react`, `@kolektiv/keel-vue`, `@kolektiv/keel-solid`, `@kolektiv/keel-preact`, `@kolektiv/keel-lit`, `@kolektiv/keel-angular` |
 | npm pack toolchain | `@kolektiv/keel-pack` |
-| docs | [keel.mey.cat](https://keel.mey.cat/) |
+| Org | [KolektivComputer](https://github.com/KolektivComputer) · [kolektiv.computer](https://kolektiv.computer) |
 
-Agents (human or otherwise) should read [AGENTS.md](./AGENTS.md).
+## License
 
-- `buildSrc/` — Kotlin JVM + Maven publish conventions
-- `lib/` — seed, manifest, page registry, `FrontendBundle`, typegen (no Ktor)
-- `ktor/` — Ktor plugin: document shell, `respondPage`, visits, pack static files
-- `samples/harbor` — in-memory message board (Ktor + Svelte pack; `./gradlew :samples:harbor:run`)
-- `packages/` — TypeScript router, framework adapters (Svelte, React, Vue, Solid, Preact, Lit, Angular), and `keel-pack` (`.feb` zip + `keel-scaffold`)
-- `skills/` — Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`) for Claude, Grok, and `.agents/skills` (`npx skills add KolektivComputer/keel`)
-- `llms.txt` — curated map for LLMs (also served from the docs site)
-- `docs/` — homepage and documentation (Astro, Tailwind 4, daisyUI 5, Shiki Catppuccin)
-- `public/logo.svg` — product mark (also `favicon.svg`); `public/mark.svg` is the hull glyph
-- [CHANGELOG.md](./CHANGELOG.md) — versioned release notes (Keep a Changelog)
+[Apache License 2.0](./LICENSE) © Kolektiv Computer
+
+## Start here
+
+- [Getting started](https://keel.kolektiv.computer/docs/getting-started/)
+- [AGENTS.md](./AGENTS.md): how to work in this repo (humans and coding agents)
+- [CHANGELOG.md](./CHANGELOG.md)
+- [llms.txt](./llms.txt): curated map for LLMs (also served from the docs site)
+
+## Layout
+
+- `buildSrc/`: Kotlin JVM + Maven publish conventions
+- `lib/`: seed, manifest, page registry, `FrontendBundle`, typegen (no Ktor)
+- `ktor/`: Ktor plugin: document shell, `respondPage`, visits, pack static files
+- `samples/harbor`: Harbor testbench (Ktor + Svelte pack). Not the product path. `./gradlew :samples:harbor:run`
+- `packages/`: TypeScript router, framework adapters, and `keel-pack` (`.feb` zip + `keel-scaffold`)
+- `skills/`: Agent Skills (`keel-host`, `keel-pack`, `keel-scaffold`)
+- `docs/`: homepage and documentation (Astro)
 
 ```bash
 ./gradlew :lib:test :ktor:test :samples:harbor:test
@@ -32,9 +46,11 @@ pnpm dev
 ./gradlew :samples:harbor:run
 ```
 
-Java 17+, Kotlin 2.2, Gradle 9.5. CI runs JVM tests on JDK 17 / 21 / 25 and
-the JS workspace on Node 22. Implementing-Keel guides live under
-`docs/src/content/docs/implementing/`.
+Java 17+, Kotlin 2.2, Gradle 9.5. CI runs JVM tests on JDK 17 / 21 / 25 and the JS workspace on Node 22.
+
+Implementing guides: [Wire protocol](https://keel.kolektiv.computer/docs/implementing/protocol/) and siblings under `/docs/implementing/`.
+
+## Publishing
 
 Consumers resolve **one** Maven repo — `maven-releases` for numbered
 versions, `maven-snapshots` for canonical `*-SNAPSHOT` builds, or
@@ -50,7 +66,6 @@ names as env, or `keel.publishing.yuriCapitalRepoUsername` /
 
 The pnpm workspace lives at the repository root (`packages/*` and `docs`).
 
-Docs deploy from `.github/workflows/pages.yml` to GitHub Pages at
-[keel.mey.cat](https://keel.mey.cat/). Enable **Settings → Pages → Source:
-GitHub Actions** and the custom domain. Pages on a private repo needs GitHub
-Pro; it will serve publicly once the repository is public.
+Docs deploy to Cloudflare Pages through its Git integration (project `keel-docs`)
+at [keel.kolektiv.computer](https://keel.kolektiv.computer/). The Pages production
+branch is `docs/v0.1.0-release-scrub` until this work merges to `main`.

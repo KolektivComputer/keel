@@ -4,6 +4,9 @@ import { fileURLToPath } from "node:url"
 import { defineConfig } from "astro/config"
 import mdx from "@astrojs/mdx"
 import tailwindcss from "@tailwindcss/vite"
+import { createShikiConfig } from "@kolektiv/common-docs-chrome"
+
+import { docs } from "./src/docs-chrome.ts"
 
 const sandboxPlugin = fileURLToPath(new URL("../scripts/grok-pwa-plugin.mjs", import.meta.url))
 /** @type {any[]} */
@@ -16,7 +19,6 @@ if (existsSync(sandboxPlugin)) {
   extraVitePlugins.push(grokPwaPlugin(), appEnvPlugin())
 }
 
-const docsSite = process.env.DOCS_SITE ?? "http://localhost:8080"
 const llmsTxt = fileURLToPath(new URL("../llms.txt", import.meta.url))
 
 /** Canonical file is repo-root `llms.txt`. Copy a real file into dist so Pages is not a dangling symlink. */
@@ -34,8 +36,8 @@ function llmsTxtIntegration() {
 }
 
 export default defineConfig({
-  site: docsSite,
-  base: "/",
+  site: docs.siteUrl,
+  base: docs.base,
   output: "static",
   redirects: {
     "/docs/getting-started/install": "/docs/getting-started/server",
@@ -46,14 +48,9 @@ export default defineConfig({
   srcDir: "./src",
   integrations: [mdx(), llmsTxtIntegration()],
   markdown: {
+    // Registers every built-in Kolektiv, Catppuccin, Nord and daisyUI theme.
     shikiConfig: {
-      themes: {
-        mocha: "catppuccin-mocha",
-        macchiato: "catppuccin-macchiato",
-        frappe: "catppuccin-frappe",
-        latte: "catppuccin-latte",
-      },
-      defaultColor: false,
+      ...createShikiConfig(docs.themes),
       wrap: true,
     },
   },

@@ -1,6 +1,5 @@
 ---
 import ShikiCode from "./ShikiCode.astro"
-import LangToggle from "./LangToggle.astro"
 
 interface FrameworkOption {
   id: string
@@ -19,43 +18,39 @@ interface Props {
   fw?: string
   bw?: string
   frameworks?: FrameworkOption[]
+  /**
+   * Generic chrome switcher id. When set (e.g. "gradle"), panels are emitted as
+   * `data-<switcher>-panel` instead of `data-framework-panel`, so the framework
+   * dropdown is not triggered and the named chrome switcher drives them.
+   */
+  switcher?: string
 }
 
-const { code = "", lang = "ts", title, fw = "all", bw = "all", frameworks } = Astro.props
+const { code = "", lang = "ts", title, fw = "all", bw = "all", frameworks, switcher } = Astro.props
 const hasFrameworks = Boolean(frameworks?.length)
 const defaultFramework = frameworks?.[0]?.id ?? "svelte"
+const panelAttrs = (id: string) =>
+  switcher ? { [`data-${switcher}-panel`]: id } : { "data-framework-panel": id }
 ---
 
 <figure
   class="keel-code not-prose my-5 overflow-hidden rounded-box border-2 border-base-300"
   data-fw={fw}
   data-bw={bw}
-  data-framework={hasFrameworks ? defaultFramework : undefined}
+  data-framework={!switcher && hasFrameworks ? defaultFramework : undefined}
 >
   <figcaption class="flex items-center justify-between gap-2 border-b-2 border-base-300 bg-base-200 px-3 py-2">
     <span class="truncate font-mono text-xs tracking-wide opacity-80">{title ?? lang}</span>
     <div class="flex items-center gap-1">
-      {
-        hasFrameworks && (
-          <select class="select select-xs min-h-8" data-local-framework aria-label="Framework">
-            {frameworks!.map((item) => (
-              <option value={item.id}>{item.label}</option>
-            ))}
-          </select>
-        )
-      }
       <button type="button" class="btn btn-ghost btn-xs" data-copy>Copy</button>
     </div>
   </figcaption>
   {
     hasFrameworks ? (
       frameworks!.map((item) => (
-        <div data-framework-panel={item.id}>
+        <div {...panelAttrs(item.id)}>
           {item.ts ? (
             <div class="keel-code">
-              <div class="flex justify-end border-b border-base-300 bg-base-200 px-3 py-1">
-                <LangToggle scope="block" />
-              </div>
               <div data-lang-panel="ts">
                 <ShikiCode code={item.ts} lang="ts" />
               </div>

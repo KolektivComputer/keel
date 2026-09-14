@@ -81,9 +81,9 @@ picker that sets `data-frontend` (default Svelte; snippets opt in with `fw`
 or per-framework panels). Code samples: Svelte-default, plus Ktor host. TS/JS
 toggles live on docs pages and on individual snippets.
 
-Production docs are `https://keel.mey.cat` (GitHub Pages custom domain, site
+Production docs are `https://keel.mey.cat` (Cloudflare Pages custom domain, site
 root). All in-app links must go through `path()` in `docs/src/lib/paths.ts`
-(or `import.meta.env.BASE_URL`). The Pages workflow sets `DOCS_SITE`; local
+(or `import.meta.env.BASE_URL`). The Pages build sets `DOCS_SITE`; local
 `astro dev` stays at `/`. Astro emits to `/dist` at the repo root.
 
 ## Contributing

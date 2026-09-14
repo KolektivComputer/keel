@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@kolektiv/keel-angular`: Angular 19 binding with signal-based page/form
   state, query/action injectables, link/form/head directives,
   navigation/unload guards, `createPage`, and `bootstrap` (#48).
+- docs: the shared chrome navbar is customizable (visibility flags, extra
+  links, brand/navbar slots) and Keel forwards per-page overrides.
 
 ### Changed
 
@@ -52,12 +54,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   updated install/bootstrap/pack guidance (#41).
 - Agent skills cover the framework adapter matrix: pack/scaffold/host
   guidance for React, Vue, Solid, Preact, Lit, and Angular (#42).
+- Docs use the shared chrome switcher state: the Gradle Kotlin DSL vs Groovy
+  choice is now a `gradle` switcher and the navbar framework dropdown only
+  appears on pages with framework content. Per-snippet framework selects and
+  TS/JS buttons were removed in favour of the chrome controls.
+- Docs adopt the canonical shared chrome theme picker: site themes are grouped
+  by family and code themes are curated (Catppuccin flavours, Nord, Kolektiv,
+  `follow`).
+- Docs render the shared chrome footer with the built-by mark enlarged and
+  placed above the copyright.
+- Docs drive the source-control menu from `repo.remotes`, listing GitHub and
+  `git.yuri.capital`.
 
 ### Fixed
 
 - Pack-adapter docs no longer claim a manifest `layouts` map or per-page
   `layout` field: adapters inline the layout chain into each entry module, and
   `keel-pack` writes neither (#38).
+- Widen the non-docs page container so the homepage uses its designed width.
+- Docs active sidebar link is readable in the `kolektiv-dark`, nord, and light
+  themes.
+- the footer built-by mark keeps its initial K (shared chrome now renders the
+  generated built-by variant content).
 
 ## [0.0.2-SNAPSHOT.4] - 2026-09-13
 
