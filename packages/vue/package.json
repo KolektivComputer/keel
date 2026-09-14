@@ -1,6 +1,6 @@
 {
   "name": "@kolektiv/keel-vue",
-  "version": "0.0.2-SNAPSHOT.4",
+  "version": "0.1.0",
   "description": "Keel Vue 3 bindings — Link, Form, Head, usePage, useForm, useAction.",
   "type": "module",
   "license": "Apache-2.0",
