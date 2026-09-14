@@ -37,13 +37,35 @@ AUTH="$(printf '%s:%s' "${YURI_CAPITAL_REPO_USERNAME}" "${YURI_CAPITAL_REPO_PASS
 path="${REGISTRY#https://}"
 path="${path#http://}"
 
+# The committed repo-root .npmrc pins @kolektiv to the read-only npm-public
+# group. Project-level scope config beats NPM_CONFIG_USERCONFIG, so swap the
+# root .npmrc for the publish config during the loop and restore it on exit.
+NPMRC_PATH="${ROOT_DIR}/.npmrc"
 NPMRC="$(mktemp)"
-trap 'rm -f "${NPMRC}"' EXIT
+NPMRC_BACKUP="$(mktemp)"
+HAD_NPMRC=0
+if [ -f "${NPMRC_PATH}" ]; then
+  cp "${NPMRC_PATH}" "${NPMRC_BACKUP}"
+  HAD_NPMRC=1
+fi
+
+restore_npmrc() {
+  rm -f "${NPMRC}"
+  if [ "${HAD_NPMRC}" -eq 1 ] && [ -f "${NPMRC_BACKUP}" ]; then
+    cp "${NPMRC_BACKUP}" "${NPMRC_PATH}"
+    rm -f "${NPMRC_BACKUP}"
+  else
+    rm -f "${NPMRC_BACKUP}" "${NPMRC_PATH}"
+  fi
+}
+trap restore_npmrc EXIT
+
 {
   printf '@kolektiv:registry=%s\n' "${REGISTRY}"
   printf '//%s:_auth=%s\n' "${path}" "${AUTH}"
   printf '//%s:always-auth=true\n' "${path}"
 } >"${NPMRC}"
+cp "${NPMRC}" "${NPMRC_PATH}"
 
 already_published() {
   local pkg="$1"
