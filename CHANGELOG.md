@@ -74,6 +74,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Widen the non-docs page container so the homepage uses its designed width.
 - Docs active sidebar link is readable in the `kolektiv-dark`, nord, and light
   themes.
+- the footer built-by mark keeps its initial K (shared chrome now renders the
+  generated built-by variant content).
 
 ## [0.0.2-SNAPSHOT.4] - 2026-09-13
 
