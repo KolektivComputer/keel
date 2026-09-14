@@ -44,6 +44,17 @@ export const docs = defineDocsChrome({
     { id: "lit", label: "Lit" },
     { id: "angular", label: "Angular" },
   ],
+  switchers: [
+    {
+      id: "gradle",
+      label: "Build script",
+      options: [
+        { id: "kts", label: "Kotlin DSL" },
+        { id: "groovy", label: "Groovy" },
+      ],
+      default: "kts",
+    },
+  ],
   defaultLang: "ts",
   defaultFramework: "svelte",
   footer: {

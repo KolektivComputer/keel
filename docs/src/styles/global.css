@@ -153,30 +153,12 @@ p {
  * Keel content panel visibility.
  *
  * The shared chrome injects `visibilityCss(config)` from `BaseHead`, which
- * sets `[data-lang-panel]` / `[data-framework-panel]` to `display:none` and
- * reveals the panels matching the html-level `data-lang` / `data-framework`.
- * Keel's code components additionally scope panels per block, so the rules
- * below re-assert the local selection with higher specificity.
+ * sets every `[data-<id>-panel]` (including `[data-lang-panel]` and
+ * `[data-framework-panel]`) to `display:none` and reveals the panels matching
+ * the html-level switcher value (or `="all"`). Keel's code components only
+ * emit the panel markers; chrome owns the active language and framework.
+ * Keel's own `[data-fw]` gating rules follow below.
  */
-html[data-lang="ts"] .keel-code:not([data-lang]) [data-lang-panel="js"],
-html[data-lang="js"] .keel-code:not([data-lang]) [data-lang-panel="ts"],
-.keel-code[data-lang="ts"] [data-lang-panel="js"],
-.keel-code[data-lang="js"] [data-lang-panel="ts"] {
-  display: none;
-}
-
-.keel-code[data-lang="ts"] [data-lang-panel="ts"],
-.keel-code[data-lang="js"] [data-lang-panel="js"] {
-  display: block;
-}
-
-html[data-frontend="svelte"] [data-fw]:not([data-fw~="svelte"]):not([data-fw~="all"]),
-html[data-frontend="react"] [data-fw]:not([data-fw~="react"]):not([data-fw~="all"]),
-html[data-frontend="vue"] [data-fw]:not([data-fw~="vue"]):not([data-fw~="all"]),
-html[data-frontend="solid"] [data-fw]:not([data-fw~="solid"]):not([data-fw~="all"]),
-html[data-frontend="preact"] [data-fw]:not([data-fw~="preact"]):not([data-fw~="all"]),
-html[data-frontend="lit"] [data-fw]:not([data-fw~="lit"]):not([data-fw~="all"]),
-html[data-frontend="angular"] [data-fw]:not([data-fw~="angular"]):not([data-fw~="all"]),
 html[data-framework="svelte"] [data-fw]:not([data-fw~="svelte"]):not([data-fw~="all"]),
 html[data-framework="react"] [data-fw]:not([data-fw~="react"]):not([data-fw~="all"]),
 html[data-framework="vue"] [data-fw]:not([data-fw~="vue"]):not([data-fw~="all"]),
@@ -189,30 +171,6 @@ html[data-framework="angular"] [data-fw]:not([data-fw~="angular"]):not([data-fw~
 
 html[data-backend="ktor"] [data-bw]:not([data-bw~="ktor"]):not([data-bw~="all"]) {
   display: none;
-}
-
-.keel-deck[data-framework] [data-framework-panel],
-.keel-code[data-framework] [data-framework-panel] {
-  display: none;
-}
-
-.keel-deck[data-framework="svelte"] [data-framework-panel="svelte"],
-.keel-code[data-framework="svelte"] [data-framework-panel="svelte"],
-.keel-deck[data-framework="react"] [data-framework-panel="react"],
-.keel-code[data-framework="react"] [data-framework-panel="react"],
-.keel-deck[data-framework="vue"] [data-framework-panel="vue"],
-.keel-code[data-framework="vue"] [data-framework-panel="vue"],
-.keel-deck[data-framework="solid"] [data-framework-panel="solid"],
-.keel-code[data-framework="solid"] [data-framework-panel="solid"],
-.keel-deck[data-framework="preact"] [data-framework-panel="preact"],
-.keel-code[data-framework="preact"] [data-framework-panel="preact"],
-.keel-deck[data-framework="lit"] [data-framework-panel="lit"],
-.keel-code[data-framework="lit"] [data-framework-panel="lit"],
-.keel-deck[data-framework="angular"] [data-framework-panel="angular"],
-.keel-code[data-framework="angular"] [data-framework-panel="angular"],
-.keel-code[data-framework="kts"] [data-framework-panel="kts"],
-.keel-code[data-framework="groovy"] [data-framework-panel="groovy"] {
-  display: block;
 }
 
 .keel-deck[data-file="0"] [data-file-panel]:not([data-file-panel="0"]),

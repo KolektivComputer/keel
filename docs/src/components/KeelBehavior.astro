@@ -17,7 +17,7 @@ const { previewPaths = [path("/"), path("/docs")] } = Astro.props
 />
 
 <script>
-  import { copyFromFigure, syncBlockLangButtons, syncFileButtons, syncLocalFrameworks } from "../lib/content"
+  import { copyFromFigure, syncFileButtons } from "../lib/content"
   import { installPreviewBridge } from "../lib/preview-bridge"
 
   const root = document.documentElement
@@ -27,21 +27,6 @@ const { previewPaths = [path("/"), path("/docs")] } = Astro.props
   const pathNode = document.getElementById("keel-preview-paths")
   const previewPaths: string[] = pathNode?.textContent ? JSON.parse(pathNode.textContent) : []
   installPreviewBridge(previewPaths)
-
-  // SSR defaults (and the package no-flash script) set data-framework/data-lang.
-  syncLocalFrameworks(root.dataset.framework ?? "svelte")
-  syncBlockLangButtons()
-
-  // Mirror the package preference events onto Keel's content panels.
-  document.addEventListener("kdc:prefs", (event) => {
-    const detail = (event as CustomEvent<{ framework?: string; lang?: string }>).detail
-    if (!detail) return
-    if (detail.framework) {
-      root.dataset.frontend = detail.framework
-      syncLocalFrameworks(detail.framework)
-    }
-    if (detail.lang) syncBlockLangButtons()
-  })
 
   document.addEventListener("click", (event) => {
     const target = event.target as HTMLElement
@@ -91,25 +76,5 @@ const { previewPaths = [path("/"), path("/docs")] } = Astro.props
       }
       return
     }
-
-    const langBtn = target.closest<HTMLButtonElement>("[data-lang-btn]")
-    if (!langBtn?.dataset.langBtn) return
-    const block = langBtn.closest<HTMLElement>(".keel-code")
-    if (block) {
-      block.dataset.lang = langBtn.dataset.langBtn
-      syncBlockLangButtons(block)
-    }
-  })
-
-  document.addEventListener("change", (event) => {
-    const el = event.target as HTMLInputElement | HTMLSelectElement
-    if (!el.matches("[data-local-framework]")) return
-    const rootEl = el.closest<HTMLElement>(".keel-deck, .keel-code")
-    if (!rootEl) return
-    rootEl.dataset.framework = el.value
-    rootEl.querySelectorAll<HTMLSelectElement>("[data-local-framework]").forEach((select) => {
-      select.value = el.value
-    })
-    syncFileButtons(rootEl)
   })
 </script>
