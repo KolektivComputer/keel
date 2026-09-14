@@ -29,8 +29,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@kolektiv/common-docs-chrome':
-        specifier: ^0.0.1-SNAPSHOT.2
-        version: 0.0.1-SNAPSHOT.2(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)
+        specifier: ^0.0.1-SNAPSHOT.3
+        version: 0.0.1-SNAPSHOT.3(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)
       '@kolektiv/themes':
         specifier: ^0.0.1-SNAPSHOT.2
         version: 0.0.1-SNAPSHOT.2
@@ -1117,8 +1117,11 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.2':
-    resolution: {integrity: sha512-o4LVx2CkDrBRLf6FEHU6FQATXp+vftXZip68Ck6nakrnHI/cW7ZVeTdknvjzHr/NSblm/sTDCvnUbg3BtfrXGw==}
+  '@kolektiv/brand-core@0.1.0':
+    resolution: {integrity: sha512-PO+95Kv6H8py4BiNFag1jx5CQHupoTYrPgKgchn6DQKulwkuJWouukQJ5DaE4T2jwQN3KMBAmiTGTY7UaPaJSA==}
+
+  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.3':
+    resolution: {integrity: sha512-2x8r758Nvl7Xj2vyvaZGU0Pq/MsFt2T4ZYbE+Mk/ueNXHtaHVn57A2w+Sg12MJOt0eUiRL2s8uq+1hjDSUrraA==}
     engines: {node: '>=22'}
     peerDependencies:
       astro: '>=5'
@@ -4048,8 +4051,11 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.2(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)':
+  '@kolektiv/brand-core@0.1.0': {}
+
+  '@kolektiv/common-docs-chrome@0.0.1-SNAPSHOT.3(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0))(daisyui@5.7.27)(tailwindcss@4.3.3)':
     dependencies:
+      '@kolektiv/brand-core': 0.1.0
       '@kolektiv/themes': 0.0.1-SNAPSHOT.2
       astro: 7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.1)(jiti@2.7.0)(sass@1.85.0)(yaml@2.9.0)
       daisyui: 5.7.27
