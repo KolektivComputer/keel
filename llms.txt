@@ -2,7 +2,7 @@
 
 > Host-owned routing and render-time frontend packs. The server owns URLs, page ids, and payload types. Packs implement ids — never paths.
 
-Keel is a protocol plus Kotlin/JS libraries. Format `keel/1`. First host adapter is Ktor; seven pack adapters ship — Svelte 5, React 18/19, Vue 3, Solid 1.9, Preact 10, Lit 3, and Angular 19 (Svelte was the first). Maven: `dev.kolektiv.keel:core`, `dev.kolektiv.keel:ktor`. npm: `@kolektiv/keel`, `@kolektiv/keel-svelte`, `@kolektiv/keel-react`, `@kolektiv/keel-vue`, `@kolektiv/keel-solid`, `@kolektiv/keel-preact`, `@kolektiv/keel-lit`, `@kolektiv/keel-angular`, `@kolektiv/keel-pack`.
+Keel is a protocol plus Kotlin/JS libraries. Format `keel/1`. First host adapter is Ktor; seven pack adapters ship — Svelte 5, React 18/19, Vue 3, Solid 1.9, Preact 10, Lit 3, and Angular 19 (Svelte was the first). Maven: `computer.kolektiv.keel:core`, `computer.kolektiv.keel:ktor`. npm: `@kolektiv/keel`, `@kolektiv/keel-svelte`, `@kolektiv/keel-react`, `@kolektiv/keel-vue`, `@kolektiv/keel-solid`, `@kolektiv/keel-preact`, `@kolektiv/keel-lit`, `@kolektiv/keel-angular`, `@kolektiv/keel-pack`.
 
 Live contract: `GET /__keel/schema` on any Keel host. Scaffold a pack with `keel-scaffold <origin> <dir>`.
 
@@ -11,7 +11,7 @@ Docs: https://keel.mey.cat/  (Cloudflare Pages; local `pnpm dev` is http://127.0
 ## Docs
 
 - [What is Keel](https://keel.mey.cat/docs/getting-started/): host-owned routing, packs implement ids
-- [Server Installation](https://keel.mey.cat/docs/getting-started/server/): Maven — one repo (`maven-releases`, `maven-snapshots`, or `keel-maven` for unique pre-releases), `dev.kolektiv.keel:core`
+- [Server Installation](https://keel.mey.cat/docs/getting-started/server/): Maven — one repo (`maven-releases`, `maven-snapshots`, or `keel-maven` for unique pre-releases), `computer.kolektiv.keel:core`
 - [Client Setup](https://keel.mey.cat/docs/getting-started/client/): npm — `keel-npm` registry, `@kolektiv/keel*`, install and bootstrap per adapter
 - [Host (Ktor)](https://keel.mey.cat/docs/getting-started/host/): stand up a Keel host
 - [Pack](https://keel.mey.cat/docs/getting-started/pack/): keel-scaffold (`--framework`) or keelPack in Vite

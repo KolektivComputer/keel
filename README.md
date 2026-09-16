@@ -10,7 +10,7 @@ Host-owned routing and render-time frontend packs for Kotlin servers.
 
 | Coordinate | Name |
 | --- | --- |
-| Maven | `dev.kolektiv.keel:core`, `dev.kolektiv.keel:ktor` |
+| Maven | `computer.kolektiv.keel:core`, `computer.kolektiv.keel:ktor` |
 | npm router | `@kolektiv/keel` |
 | npm adapters | `@kolektiv/keel-svelte`, `@kolektiv/keel-react`, `@kolektiv/keel-vue`, `@kolektiv/keel-solid`, `@kolektiv/keel-preact`, `@kolektiv/keel-lit`, `@kolektiv/keel-angular` |
 | npm pack toolchain | `@kolektiv/keel-pack` |
