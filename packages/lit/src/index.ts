@@ -10,7 +10,7 @@ export {
 } from "./guards.js"
 export type { GuardResult, NavigationGuard, NavigationTarget } from "@kolektiv/keel"
 export { applyHead, fromPageHead, setTitle, syncHead, type HeadInput } from "./head.js"
-export { router, ActionError } from "@kolektiv/keel"
+export { realtime, router, ActionError, type RealtimeMessage } from "@kolektiv/keel"
 export {
   getQueryClient,
   hydrateKeelQuery,
