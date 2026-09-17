@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Typed realtime event registry: `@KeelEvent` (payload classes and host
+  handler functions), `dev.kolektiv.keel.event.EventRegistry` /
+  `EventDiscovery`, and the versioned JSON envelope
+  (`KeelRealtimeEnvelope`) both transports speak. Typegen and
+  `keel-scaffold` emit the events section (`HarborEvents` /
+  `HarborEventId`) next to pages and actions. (#72)
+
 ### Fixed
 
 - npm publishing now targets the `keel-npm` registry for the `@kolektiv`

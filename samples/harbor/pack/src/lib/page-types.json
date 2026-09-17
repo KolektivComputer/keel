@@ -34,6 +34,7 @@
             "out": "SetNameOut"
         }
     },
+    "events": {},
     "types": {
         "UserRef": {
             "kind": "object",
