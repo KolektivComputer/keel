@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.slf4j.simple)
     testImplementation(libs.ktor.server.test.host)
+    testImplementation(libs.ktor.client.websockets)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

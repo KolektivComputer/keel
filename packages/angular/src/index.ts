@@ -13,7 +13,7 @@ export {
   syncHead,
   type HeadInput,
 } from "./head.js"
-export { router, ActionError } from "@kolektiv/keel"
+export { realtime, router, ActionError, type RealtimeMessage } from "@kolektiv/keel"
 export type { GuardResult, NavigationGuard, NavigationTarget } from "@kolektiv/keel"
 export {
   getQueryClient,

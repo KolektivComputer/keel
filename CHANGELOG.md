@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Harbor testbench now runs live: posts stream to `page:harbor.home` as
+  `harbor.message`, renames send an `invalidate`, and clients send
+  `harbor.typing` notices that the host echoes back. (#75)
 - Realtime client: `realtime` from `@kolektiv/keel` connects over WebSocket
   (SSE fallback) to `/__keel/events`, auto-holds `page:<page id>`, dispatches
   typed events to `realtime.on`, rehydrates the seed on `invalidate`,

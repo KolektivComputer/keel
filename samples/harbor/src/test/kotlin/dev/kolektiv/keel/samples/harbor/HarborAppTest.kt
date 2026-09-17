@@ -3,10 +3,14 @@ package dev.kolektiv.keel.samples.harbor
 import dev.kolektiv.keel.Keel
 import dev.kolektiv.keel.KeelJson
 import dev.kolektiv.keel.bundle.FrontendBundle
+import dev.kolektiv.keel.realtime.KeelRealtimeEnvelope
 import dev.kolektiv.keel.seed.KeelSeed
 import dev.kolektiv.keel.typegen.ClasspathContract
 import dev.kolektiv.keel.typegen.Typegen
 import dev.kolektiv.keel.visit.KeelHeaders
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.WebSockets as ClientWebSockets
+import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -16,9 +20,13 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
@@ -256,6 +264,70 @@ class HarborAppTest {
         assertEquals(HttpStatusCode.NotFound, missingPath.status)
         assertTrue(missingPath.bodyAsText().contains("\"path\":\"/nope\""))
     }
+
+    @Test
+    fun `postMessage streams a harbor message event to the home channel`() = testApplication {
+        writePack()
+        application { harbor(FrontendBundle.fromDirectory(pack)) }
+        val client = createClient { install(ClientWebSockets) }
+        val named = client.post("${Keel.ACTION_PATH}/harbor.setName") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"displayName":"Ada"}""")
+        }
+        val cookie = cookieHeader(named.headers["Set-Cookie"])
+
+        client.webSocket("/__keel/events?channels=page:harbor.home", request = { header("Cookie", cookie) }) {
+            val ready = nextRealtimeEnvelope()
+            assertEquals(KeelRealtimeEnvelope.READY, ready.type)
+            assertEquals(listOf("page:harbor.home"), ready.channels)
+
+            val posted = client.post("${Keel.ACTION_PATH}/harbor.postMessage") {
+                contentType(ContentType.Application.Json)
+                header("Cookie", cookie)
+                setBody("""{"body":"live from the pier"}""")
+            }
+            assertEquals(HttpStatusCode.OK, posted.status)
+
+            val event = nextRealtimeEnvelope()
+            assertEquals(KeelRealtimeEnvelope.EVENT, event.type)
+            assertEquals("harbor.message", event.event)
+            assertEquals("page:harbor.home", event.channel)
+            val data = event.data!!.jsonObject
+            assertEquals("live from the pier", data.getValue("body").jsonPrimitive.content)
+            assertEquals("Ada", data.getValue("displayName").jsonPrimitive.content)
+        }
+    }
+
+    @Test
+    fun `client typing notices round trip through the host`() = testApplication {
+        writePack()
+        application { harbor(FrontendBundle.fromDirectory(pack)) }
+        val client = createClient { install(ClientWebSockets) }
+        val named = client.post("${Keel.ACTION_PATH}/harbor.setName") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"displayName":"Ada"}""")
+        }
+        val cookie = cookieHeader(named.headers["Set-Cookie"])
+
+        client.webSocket("/__keel/events?channels=page:harbor.home", request = { header("Cookie", cookie) }) {
+            assertEquals(KeelRealtimeEnvelope.READY, nextRealtimeEnvelope().type)
+            val envelope = KeelRealtimeEnvelope.send(
+                "harbor.typing",
+                buildJsonObject { put("displayName", "Ada") },
+            )
+            send(Frame.Text(KeelJson.codec.encodeToString(KeelRealtimeEnvelope.serializer(), envelope)))
+
+            val event = nextRealtimeEnvelope()
+            assertEquals("harbor.typing", event.event)
+            assertEquals("Ada", event.data!!.jsonObject.getValue("displayName").jsonPrimitive.content)
+        }
+    }
+
+    private suspend fun DefaultClientWebSocketSession.nextRealtimeEnvelope(): KeelRealtimeEnvelope =
+        KeelJson.codec.decodeFromString(
+            KeelRealtimeEnvelope.serializer(),
+            (withTimeout(5000) { incoming.receive() } as Frame.Text).readText(),
+        )
 
     @Test
     fun `generated page types stay in lockstep`() {

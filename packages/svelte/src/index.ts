@@ -5,7 +5,7 @@ export { useNavigationGuard, useUnloadGuard } from "./guards.svelte.js"
 export { useKeelEvent } from "./event.svelte.js"
 export type { GuardResult, NavigationGuard, NavigationTarget } from "@kolektiv/keel"
 export { applyHead, fromPageHead, setTitle, syncHead, type HeadInput } from "./head.js"
-export { router } from "@kolektiv/keel"
+export { realtime, router, type RealtimeMessage } from "@kolektiv/keel"
 export { bootstrap } from "./bootstrap.js"
 export {
   getQueryClient,

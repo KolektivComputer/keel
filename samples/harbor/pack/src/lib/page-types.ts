@@ -44,6 +44,10 @@ export interface SetNameOut {
   user: UserRef
 }
 
+export interface TypingNotice {
+  displayName: string
+}
+
 export interface HarborPages {
   "harbor.home": HomePage
   "harbor.notFound": NotFoundPage
@@ -58,3 +62,10 @@ export interface HarborActions {
 }
 
 export type HarborActionId = keyof HarborActions
+
+export interface HarborEvents {
+  "harbor.message": FeedItem
+  "harbor.typing": TypingNotice
+}
+
+export type HarborEventId = keyof HarborEvents
