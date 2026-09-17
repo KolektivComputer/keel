@@ -1,0 +1,30 @@
+name: Task
+description: Chore or non-feature work
+type: Task
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What needs doing
+    validations:
+      required: true
+  - type: checkboxes
+    id: targets
+    attributes:
+      label: Targets
+      description: Where this lands (triage applies matching `t/` labels).
+      options:
+        - label: ktor
+        - label: svelte
+        - label: react
+        - label: vue
+        - label: solid
+        - label: preact
+        - label: lit
+        - label: angular
+        - label: vanilla
+        - label: compose
+        - label: repo
+        - label: cloudflare
+    validations:
+      required: true

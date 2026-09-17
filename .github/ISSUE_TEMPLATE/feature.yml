@@ -1,0 +1,43 @@
+name: Feature / Goal
+description: A new capability or product goal
+type: Feature
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem this solves
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed approach
+      description: Optional
+    validations:
+      required: false
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+    validations:
+      required: false
+  - type: checkboxes
+    id: targets
+    attributes:
+      label: Targets
+      description: Where this lands (triage applies matching `t/` labels).
+      options:
+        - label: ktor
+        - label: svelte
+        - label: react
+        - label: vue
+        - label: solid
+        - label: preact
+        - label: lit
+        - label: angular
+        - label: vanilla
+        - label: compose
+        - label: repo
+        - label: cloudflare
+    validations:
+      required: true
