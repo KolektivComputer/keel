@@ -1,8 +1,11 @@
 package dev.kolektiv.keel.typegen
 
+import dev.kolektiv.keel.KeelEvent
 import dev.kolektiv.keel.KeelType
 import dev.kolektiv.keel.action.ActionBinding
 import dev.kolektiv.keel.action.ActionDiscovery
+import dev.kolektiv.keel.event.EventBinding
+import dev.kolektiv.keel.event.EventDiscovery
 import dev.kolektiv.keel.page.PageBinding
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
@@ -12,13 +15,15 @@ import java.nio.file.Path
 import kotlin.reflect.full.starProjectedType
 
 /**
- * Pages, actions, and extra serializers Typegen walks. Built from `@KeelType`
- * / `@KeelAction` on the compile output, or from the runtime registries.
+ * Pages, actions, events, and extra serializers Typegen walks. Built from
+ * `@KeelType` / `@KeelAction` / `@KeelEvent` on the compile output, or from
+ * the runtime registries.
  */
 class TypegenContract(
     val pages: Collection<PageBinding>,
     val actions: Collection<ActionBinding>,
     val types: Collection<KSerializer<*>> = emptyList(),
+    val events: Collection<EventBinding> = emptyList(),
 )
 
 object ClasspathContract {
@@ -36,8 +41,10 @@ object ClasspathContract {
         val pages = ArrayList<PageBinding>()
         val actions = ArrayList<ActionBinding>()
         val types = ArrayList<KSerializer<*>>()
+        val events = ArrayList<EventBinding>()
         val seenActions = HashSet<String>()
         val seenPages = HashSet<String>()
+        val seenEvents = HashSet<String>()
         for (name in names) {
             val clazz = runCatching { Class.forName(name, false, classLoader) }.getOrNull() ?: continue
             val keelType = clazz.getAnnotation(KeelType::class.java)
@@ -49,14 +56,27 @@ object ClasspathContract {
                     pages.add(PageBinding(pageId, typegenPath(pageId), serializer))
                 }
             }
+            val keelEvent = clazz.getAnnotation(KeelEvent::class.java)
+            if (keelEvent != null) {
+                val serializer = serializerFor(clazz) ?: continue
+                types.add(serializer)
+                val eventId = keelEvent.value.ifBlank { clazz.simpleName }
+                if (seenEvents.add(eventId)) {
+                    events.add(EventBinding(eventId, keelEvent.direction, serializer))
+                }
+            }
             for (action in ActionDiscovery.discover(clazz)) {
                 if (seenActions.add(action.id)) actions.add(action.binding)
+            }
+            for (event in EventDiscovery.discover(clazz)) {
+                if (seenEvents.add(event.id)) events.add(event.binding)
             }
         }
         return TypegenContract(
             pages.sortedBy { it.id },
             actions.sortedBy { it.id },
             types,
+            events.sortedBy { it.id },
         )
     }
 

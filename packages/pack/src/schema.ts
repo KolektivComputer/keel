@@ -11,6 +11,11 @@ export interface SchemaAction {
   out: string
 }
 
+export interface SchemaEvent {
+  direction: "in" | "out" | "both" | string
+  type: string
+}
+
 export interface SchemaType {
   kind: "object" | "enum" | string
   fields?: Record<string, string>
@@ -22,6 +27,7 @@ export interface PackSchema {
   pagesName?: string
   pages: Record<string, SchemaPage>
   actions?: Record<string, SchemaAction>
+  events?: Record<string, SchemaEvent>
   types?: Record<string, SchemaType>
 }
 

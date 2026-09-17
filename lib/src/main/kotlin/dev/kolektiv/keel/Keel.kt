@@ -16,6 +16,8 @@ object Keel {
     const val NAVIGATE_PATH: String = "/__keel/navigate"
     const val ACTION_PATH: String = "/__keel/action"
     const val SCHEMA_PATH: String = "/__keel/schema"
+    const val REALTIME_PATH: String = "/__keel/events"
+    const val REALTIME_VERSION: Int = 1
     const val BUNDLE_EXTENSION: String = "feb"
     const val PACK_URL_PREFIX: String = "/__keel/pack"
 }
