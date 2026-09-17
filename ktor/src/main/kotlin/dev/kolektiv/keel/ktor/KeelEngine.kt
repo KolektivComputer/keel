@@ -5,6 +5,8 @@ import dev.kolektiv.keel.KeelJson
 import dev.kolektiv.keel.bundle.BundleOrigin
 import dev.kolektiv.keel.bundle.FrontendBundle
 import dev.kolektiv.keel.bundle.UnknownPageInBundleException
+import dev.kolektiv.keel.ktor.realtime.KeelRealtime
+import dev.kolektiv.keel.ktor.realtime.installRealtime
 import dev.kolektiv.keel.page.PageBinding
 import dev.kolektiv.keel.page.PageMethod
 import dev.kolektiv.keel.page.PageRegistry
@@ -83,11 +85,14 @@ class AmbiguousPackException(ids: List<String>) : IllegalStateException(
 )
 
 @PublishedApi
-internal class KeelEngine(private val config: KeelConfig) {
+internal class KeelEngine(internal val config: KeelConfig) {
     private val packPrefix: String = config.packUrlPrefix.trimEnd('/')
     private val bundleOrder = CopyOnWriteArrayList<FrontendBundle>()
     private val configuredOrder = CopyOnWriteArrayList<FrontendBundle>()
     private val bundlesById = ConcurrentHashMap<String, FrontendBundle>()
+
+    /** Live realtime bus; non-null when `keel { realtime { } }` is configured. */
+    internal var realtimeHub: KeelRealtime? = null
 
     private val swapLock = Any()
     private val reloadMutex = Mutex()
@@ -133,6 +138,7 @@ internal class KeelEngine(private val config: KeelConfig) {
                 }
             }
         }
+        installRealtime(application)
         startPackWatcher(application)
     }
 
@@ -391,7 +397,7 @@ internal class KeelEngine(private val config: KeelConfig) {
     }
 
     private suspend fun respondSchema(call: ApplicationCall) {
-        val raw = Typegen.emitJson(config.registry, config.actionRegistry)
+        val raw = Typegen.emitJson(config.registry, config.actionRegistry, config.eventRegistry)
         call.respondText(raw, ContentType.Application.Json, HttpStatusCode.OK)
     }
 
@@ -575,7 +581,7 @@ internal class KeelEngine(private val config: KeelConfig) {
 
     private fun csrfPolicy() = config.csrf ?: SameOriginCsrfPolicy(config.csrfAllowedOrigins)
 
-    private suspend fun guardCsrf(call: ApplicationCall): Boolean {
+    internal suspend fun guardCsrf(call: ApplicationCall): Boolean {
         val verdict = csrfPolicy().check(
             CsrfRequest(
                 method = call.request.httpMethod.value,

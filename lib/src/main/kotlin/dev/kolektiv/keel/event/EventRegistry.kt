@@ -80,6 +80,8 @@ class EventRegistry {
     fun get(id: String): EventBinding =
         byId[id] ?: throw UnknownEventException(id)
 
+    fun find(id: String): EventBinding? = byId[id]
+
     /** Looks up an event the host may publish. [EventDirection.IN] is rejected. */
     fun outgoing(id: String): EventBinding = get(id).also {
         if (it.direction == EventDirection.IN) {

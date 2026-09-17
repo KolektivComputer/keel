@@ -80,11 +80,11 @@ data class KeelRealtimeEnvelope(
 
         fun ping(): KeelRealtimeEnvelope = KeelRealtimeEnvelope(type = PING)
 
-        fun subscribe(channels: List<String>): KeelRealtimeEnvelope =
-            KeelRealtimeEnvelope(type = SUBSCRIBE, channels = channels)
+        fun subscribe(channels: List<String>, sid: String? = null): KeelRealtimeEnvelope =
+            KeelRealtimeEnvelope(type = SUBSCRIBE, sid = sid, channels = channels)
 
-        fun unsubscribe(channels: List<String>): KeelRealtimeEnvelope =
-            KeelRealtimeEnvelope(type = UNSUBSCRIBE, channels = channels)
+        fun unsubscribe(channels: List<String>, sid: String? = null): KeelRealtimeEnvelope =
+            KeelRealtimeEnvelope(type = UNSUBSCRIBE, sid = sid, channels = channels)
 
         fun send(
             event: String,
