@@ -4,6 +4,8 @@ export {
   KEEL_FORMAT,
   KEEL_HEADERS,
   KEEL_NAVIGATE_PATH,
+  KEEL_REALTIME_PATH,
+  KEEL_REALTIME_VERSION,
   KEEL_SCHEMA_PATH,
   KEEL_SEED_ELEMENT_ID,
   KEEL_SEED_VERSION,
@@ -44,3 +46,11 @@ export {
   type FormStore,
 } from "./form.ts"
 export { KEEL_PAGE_QUERY_KEY, pageQueryKey } from "./query.ts"
+export {
+  realtime,
+  type KeelRealtimeEnvelope,
+  type KeelRealtimeInvalidate,
+  type RealtimeMessage,
+  type RealtimeOptions,
+  type RealtimeStatus,
+} from "./realtime.ts"

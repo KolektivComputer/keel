@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Realtime client: `realtime` from `@kolektiv/keel` connects over WebSocket
+  (SSE fallback) to `/__keel/events`, auto-holds `page:<page id>`, dispatches
+  typed events to `realtime.on`, rehydrates the seed on `invalidate`,
+  `POST`s sends by `sid` when streaming SSE, and reconnects with backoff and
+  resubscribe. Every adapter gains a lifecycle-aware
+  `useKeelEvent` / `injectKeelEvent` helper. (#73)
 - Realtime host: opt-in `keel { realtime { } }` serves SSE and WebSocket
   transports at `/__keel/events` when `install(SSE)` and/or
   `install(WebSockets)` are present. Host-owned channels, session-cookie
