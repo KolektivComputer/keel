@@ -26,7 +26,15 @@ export type HarborPageId = keyof HarborPages
 export interface HarborActions {
   "harbor.setName": { in: SetNameIn; out: SetNameOut }
 }
+export interface HarborEvents {
+  "harbor.message": FeedItem
+}
+export type HarborEventId = keyof HarborEvents
 ```
+
+`@KeelEvent` classes and `@KeelEvent` host functions feed the events section;
+directions (`in`, `out`, `both`) live in the JSON document because the
+TypeScript payload map is direction-agnostic.
 
 ## JSON
 
@@ -51,6 +59,12 @@ at `GET /__keel/schema`.
     "harbor.setName": {
       "in": "SetNameIn",
       "out": "SetNameOut"
+    }
+  },
+  "events": {
+    "harbor.message": {
+      "direction": "out",
+      "type": "FeedItem"
     }
   },
   "types": {

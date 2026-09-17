@@ -1,0 +1,247 @@
+---
+title: Realtime
+description: Typed events and invalidations over SSE and WebSocket. The seed stays the read model.
+category: advanced
+order: 7
+---
+
+import CodePair from "../../../components/CodePair.astro"
+import FrameworkPanel from "../../../components/FrameworkPanel.astro"
+import { path } from "../../../lib/paths"
+
+Realtime in Keel is **opt-in and advisory**. The seed is still the only read
+model. A typed event says *something happened*; an `invalidate` says
+*rehydrate with a normal visit*. Events missed while offline are not
+replayed — the next visit always recovers the truth. That is what keeps
+reconnect semantics small and the UI honest.
+
+One endpoint, two transports. `GET /__keel/events` streams SSE when the host
+installed the Ktor `SSE` plugin; the same path upgrades to a WebSocket when
+`WebSockets` is installed. SSE clients `POST` envelopes to the same path for
+client-to-host sends (`sid` addresses the stream). Both transports speak the
+same JSON envelope — see
+<a href={path("/docs/implementing/protocol")}>Wire protocol</a>.
+
+## Enable it on the host
+
+Install the plugins before `keel { }`, then opt in. Endpoints exist only when
+the `realtime` block is present **and** at least one transport plugin is
+installed.
+
+```kotlin
+install(WebSockets)
+install(SSE)
+
+keel {
+  realtime {
+    event<FeedItem>("harbor.message", EventDirection.OUT) // host → pack
+    on<TypingNotice>("harbor.typing") { input ->           // pack → host
+      call.keelRealtime.publish("page:harbor.home", "harbor.typing", input)
+    }
+    events(Board)                                          // @KeelEvent functions
+    authorize = { call, channel ->                         // session cookies
+      channel.startsWith("page:") || call.request.cookies["harbor_uid"] != null
+    }
+    heartbeatSeconds = 25
+  }
+}
+```
+
+- `event<T>(id, direction)` declares a typed payload without a handler.
+- `on<I>(id) { input -> … }` registers a handler for a client-sent event and
+  registers the binding as `IN` when it is not declared yet.
+- `events(vararg hosts)` scans `@KeelEvent` functions the way `actions(hosts)`
+  scans `@KeelAction`; an `ApplicationCall.(Payload) -> Unit` extension gets
+  the handshake/POST call as `this`.
+- `authorize` runs per channel at subscribe time. Channel ids are host-owned
+  strings; `page:…` and `user:…` are conventions, not built-ins.
+- `heartbeatSeconds` sends `ping` envelopes (0 disables). Keepalives are how
+  dead SSE connections are noticed and reaped.
+
+Publish from anywhere a call is reachable — actions, page loaders, jobs —
+with `call.keelRealtime` (or `application.keelRealtime`):
+
+```kotlin
+@KeelAction("harbor.postMessage")
+fun ApplicationCall.postMessage(input: PostMessageIn): PostMessageOut {
+  val item = Board.post(input.body)
+  keelRealtime.publish("page:harbor.home", "harbor.message", item) // flavor (a)
+  return PostMessageOut(item)
+}
+
+@KeelAction("harbor.setName")
+fun ApplicationCall.setName(input: SetNameIn): SetNameOut {
+  val user = Board.rename(input.displayName)
+  keelRealtime.invalidate("page:harbor.home", path = "/")          // flavor (b)
+  return SetNameOut(user)
+}
+```
+
+`publish` encodes with the registered serializer; unknown or `IN`-only ids
+throw. `invalidate(channel, path, only, except)` sends the visit-shaped hint.
+`send(sid, …)` targets one connection.
+
+## Subscribe in a pack
+
+`@KeelEvent` on a `@Serializable` class is the contract: Typegen emits the
+payload into `<Pack>Events` (`HarborEvents["harbor.message"]`). The client
+side is the core `realtime` singleton plus one lifecycle helper per adapter.
+`useKeelEvent` subscribes for the component's lifetime and keeps the latest
+handler, so inline closures never resubscribe.
+
+<CodePair
+  fw="svelte"
+  title="Typed events and sends"
+  ts={`import { realtime, useKeelEvent } from "@kolektiv/keel-svelte"
+import type { HarborEvents } from "../lib/page-types"
+
+let liveFeed = $state<FeedItem[]>([])
+
+useKeelEvent<HarborEvents["harbor.message"]>("harbor.message", (item) => {
+  liveFeed = [item, ...liveFeed]
+})
+
+function announceTyping(displayName: string) {
+  void realtime.send("harbor.typing", { displayName })
+}`}
+  js={`import { realtime, useKeelEvent } from "@kolektiv/keel-svelte"
+
+let liveFeed = $state([])
+
+useKeelEvent("harbor.message", (item) => {
+  liveFeed = [item, ...liveFeed]
+})
+
+function announceTyping(displayName) {
+  void realtime.send("harbor.typing", { displayName })
+}`}
+/>
+
+<FrameworkPanel frameworks="react preact">
+In React and Preact, `useKeelEvent` is a hook; the latest handler wins.
+
+```tsx
+import { useKeelEvent } from "@kolektiv/keel-react"
+import type { HarborEvents } from "../lib/page-types"
+
+useKeelEvent<HarborEvents["harbor.message"]>("harbor.message", (item) => {
+  setItems((current) => [item, ...current])
+})
+```
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="vue">
+In Vue, `useKeelEvent` subscribes in the component scope and releases on
+scope dispose.
+
+```vue
+<script setup lang="ts">
+import { realtime, useKeelEvent } from "@kolektiv/keel-vue"
+import type { HarborEvents } from "../lib/page-types"
+
+const items = ref<FeedItem[]>([])
+useKeelEvent<HarborEvents["harbor.message"]>("harbor.message", (item) => {
+  items.value = [item, ...items.value]
+})
+function announceTyping(displayName: string) {
+  void realtime.send("harbor.typing", { displayName })
+}
+</script>
+```
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="solid">
+Solid's `useKeelEvent` registers cleanup with the owner; read signals inside
+the handler.
+
+```tsx
+import { useKeelEvent } from "@kolektiv/keel-solid"
+import type { HarborEvents } from "../lib/page-types"
+
+const [items, setItems] = createSignal<FeedItem[]>([])
+useKeelEvent<HarborEvents["harbor.message"]>("harbor.message", (item) => {
+  setItems([item, ...items()])
+})
+```
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="lit">
+Lit gets a `ReactiveController`; `useKeelEvent` is the convenience wrapper.
+
+```ts
+import { useKeelEvent, type RealtimeMessage } from "@kolektiv/keel-lit"
+import type { HarborEvents } from "../lib/page-types"
+
+export class HarborFeed extends LitElement {
+  constructor() {
+    super()
+    useKeelEvent<HarborEvents["harbor.message"]>(this, "harbor.message", (item) => {
+      this.items = [item, ...this.items]
+    })
+  }
+}
+```
+</FrameworkPanel>
+
+<FrameworkPanel frameworks="angular">
+Angular injects the subscription and releases it with the injector.
+
+```ts
+import { injectKeelEvent } from "@kolektiv/keel-angular"
+import type { HarborEvents } from "../lib/page-types"
+
+injectKeelEvent<HarborEvents["harbor.message"]>("harbor.message", (item) => {
+  this.items.update((current) => [item, ...current])
+})
+```
+</FrameworkPanel>
+
+## Channels
+
+Channels are how the host targets traffic; the client only asks to listen.
+
+- The client automatically holds `page:<page id>` and follows the seed as it
+  changes. Disable with `realtime.configure({ autoChannels: false })` or add
+  your own with `channels`.
+- `realtime.subscribe(channel)` returns a release function; ref-counted, so
+  several components can hold the same channel.
+- `realtime.configure({ channels: (seed) => [...] })` adds seed-derived
+  channels.
+- Every channel is authorized at subscribe time with the same session cookies
+  as visits. A denied channel means no events, not an error page.
+
+## Invalidate
+
+When an `invalidate` envelope arrives and no handler is registered, the
+client reloads the current page with
+`router.reload({ preserveState: true })` — path, `only`, and `except` from
+the envelope are honored. Registering `realtime.onInvalidate(handler)`
+takes over, which is how a pack can merge partial state without a visit.
+
+## Reconnect
+
+`realtime.connect()` is idempotent. With `transport: "auto"` the client tries
+WebSocket, falls back to SSE, and reconnects with exponential backoff plus
+jitter (`minReconnectDelayMs` 500, `maxReconnectDelayMs` 15000). On every
+re-open it resubscribes the channel set.
+
+Because there is no replay, a reconnection that followed a live connection
+also rehydrates: `router.reload({ preserveState: true })`. Set
+`resyncOnReconnect: false` to opt out. A first connect never reloads — the
+document seed is already fresh.
+
+## Client surface
+
+| Member | Effect |
+| --- | --- |
+| `realtime.configure(options)` | transport, `url`, channels, backoff, resync, `reloadOnInvalidate` |
+| `realtime.connect()` / `disconnect()` | open or close the transport |
+| `realtime.subscribe(channel)` | hold a channel; returns a release function |
+| `realtime.on(event, handler)` | typed events; returns a release function |
+| `realtime.onInvalidate(handler)` | take over invalidation handling |
+| `realtime.send(event, data)` | client-to-host event (WebSocket frame or SSE `POST`) |
+| `realtime.status()` / `onStatus(fn)` | `idle`, `connecting`, `open`, `reconnecting`, `closed` |
+| `realtime.sid()` / `lastSeen()` | stream id, last envelope timestamp |
+
+`realtime` is re-exported from every adapter package; `Harbor` opens two
+browser windows to show posts and typing notices streaming in.

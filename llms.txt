@@ -27,13 +27,14 @@ Docs: https://keel.mey.cat/  (Cloudflare Pages; local `pnpm dev` is http://127.0
 - [Partial reloads](https://keel.mey.cat/docs/advanced/partials/): `only` / `except` on visits; shallow merge
 - [Forms and 422s](https://keel.mey.cat/docs/advanced/forms/): progressive enhancement over router.visit
 - [Mutate and rehydrate](https://keel.mey.cat/docs/advanced/query/): action then reload; state reads subscribe, method reads do not
+- [Realtime](https://keel.mey.cat/docs/advanced/realtime/): opt-in typed events + `invalidate` over SSE/WebSocket; the seed stays the read model
 - [Pack hot reload](https://keel.mey.cat/docs/advanced/pack-hot-reload/): watcher, `seed.build` / `X-Keel-Build`, client reload
 - [Navigation guards](https://keel.mey.cat/docs/advanced/navigation-guards/): `beforeEach`, async guards, popstate, `force`
-- [Wire protocol](https://keel.mey.cat/docs/implementing/protocol/): seed JSON, headers, status codes, path grammar, CSRF, `/__keel/schema`
-- [Host adapter](https://keel.mey.cat/docs/implementing/host-adapter/): what a backend must implement, `KeelConfig` knobs
+- [Wire protocol](https://keel.mey.cat/docs/implementing/protocol/): seed JSON, headers, status codes, path grammar, CSRF, `/__keel/schema`, realtime envelope
+- [Host adapter](https://keel.mey.cat/docs/implementing/host-adapter/): what a backend must implement, `KeelConfig` knobs (including `realtime { }`)
 - [Pack adapter](https://keel.mey.cat/docs/implementing/pack-adapter/): PageModule, .feb, RouterAdapter, manifest head/layout fields
-- [Typegen](https://keel.mey.cat/docs/implementing/typegen/): `.ts`, `.d.ts`, JSON contract
-- [Framework adapters](https://keel.mey.cat/docs/implementing/framework-adapters/): one pack contract across Svelte, React, Vue, Solid, Preact, Lit, and Angular — install, bootstrap, page state, forms, actions, components, guards, mount, and DX caveats
+- [Typegen](https://keel.mey.cat/docs/implementing/typegen/): `.ts`, `.d.ts`, JSON contract — pages, actions, typed events
+- [Framework adapters](https://keel.mey.cat/docs/implementing/framework-adapters/): one pack contract across Svelte, React, Vue, Solid, Preact, Lit, and Angular — install, bootstrap, page state, forms, actions, realtime helpers, components, guards, mount, and DX caveats
 - [AGENTS.md](https://github.com/KolektivComputer/keel/blob/main/AGENTS.md): how to work in this repository
 
 ## Optional

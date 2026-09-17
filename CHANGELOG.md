@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Docs: new Realtime guide (host opt-in, typed events, invalidate, reconnect,
+  client surface), the wire-protocol envelope section, Typegen and
+  framework-adapter updates, refreshed llms.txt and agent skills. (#74)
 - Harbor testbench now runs live: posts stream to `page:harbor.home` as
   `harbor.message`, renames send an `invalidate`, and clients send
   `harbor.typing` notices that the host echoes back. (#75)
