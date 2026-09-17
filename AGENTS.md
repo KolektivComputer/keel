@@ -50,6 +50,12 @@ JS workspace root is this repository (`packages/*` and `docs`).
   <dir>` writes a blank pack from it for the chosen `--framework` (default
   Svelte). Gradle `generateKeelTypes` is the
   offline classpath scan. Actions are a Kotlin function `(In) -> Out`.
+- Realtime is opt-in: `keel { realtime { } }` plus `install(SSE)` and/or
+  `install(WebSockets)` serves `/__keel/events` (SSE stream, WS upgrade, and
+  `POST` sends from SSE clients). Channels are host-owned strings; typed
+  `@KeelEvent` payloads are hints, the seed stays the only read model, and
+  `invalidate` rehydrates with a normal visit. No replay: reconnect means
+  resubscribe + reload.
 - Packs ship as `.feb` (zip of `manifest.json` + modules). Hosts load a
   `FrontendBundle` from a jar resource, a file, or an exploded directory.
 - Visits hit the real page URL with `X-Keel-Visit: true`. `/__keel/navigate`
