@@ -3,6 +3,7 @@ export { injectKeelContext, KeelContext } from "./context.js"
 export { injectKeelPage, type KeelPage } from "./page.js"
 export { injectKeelForm, type FormState } from "./form.js"
 export { injectNavigationGuard, injectUnloadGuard } from "./guards.js"
+export { injectKeelEvent } from "./event.js"
 export { KeelHead } from "./head.js"
 export {
   applyHead,

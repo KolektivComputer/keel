@@ -21,6 +21,7 @@ export {
   useKeelPageQuery,
   type UseActionOptions,
 } from "./query.js"
+export { KeelEventController, useKeelEvent } from "./event.js"
 export { Link } from "./Link.js"
 export { form, type FormOptions } from "./Form.js"
 export { Head } from "./HeadElement.js"
