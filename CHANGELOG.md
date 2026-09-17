@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Realtime host: opt-in `keel { realtime { } }` serves SSE and WebSocket
+  transports at `/__keel/events` when `install(SSE)` and/or
+  `install(WebSockets)` are present. Host-owned channels, session-cookie
+  auth via an `authorize` hook, typed `publish` / `invalidate` helpers on
+  `call.keelRealtime`, heartbeats, CSRF-protected HTTP sends, and a
+  documented no-replay reconnect story (resubscribe and rehydrate the
+  seed). (#71)
 - Typed realtime event registry: `@KeelEvent` (payload classes and host
   handler functions), `dev.kolektiv.keel.event.EventRegistry` /
   `EventDiscovery`, and the versioned JSON envelope
