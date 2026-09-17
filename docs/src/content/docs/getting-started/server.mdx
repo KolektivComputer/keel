@@ -1,6 +1,6 @@
 ---
 title: Server installation
-description: Add the Yuri Capital Maven releases repo and dev.kolektiv.keel:core.
+description: Add the Yuri Capital Maven releases repo and computer.kolektiv.keel:core.
 category: getting-started
 order: 2
 ---
@@ -20,7 +20,7 @@ A version like `0.0.2-SNAPSHOT.4` is **not** a canonical Maven snapshot:
 snapshots end in `-SNAPSHOT`, and `maven-snapshots` rejects every other
 version. Do not add more than one. Gradle will mix channels.
 
-This page is **core** only (`dev.kolektiv.keel:core`). It has no Ktor
+This page is **core** only (`computer.kolektiv.keel:core`). It has no Ktor
 dependency. Protocol format `keel/1`. Seed version `1`.
 
 ## Releases (recommended)
@@ -41,7 +41,7 @@ Current release: `0.1.0`.
 }
 
 dependencies {
-    implementation("dev.kolektiv.keel:core:0.1.0")
+    implementation("computer.kolektiv.keel:core:0.1.0")
 }`,
     },
     {
@@ -54,14 +54,14 @@ dependencies {
 }
 
 dependencies {
-    implementation "dev.kolektiv.keel:core:0.1.0"
+    implementation "computer.kolektiv.keel:core:0.1.0"
 }`,
     },
   ]}
 />
 
 <Callout title="Ktor is a separate artifact">
-  A Ktor process also needs `dev.kolektiv.keel:ktor` and a server engine.
+  A Ktor process also needs `computer.kolektiv.keel:ktor` and a server engine.
   That wiring lives on the <a href={path("/docs/getting-started/host")}>Host (Ktor)</a> page, not here.
 </Callout>
 

@@ -12,8 +12,8 @@ against the same typed contract.
 
 | Path | What |
 | --- | --- |
-| `lib/` | Kotlin core (`dev.kolektiv.keel:core`) — seed, manifest, `PageRegistry`, `ActionRegistry`, `FrontendBundle`, typegen. No Ktor dependency. |
-| `ktor/` | `dev.kolektiv.keel:ktor` — binds the registry, `respondPage`, actions, HTML shell, visits, pack files. |
+| `lib/` | Kotlin core (`computer.kolektiv.keel:core`) — seed, manifest, `PageRegistry`, `ActionRegistry`, `FrontendBundle`, typegen. No Ktor dependency. |
+| `ktor/` | `computer.kolektiv.keel:ktor` — binds the registry, `respondPage`, actions, HTML shell, visits, pack files. |
 | `samples/harbor` | In-memory message board: Ktor + Svelte pack. `./gradlew :samples:harbor:run` → http://127.0.0.1:8090 |
 | `packages/core` | `@kolektiv/keel` — visits, history, prefetch, `action()` |
 | `packages/svelte` | `@kolektiv/keel-svelte` — `Link`, `Form`, `Head`, `page()`, `useForm`, `useAction` |
