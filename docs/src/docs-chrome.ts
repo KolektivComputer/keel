@@ -1,7 +1,7 @@
 import { defineDocsChrome } from "@kolektiv/common-docs-chrome"
 
 /**
- * Shared docs chrome configuration for keel.mey.cat.
+ * Shared docs chrome configuration for keel.kolektiv.computer.
  *
  * The sidebar nav is generated from the `docs` content collection in
  * `src/lib/nav.ts` and merged in by `src/layouts/Docs.astro`, so the collection
@@ -58,7 +58,9 @@ export const docs = defineDocsChrome({
   defaultLang: "ts",
   defaultFramework: "svelte",
   footer: {
-    tagline: "The host owns the contract. Packs implement the pages.",
+    // Product tagline first; Keel Labs name-collision disambiguation (room-signed 2026-09-23).
+    tagline:
+      "The host owns the contract. Packs implement the pages. Not the Electron AI workspace from Keel Labs. This Keel is a Kotlin host with typed routes and swappable `.feb` packs.",
     links: [
       { label: "Getting started", href: "/docs/getting-started" },
       { label: "Core concepts", href: "/docs/core-concepts/routing" },
