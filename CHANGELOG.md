@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-27
+
+### Changed
+
+- Publish Maven to `repo.kolektiv.computer` `maven-releases` / `maven-snapshots` only (dropped `keel-maven`).
+- Publish and consume npm via `npm-public` on `repo.kolektiv.computer` (dropped `keel-npm`).
+- Docs and consumer pins updated for the Kolektiv registry cut.
+
+
 ### Fixed
 
 - npm publishing now targets the `keel-npm` registry for the `@kolektiv`
@@ -72,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docs render the shared chrome footer with the built-by mark enlarged and
   placed above the copyright.
 - Docs drive the source-control menu from `repo.remotes`, listing GitHub and
-  `git.yuri.capital`.
+  `git.kolektiv.computer`.
 
 ### Fixed
 

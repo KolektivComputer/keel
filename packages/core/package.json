@@ -1,12 +1,12 @@
 {
   "name": "@kolektiv/keel",
-  "version": "0.1.0",
-  "description": "Keel host router — visits, seed, history, prefetch.",
+  "version": "0.1.1",
+  "description": "Keel host router \u2014 visits, seed, history, prefetch.",
   "type": "module",
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public",
-    "registry": "https://repo.yuri.capital/repository/keel-npm/"
+    "registry": "https://repo.kolektiv.computer/repository/npm-public/"
   },
   "sideEffects": false,
   "exports": {
@@ -16,7 +16,10 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "build": "tsc -p tsconfig.build.json",

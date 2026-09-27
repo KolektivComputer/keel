@@ -1,6 +1,6 @@
 ---
 title: Server installation
-description: Add the Yuri Capital Maven releases repo and computer.kolektiv.keel:core.
+description: Add the Kolektiv Maven releases or snapshots repo and computer.kolektiv.keel:core.
 category: getting-started
 order: 2
 ---
@@ -9,23 +9,22 @@ import CodeBlock from "../../../components/CodeBlock.astro"
 import Callout from "../../../components/Callout.astro"
 import { path } from "../../../lib/paths"
 
-Host artifacts live on Nexus at `repo.yuri.capital`. Pick **one** Maven
+Host artifacts live on Nexus at `repo.kolektiv.computer`. Pick **one** Maven
 repository:
 
-- `maven-releases`, numbered releases such as `0.1.0`
+- `maven-releases`, numbered releases such as `0.1.1`
 - `maven-snapshots`, canonical `*-SNAPSHOT` builds
-- `keel-maven`, the unique pre-release line such as `0.0.2-SNAPSHOT.4`
 
-A version like `0.0.2-SNAPSHOT.4` is **not** a canonical Maven snapshot:
-snapshots end in `-SNAPSHOT`, and `maven-snapshots` rejects every other
-version. Do not add more than one. Gradle will mix channels.
+Do not add both. Gradle will mix channels. `maven-public` is an optional
+aggregate group if you already resolve other Kolektiv artifacts from it; Keel
+itself does not require it.
 
 This page is **core** only (`computer.kolektiv.keel:core`). It has no Ktor
 dependency. Protocol format `keel/1`. Seed version `1`.
 
 ## Releases (recommended)
 
-Current release: `0.1.0`.
+Current release: `0.1.1`.
 
 <CodeBlock
   title="repositories + core"
@@ -37,11 +36,11 @@ Current release: `0.1.0`.
       lang: "kotlin",
       code: `repositories {
     mavenCentral()
-    maven("https://repo.yuri.capital/repository/maven-releases/")
+    maven("https://repo.kolektiv.computer/repository/maven-releases/")
 }
 
 dependencies {
-    implementation("computer.kolektiv.keel:core:0.1.0")
+    implementation("computer.kolektiv.keel:core:0.1.1")
 }`,
     },
     {
@@ -50,11 +49,11 @@ dependencies {
       lang: "groovy",
       code: `repositories {
     mavenCentral()
-    maven { url "https://repo.yuri.capital/repository/maven-releases/" }
+    maven { url "https://repo.kolektiv.computer/repository/maven-releases/" }
 }
 
 dependencies {
-    implementation "computer.kolektiv.keel:core:0.1.0"
+    implementation "computer.kolektiv.keel:core:0.1.1"
 }`,
     },
   ]}
@@ -65,21 +64,13 @@ dependencies {
   That wiring lives on the <a href={path("/docs/getting-started/host")}>Host (Ktor)</a> page, not here.
 </Callout>
 
-## Unique pre-release instead
+## Snapshots
 
-Current pre-release: `0.0.2-SNAPSHOT.4`. The `-SNAPSHOT.4` suffix is part of
-a literal, unique version, not a canonical Maven snapshot, so point Gradle
-at `keel-maven`:
+Canonical `*-SNAPSHOT` builds resolve from `maven-snapshots`. Point Gradle at
+that URL instead of `maven-releases`, and pin the snapshot version you want.
 
-```
-https://repo.yuri.capital/repository/keel-maven/
-```
-
-That is the advertised repository for the pre-release line. Canonical
-`*-SNAPSHOT` builds, when published, resolve from `maven-snapshots`.
-Publishers always write to `keel-maven`, plus `maven-releases` for numbered
-releases or `maven-snapshots` for canonical snapshots. You only need the
-consumer URL you chose.
+Publishers write numbered releases to `maven-releases` and canonical snapshots
+to `maven-snapshots`. You only need the consumer URL you chose.
 
 Next: <a href={path("/docs/getting-started/client")}>Client Setup</a> for
 the router, or skip ahead to

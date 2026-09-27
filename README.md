@@ -52,20 +52,25 @@ Implementing guides: [Wire protocol](https://keel.kolektiv.computer/docs/impleme
 
 ## Publishing
 
-Consumers resolve **one** Maven repo — `maven-releases` for numbered
-versions, `maven-snapshots` for canonical `*-SNAPSHOT` builds, or
-`keel-maven` for unique pre-releases like `0.0.2-SNAPSHOT.4` — never more
-than one. npm resolves from hosted `keel-npm`. Maintainers publish Maven to
-`keel-maven`, plus `maven-snapshots` for canonical snapshots or
-`maven-releases` for numbered releases; unique pre-releases go to
-`keel-maven` only. Credentials: GitHub Actions secrets
-`YURI_CAPITAL_REPO_USERNAME` / `YURI_CAPITAL_REPO_PASSWORD`, or the same
-names as env, or `keel.publishing.yuriCapitalRepoUsername` /
+Consumers resolve **one** Maven repo on `repo.kolektiv.computer` —
+`maven-releases` for numbered versions, or `maven-snapshots` for canonical
+`*-SNAPSHOT` builds — never both. `maven-public` is optional if you already
+resolve other Kolektiv artifacts from that group. npm consumers and publishers
+use `npm-public`:
+
+```
+@kolektiv:registry=https://repo.kolektiv.computer/repository/npm-public/
+```
+
+Credentials: GitHub Actions secrets `YURI_CAPITAL_REPO_USERNAME` /
+`YURI_CAPITAL_REPO_PASSWORD`, or the same names as env, or
+`keel.publishing.yuriCapitalRepoUsername` /
 `keel.publishing.yuriCapitalRepoPassword` in `~/.gradle/gradle.properties`.
-`.github/workflows/publish.yml`.
+See `.github/workflows/publish.yml`.
+
 
 The pnpm workspace lives at the repository root (`packages/*` and `docs`).
 
 Docs deploy to Cloudflare Pages through its Git integration (project `keel-docs`)
 at [keel.kolektiv.computer](https://keel.kolektiv.computer/). The Pages production
-branch is `docs/v0.1.0-release-scrub` until this work merges to `main`.
+branch is `main` until this work merges to `main`.

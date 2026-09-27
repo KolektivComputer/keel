@@ -14,7 +14,6 @@ val febLicenseUrl = providers.gradleProperty("keel.licenseUrl")
 
 val versionString = project.version.toString()
 val isCanonicalSnapshot = versionString.endsWith("-SNAPSHOT")
-val isPrerelease = versionString.contains("SNAPSHOT")
 
 publishing {
     publications {
@@ -48,7 +47,7 @@ publishing {
     repositories {
         mavenLocal()
 
-        // GitHub Packages (dual-publish alongside Yuri Capital)
+        // GitHub Packages (optional dual-publish; never the primary consumer path)
         val ghActor = providers.environmentVariable("GITHUB_ACTOR")
         val ghToken = providers.environmentVariable("GITHUB_TOKEN")
         if (ghActor.isPresent && ghToken.isPresent) {
@@ -70,30 +69,14 @@ publishing {
             val user = yuriUser.get()
             val pass = yuriPass.get()
             maven {
-                name = "keelMaven"
-                url = uri("https://repo.yuri.capital/repository/keel-maven/")
+                name = if (isCanonicalSnapshot) "kolektivSnapshots" else "kolektivReleases"
+                url = uri(
+                    if (isCanonicalSnapshot) "https://repo.kolektiv.computer/repository/maven-snapshots/"
+                    else "https://repo.kolektiv.computer/repository/maven-releases/"
+                )
                 credentials {
                     username = user
                     password = pass
-                }
-            }
-            if (isCanonicalSnapshot) {
-                maven {
-                    name = "yuriSnapshots"
-                    url = uri("https://repo.yuri.capital/repository/maven-snapshots/")
-                    credentials {
-                        username = user
-                        password = pass
-                    }
-                }
-            } else if (!isPrerelease) {
-                maven {
-                    name = "yuriReleases"
-                    url = uri("https://repo.yuri.capital/repository/maven-releases/")
-                    credentials {
-                        username = user
-                        password = pass
-                    }
                 }
             }
         }
@@ -102,7 +85,7 @@ publishing {
 
 signing {
     val hasSigning = providers.gradleProperty("signing.keyId").isPresent
-    isRequired = hasSigning && !isPrerelease
+    isRequired = hasSigning && !isCanonicalSnapshot
     if (hasSigning) {
         sign(publishing.publications)
     }

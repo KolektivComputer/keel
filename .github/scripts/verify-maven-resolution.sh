@@ -9,7 +9,7 @@
 # Usage: verify-maven-resolution.sh [version]
 set -uo pipefail
 
-HOST="repo.yuri.capital"
+HOST="repo.kolektiv.computer"
 GROUP_PATH="dev/kolektiv/keel"
 MODULES=(core ktor)
 EXTENSIONS=(pom jar)

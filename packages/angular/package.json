@@ -1,13 +1,13 @@
 {
   "name": "@kolektiv/keel-angular",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Keel Angular 19 bindings \u2014 signal page/form state, query/action injectables, link/form/head directives, and createPage.",
   "type": "module",
   "license": "Apache-2.0",
   "sideEffects": false,
   "publishConfig": {
     "access": "public",
-    "registry": "https://repo.yuri.capital/repository/keel-npm/"
+    "registry": "https://repo.kolektiv.computer/repository/npm-public/"
   },
   "exports": {
     ".": {

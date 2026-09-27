@@ -14,7 +14,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(CDPATH= cd -- "${SCRIPT_DIR}/../.." && pwd)"
-REGISTRY="https://repo.yuri.capital/repository/keel-npm/"
+REGISTRY="https://repo.kolektiv.computer/repository/keel-npm/"
 PKG_DIR="${1:-${ROOT_DIR}/packages}"
 
 CORE_MANIFEST="${PKG_DIR}/core/package.json"

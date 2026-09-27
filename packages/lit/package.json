@@ -1,13 +1,16 @@
 {
   "name": "@kolektiv/keel-lit",
-  "version": "0.1.0",
-  "description": "Keel Lit 3 bindings — page/form/action controllers, link/form/head helpers, and createPage.",
+  "version": "0.1.1",
+  "description": "Keel Lit 3 bindings \u2014 page/form/action controllers, link/form/head helpers, and createPage.",
   "type": "module",
   "license": "Apache-2.0",
-  "sideEffects": ["./dist/index.js", "./dist/mount.js"],
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/mount.js"
+  ],
   "publishConfig": {
     "access": "public",
-    "registry": "https://repo.yuri.capital/repository/keel-npm/"
+    "registry": "https://repo.kolektiv.computer/repository/npm-public/"
   },
   "exports": {
     ".": {
@@ -26,7 +29,10 @@
       "default": "./dist/bootstrap.js"
     }
   },
-  "files": ["dist", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "build": "vite build && tsc -p tsconfig.build.json",
