@@ -1,7 +1,7 @@
 import { defineDocsChrome } from "@kolektiv/common-docs-chrome"
 
 /**
- * Shared docs chrome configuration for keel.mey.cat.
+ * Shared docs chrome configuration for keel.kolektiv.computer.
  *
  * The sidebar nav is generated from the `docs` content collection in
  * `src/lib/nav.ts` and merged in by `src/layouts/Docs.astro`, so the collection
@@ -28,7 +28,7 @@ export const docs = defineDocsChrome({
     branch: "main",
     remotes: [
       { label: "GitHub", href: "https://github.com/KolektivComputer/keel" },
-      { label: "yuri.capital", href: "https://git.yuri.capital/kolektiv/keel" },
+      { label: "yuri.capital", href: "https://git.kolektiv.computer/kolektiv/keel" },
     ],
   },
   langs: [
@@ -66,7 +66,7 @@ export const docs = defineDocsChrome({
       { label: "Implementing Keel", href: "/docs/implementing/protocol" },
       { label: "llms.txt", href: "/llms.txt" },
       { label: "GitHub", href: "https://github.com/KolektivComputer/keel" },
-      { label: "git.yuri.capital", href: "https://git.yuri.capital/kolektiv/keel" },
+      { label: "git.kolektiv.computer", href: "https://git.kolektiv.computer/kolektiv/keel" },
     ],
   },
 })

@@ -23,7 +23,7 @@ themes are curated to the Catppuccin flavours plus Nord, Kolektiv, and
 `follow`. Its footer renders an enlarged built-by mark above the copyright, the
 active sidebar link stays readable under `kolektiv-dark`, nord, and light
 themes, and the source-control menu is driven by the `repo.remotes` list
-(Keel points it at GitHub and `git.yuri.capital`).
+(Keel points it at GitHub and `git.kolektiv.computer`).
 
 Chrome owns the switcher state. It renders one navbar control per configured
 `switcher`, persists the choice, sets `<html data-<id>>`, and injects CSS that

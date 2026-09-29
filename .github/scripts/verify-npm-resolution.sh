@@ -10,7 +10,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(CDPATH= cd -- "${SCRIPT_DIR}/../.." && pwd)"
-REGISTRY="https://repo.yuri.capital/repository/keel-npm/"
+REGISTRY="https://repo.kolektiv.computer/repository/npm-public/"
 
 VERSION="${1:-}"
 if [ -z "${VERSION}" ]; then

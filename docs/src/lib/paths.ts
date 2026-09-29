@@ -1,6 +1,6 @@
 import { path as chromePath } from "@kolektiv/common-docs-chrome"
 
-/** Site base. `/` locally and on keel.mey.cat. */
+/** Site base. `/` locally and on keel.kolektiv.computer. */
 export const base = import.meta.env.BASE_URL
 
 /**

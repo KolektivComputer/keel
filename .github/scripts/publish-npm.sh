@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
-# Publish @kolektiv/* to the hosted Nexus repo (keel-npm).
-# npm-releases / npm-snapshots are groups — read-only, PUT returns 404.
-#
-# Publishable packages are discovered from packages/*/package.json (every
+# Publish @kolektiv/* to the Kolektiv Nexus npm-public.
+# # Publishable packages are discovered from packages/*/package.json (every
 # non-private @kolektiv/keel* package, sorted by name); adding an adapter
 # package needs no change here. DRY_RUN=1 lists them without publishing.
 set -euo pipefail
 
-HOST="repo.yuri.capital"
-REGISTRY="https://${HOST}/repository/keel-npm/"
+HOST="repo.kolektiv.computer"
+REGISTRY="https://${HOST}/repository/npm-public/"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(CDPATH= cd -- "${SCRIPT_DIR}/../.." && pwd)"
 VERSION="$(PKG_MANIFEST="${ROOT_DIR}/packages/core/package.json" node -p 'require(process.env.PKG_MANIFEST).version')"
@@ -37,9 +35,8 @@ AUTH="$(printf '%s:%s' "${YURI_CAPITAL_REPO_USERNAME}" "${YURI_CAPITAL_REPO_PASS
 path="${REGISTRY#https://}"
 path="${path#http://}"
 
-# The committed repo-root .npmrc pins @kolektiv to the read-only npm-public
-# group. Project-level scope config beats NPM_CONFIG_USERCONFIG, so swap the
-# root .npmrc for the publish config during the loop and restore it on exit.
+# The committed repo-root .npmrc already points @kolektiv at npm-public.
+# Swap in auth for the publish loop and restore on exit.
 NPMRC_PATH="${ROOT_DIR}/.npmrc"
 NPMRC="$(mktemp)"
 NPMRC_BACKUP="$(mktemp)"

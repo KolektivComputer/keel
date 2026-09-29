@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
-# Publish Keel Maven artifacts to Nexus. Classification:
-#   *-SNAPSHOT  canonical snapshot -> keel-maven + maven-snapshots
-#   *SNAPSHOT*  unique pre-release -> keel-maven only
-#   other       numbered release   -> keel-maven + maven-releases
-# Hosted repos reject redeploys (409), and release-policy repos reject
-# versions containing SNAPSHOT (400); a version-policy rejection is tolerated
-# only when the asset already exists in keel-maven. Any other failure fails.
+# Publish Keel Maven artifacts to Kolektiv Nexus.
+#   *-SNAPSHOT  → maven-snapshots
+#   other       → maven-releases
+# Pick one host repo per version. Do not publish to maven-public (group, read-only).
+# Hosted repos reject redeploys (409); conflicts are tolerated when the asset already exists.
 set -uo pipefail
 
 : "${YURI_CAPITAL_REPO_USERNAME:?set YURI_CAPITAL_REPO_USERNAME}"
 : "${YURI_CAPITAL_REPO_PASSWORD:?set YURI_CAPITAL_REPO_PASSWORD}"
 
-HOST="repo.yuri.capital"
-GROUP_PATH="dev/kolektiv/keel"
+HOST="repo.kolektiv.computer"
+GROUP_PATH="computer/kolektiv/keel"
 MODULES=(core ktor)
 AUTH=(-u "${YURI_CAPITAL_REPO_USERNAME}:${YURI_CAPITAL_REPO_PASSWORD}")
 
@@ -22,13 +20,8 @@ if [ -z "${VERSION}" ]; then
   exit 1
 fi
 
-# Canonical Maven snapshots end exactly in -SNAPSHOT. Version lines like
-# 0.0.2-SNAPSHOT.1 are unique pre-releases: maven-snapshots rejects them and
-# maven-releases rejects the SNAPSHOT substring, so keel-maven is their
-# advertised repository.
 case "${VERSION}" in
   *-SNAPSHOT) TARGET_REPO="maven-snapshots" ;;
-  *SNAPSHOT*) TARGET_REPO="keel-maven" ;;
   *) TARGET_REPO="maven-releases" ;;
 esac
 
@@ -48,18 +41,14 @@ for module in "${MODULES[@]}"; do
   url_exists "$(artifact_url "${TARGET_REPO}" "${module}")" || published=0
 done
 if [ "${published}" -eq 1 ]; then
-  echo "::warning::dev.kolektiv.keel:${VERSION} is already published in ${TARGET_REPO}; skipping Maven publish."
+  echo "::warning::computer.kolektiv.keel:${VERSION} is already published in ${TARGET_REPO}; skipping Maven publish."
   exit 0
 fi
 
 LOG="$(mktemp)"
 trap 'rm -f "${LOG}"' EXIT
 
-if [ "${TARGET_REPO}" = "keel-maven" ]; then
-  echo "publishing dev.kolektiv.keel:${VERSION} to keel-maven (unique pre-release; not a canonical Maven snapshot)"
-else
-  echo "publishing dev.kolektiv.keel:${VERSION} to keel-maven and ${TARGET_REPO}"
-fi
+echo "publishing computer.kolektiv.keel:${VERSION} to ${TARGET_REPO}"
 ./gradlew :lib:publish :ktor:publish --continue 2>&1 | tee "${LOG}"
 status="${PIPESTATUS[0]}"
 
@@ -82,14 +71,6 @@ while IFS= read -r failure; do
     echo "::warning::ignoring conflict (asset already exists): ${url}"
     tolerated=$((tolerated + 1))
     continue
-  fi
-  if [ "${code}" = "400" ]; then
-    mirror="$(printf '%s' "${url}" | sed -E 's#(/repository/)[^/]+/#\1keel-maven/#')"
-    if [ "${mirror}" != "${url}" ] && url_exists "${mirror}"; then
-      echo "::warning::ignoring 400 (version rejected by target repo, asset already in keel-maven): ${url}"
-      tolerated=$((tolerated + 1))
-      continue
-    fi
   fi
   echo "::error::untolerated publish failure: ${failure}"
   exit 1

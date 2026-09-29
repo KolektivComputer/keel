@@ -1,25 +1,30 @@
-# Dual-publish (GH Packages + Yuri + JSR)
+# Publish notes (Kolektiv Nexus + optional GH Packages)
 
-Org epic: [KolektivComputer/.github#2](https://github.com/KolektivComputer/.github/issues/2)  
-Spine: [gradle-conventions#1](https://github.com/KolektivComputer/gradle-conventions/pull/1) → plugin `computer.kolektiv.publishing`
+Org epic: [KolektivComputer/.github#2](https://github.com/KolektivComputer/.github/issues/2)
+Spine: [gradle-conventions](https://github.com/KolektivComputer/gradle-conventions) → plugin `computer.kolektiv.publishing`
 
-## Maven
+## Maven (primary)
+
+- Host: `https://repo.kolektiv.computer/`
 - GroupId: `computer.kolektiv.keel` (org family `computer.kolektiv.*`)
-- Dual repositories: GitHub Packages `https://maven.pkg.github.com/KolektivComputer/keel` **and** Yuri Capital (`maven-releases` / `maven-snapshots`) when credentials are present
-- Prefer `id("computer.kolektiv.publishing")` once the conventions plugin is published; until then repos are inlined to match that plugin
+- Publish to **one** of `maven-releases` or `maven-snapshots` (never both, never `maven-public`)
+- GitHub Packages (`https://maven.pkg.github.com/KolektivComputer/keel`) stays optional dual when `GITHUB_ACTOR` / `GITHUB_TOKEN` are present. It is never the first consumer path.
 
-## npm
-- Scope **`@kolektiv/...` only** — do not invent a second JS scope
-- Dual: existing Yuri Capital npm (where used) + `https://npm.pkg.github.com` with `@kolektiv:registry=…`
-- Auth: `NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}` with `permissions.packages: write`
+## npm (primary)
+
+- Scope **`@kolektiv/...` only**
+- Publish and consume: `https://repo.kolektiv.computer/repository/npm-public/`
+- Optional dual: `https://npm.pkg.github.com` with `@kolektiv:registry=…` when you already dual-publish. Never first for consumers.
+- Auth secrets keep the names `YURI_CAPITAL_REPO_USERNAME` / `YURI_CAPITAL_REPO_PASSWORD`
 
 ## JSR
+
 - Scope `@kolektiv` (owned)
 - Actions: OIDC only — `permissions.id-token: write` — **no org `JSR_TOKEN`**
 - Mey: link each package on jsr.io for GitHub Actions trusted publishing
 - Not a substitute for npm publish
 
-## Workflow paste (token may lack `workflows` scope)
+## Workflow paste
 
 ```yaml
 permissions:
@@ -32,11 +37,11 @@ Maven job env:
 ```yaml
 GITHUB_ACTOR: ${{ github.actor }}
 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-# optional Yuri dual:
-# YURI_CAPITAL_REPO_USERNAME / YURI_CAPITAL_REPO_PASSWORD (org secrets)
+YURI_CAPITAL_REPO_USERNAME: ${{ secrets.YURI_CAPITAL_REPO_USERNAME }}
+YURI_CAPITAL_REPO_PASSWORD: ${{ secrets.YURI_CAPITAL_REPO_PASSWORD }}
 ```
 
-npm → GitHub Packages:
+Optional npm → GitHub Packages (never first):
 ```yaml
 - uses: actions/setup-node@v4
   with:
@@ -46,10 +51,6 @@ env:
   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-JSR:
-```yaml
-- run: npx jsr publish
-```
+Docker images (sibling products): `docker.kolektiv.computer/kolektiv/<image>`.
 
-Kotlin packages remain `dev.kolektiv.keel.*` until a follow-up; Maven group is `computer.kolektiv.keel`.
-npm stays `@kolektiv/*`.
+Maven group is `computer.kolektiv.keel`. npm stays `@kolektiv/*`.

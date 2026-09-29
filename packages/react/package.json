@@ -1,13 +1,13 @@
 {
   "name": "@kolektiv/keel-react",
-  "version": "0.1.0",
-  "description": "Keel React 18/19 bindings — Link, Form, Head, usePage, useForm, useAction.",
+  "version": "0.1.1",
+  "description": "Keel React 18/19 bindings \u2014 Link, Form, Head, usePage, useForm, useAction.",
   "type": "module",
   "license": "Apache-2.0",
   "sideEffects": false,
   "publishConfig": {
     "access": "public",
-    "registry": "https://repo.yuri.capital/repository/keel-npm/"
+    "registry": "https://repo.kolektiv.computer/repository/npm-public/"
   },
   "exports": {
     ".": {
@@ -26,7 +26,10 @@
       "default": "./dist/bootstrap.js"
     }
   },
-  "files": ["dist", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "build": "tsc -p tsconfig.build.json",

@@ -6,34 +6,34 @@ Keel is a protocol plus Kotlin/JS libraries. Format `keel/1`. First host adapter
 
 Live contract: `GET /__keel/schema` on any Keel host. Scaffold a pack with `keel-scaffold <origin> <dir>`.
 
-Docs: https://keel.mey.cat/  (Cloudflare Pages; local `pnpm dev` is http://127.0.0.1:8080/)
+Docs: https://keel.kolektiv.computer/  (Cloudflare Pages; local `pnpm dev` is http://127.0.0.1:8080/)
 
 ## Docs
 
-- [What is Keel](https://keel.mey.cat/docs/getting-started/): host-owned routing, packs implement ids
-- [Server Installation](https://keel.mey.cat/docs/getting-started/server/): Maven — one repo (`maven-releases`, `maven-snapshots`, or `keel-maven` for unique pre-releases), `computer.kolektiv.keel:core`
-- [Client Setup](https://keel.mey.cat/docs/getting-started/client/): npm — `keel-npm` registry, `@kolektiv/keel*`, install and bootstrap per adapter
-- [Host (Ktor)](https://keel.mey.cat/docs/getting-started/host/): stand up a Keel host
-- [Pack](https://keel.mey.cat/docs/getting-started/pack/): keel-scaffold (`--framework`) or keelPack in Vite
-- [First page](https://keel.mey.cat/docs/getting-started/first-page/): register a page id and implement it in a pack
-- [Routing](https://keel.mey.cat/docs/core-concepts/routing/): page ids live on the server; packs implement ids, never paths
-- [Page contracts](https://keel.mey.cat/docs/core-concepts/contracts/): page ids + payload types are the contract
-- [Seed and headers](https://keel.mey.cat/docs/core-concepts/seed/): the read model bootstrap and visits share
-- [Document head and SEO](https://keel.mey.cat/docs/core-concepts/head/): `+head.svelte` / `+head.html`, placeholders, sanitizing, CSP nonces
-- [Packs](https://keel.mey.cat/docs/core-concepts/packs/): `.feb` manifest, page-id modules, asset prefixes
-- [Routing primitives](https://keel.mey.cat/docs/core-concepts/primitives/): router, Link, Form, useForm, Head
-- [Server actions](https://keel.mey.cat/docs/core-concepts/actions/): typed writes; the seed stays the read model
-- [Choosing a pack](https://keel.mey.cat/docs/advanced/choosing-a-pack/): the call site passes the pack into render
-- [Partial reloads](https://keel.mey.cat/docs/advanced/partials/): `only` / `except` on visits; shallow merge
-- [Forms and 422s](https://keel.mey.cat/docs/advanced/forms/): progressive enhancement over router.visit
-- [Mutate and rehydrate](https://keel.mey.cat/docs/advanced/query/): action then reload; state reads subscribe, method reads do not
-- [Pack hot reload](https://keel.mey.cat/docs/advanced/pack-hot-reload/): watcher, `seed.build` / `X-Keel-Build`, client reload
-- [Navigation guards](https://keel.mey.cat/docs/advanced/navigation-guards/): `beforeEach`, async guards, popstate, `force`
-- [Wire protocol](https://keel.mey.cat/docs/implementing/protocol/): seed JSON, headers, status codes, path grammar, CSRF, `/__keel/schema`
-- [Host adapter](https://keel.mey.cat/docs/implementing/host-adapter/): what a backend must implement, `KeelConfig` knobs
-- [Pack adapter](https://keel.mey.cat/docs/implementing/pack-adapter/): PageModule, .feb, RouterAdapter, manifest head/layout fields
-- [Typegen](https://keel.mey.cat/docs/implementing/typegen/): `.ts`, `.d.ts`, JSON contract
-- [Framework adapters](https://keel.mey.cat/docs/implementing/framework-adapters/): one pack contract across Svelte, React, Vue, Solid, Preact, Lit, and Angular — install, bootstrap, page state, forms, actions, components, guards, mount, and DX caveats
+- [What is Keel](https://keel.kolektiv.computer/docs/getting-started/): host-owned routing, packs implement ids
+- [Server Installation](https://keel.kolektiv.computer/docs/getting-started/server/): Maven — one repo (`maven-releases` or `maven-snapshots`), `computer.kolektiv.keel:core`
+- [Client Setup](https://keel.kolektiv.computer/docs/getting-started/client/): npm — `npm-public` registry, `@kolektiv/keel*`, install and bootstrap per adapter
+- [Host (Ktor)](https://keel.kolektiv.computer/docs/getting-started/host/): stand up a Keel host
+- [Pack](https://keel.kolektiv.computer/docs/getting-started/pack/): keel-scaffold (`--framework`) or keelPack in Vite
+- [First page](https://keel.kolektiv.computer/docs/getting-started/first-page/): register a page id and implement it in a pack
+- [Routing](https://keel.kolektiv.computer/docs/core-concepts/routing/): page ids live on the server; packs implement ids, never paths
+- [Page contracts](https://keel.kolektiv.computer/docs/core-concepts/contracts/): page ids + payload types are the contract
+- [Seed and headers](https://keel.kolektiv.computer/docs/core-concepts/seed/): the read model bootstrap and visits share
+- [Document head and SEO](https://keel.kolektiv.computer/docs/core-concepts/head/): `+head.svelte` / `+head.html`, placeholders, sanitizing, CSP nonces
+- [Packs](https://keel.kolektiv.computer/docs/core-concepts/packs/): `.feb` manifest, page-id modules, asset prefixes
+- [Routing primitives](https://keel.kolektiv.computer/docs/core-concepts/primitives/): router, Link, Form, useForm, Head
+- [Server actions](https://keel.kolektiv.computer/docs/core-concepts/actions/): typed writes; the seed stays the read model
+- [Choosing a pack](https://keel.kolektiv.computer/docs/advanced/choosing-a-pack/): the call site passes the pack into render
+- [Partial reloads](https://keel.kolektiv.computer/docs/advanced/partials/): `only` / `except` on visits; shallow merge
+- [Forms and 422s](https://keel.kolektiv.computer/docs/advanced/forms/): progressive enhancement over router.visit
+- [Mutate and rehydrate](https://keel.kolektiv.computer/docs/advanced/query/): action then reload; state reads subscribe, method reads do not
+- [Pack hot reload](https://keel.kolektiv.computer/docs/advanced/pack-hot-reload/): watcher, `seed.build` / `X-Keel-Build`, client reload
+- [Navigation guards](https://keel.kolektiv.computer/docs/advanced/navigation-guards/): `beforeEach`, async guards, popstate, `force`
+- [Wire protocol](https://keel.kolektiv.computer/docs/implementing/protocol/): seed JSON, headers, status codes, path grammar, CSRF, `/__keel/schema`
+- [Host adapter](https://keel.kolektiv.computer/docs/implementing/host-adapter/): what a backend must implement, `KeelConfig` knobs
+- [Pack adapter](https://keel.kolektiv.computer/docs/implementing/pack-adapter/): PageModule, .feb, RouterAdapter, manifest head/layout fields
+- [Typegen](https://keel.kolektiv.computer/docs/implementing/typegen/): `.ts`, `.d.ts`, JSON contract
+- [Framework adapters](https://keel.kolektiv.computer/docs/implementing/framework-adapters/): one pack contract across Svelte, React, Vue, Solid, Preact, Lit, and Angular — install, bootstrap, page state, forms, actions, components, guards, mount, and DX caveats
 - [AGENTS.md](https://github.com/KolektivComputer/keel/blob/main/AGENTS.md): how to work in this repository
 
 ## Optional

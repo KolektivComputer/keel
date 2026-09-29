@@ -81,7 +81,7 @@ picker that sets `data-frontend` (default Svelte; snippets opt in with `fw`
 or per-framework panels). Code samples: Svelte-default, plus Ktor host. TS/JS
 toggles live on docs pages and on individual snippets.
 
-Production docs are `https://keel.mey.cat` (Cloudflare Pages custom domain, site
+Production docs are `https://keel.kolektiv.computer` (Cloudflare Pages custom domain, site
 root). All in-app links must go through `path()` in `docs/src/lib/paths.ts`
 (or `import.meta.env.BASE_URL`). The Pages build sets `DOCS_SITE`; local
 `astro dev` stays at `/`. Astro emits to `/dist` at the repo root.
@@ -94,27 +94,21 @@ in; do not reformat unrelated code or add deps without a need.
 
 ## Publishing
 
-Maven publishing (`bash .github/scripts/publish-maven.sh`) always goes to
-`https://repo.yuri.capital/repository/keel-maven/`. Versions that end
-exactly in `-SNAPSHOT` (canonical snapshots) also go to
-`…/maven-snapshots/`; numbered releases also go to `…/maven-releases/`.
-Unique pre-release versions such as `0.0.2-SNAPSHOT.1` are not canonical
-Maven snapshots — they do not end in `-SNAPSHOT` — and both of those hosted
-repos reject them, so they go to `keel-maven` only. Consumers configure
-exactly one Maven repository: `maven-releases` for numbered releases,
-`maven-snapshots` for canonical `-SNAPSHOT` builds, or `keel-maven` for the
-unique `X-SNAPSHOT.N` pre-release line. Versions already present in the
-target repo are skipped, and conflicts from redeploys to `keel-maven` are
-tolerated. `bash .github/scripts/verify-maven-resolution.sh <version>`
+Maven publishing (`bash .github/scripts/publish-maven.sh`) writes to
+`https://repo.kolektiv.computer/repository/maven-releases/` for numbered
+releases, or `…/maven-snapshots/` for versions that end exactly in
+`-SNAPSHOT`. Pick one. Do not publish to `maven-public` (aggregate group,
+read-only). Consumers configure exactly one of those two Maven repositories.
+Versions already present in the target repo are skipped; redeploy conflicts
+(409) are tolerated. `bash .github/scripts/verify-maven-resolution.sh <version>`
 anonymously checks that `core` and `ktor` resolve from the advertised repo;
 `.github/workflows/publish.yml` runs it after publishing.
 
-npm (`bash .github/scripts/publish-npm.sh`) publishes only to the hosted
-repo `https://repo.yuri.capital/repository/keel-npm/`, which is also the
-advertised consumer registry; the `npm-releases` / `npm-snapshots` group
-URLs are not available on this Nexus instance. Consumers point the
-`@kolektiv` scope at hosted `keel-npm`. `publish.yml` verifies resolution
-after publishing with `.github/scripts/verify-npm-resolution.sh`. Workflow:
+npm (`bash .github/scripts/publish-npm.sh`) publishes to
+`https://repo.kolektiv.computer/repository/npm-public/`, which is also the
+advertised consumer registry. Consumers point the `@kolektiv` scope at
+`npm-public`. `publish.yml` verifies resolution after publishing with
+`.github/scripts/verify-npm-resolution.sh`. Workflow:
 `.github/workflows/publish.yml` (tag `v*` or `workflow_dispatch`).
 
 ### Adding an npm package
@@ -122,7 +116,7 @@ after publishing with `.github/scripts/verify-npm-resolution.sh`. Workflow:
 A new package lives in `packages/<dir>/` and is named `@kolektiv/keel-<dir>`
 (router: `@kolektiv/keel`). Copy the boilerplate from an existing adapter:
 version locked to `packages/core`'s version, `publishConfig.registry` =
-hosted `keel-npm`, `files` including `dist` and `CHANGELOG.md`, and the
+`npm-public`, `files` including `dist` and `CHANGELOG.md`, and the
 standard `prepack` one-liner that copies the root `CHANGELOG.md`. A
 `"private": true` package is skipped. `pnpm build:packages`,
 `publish-npm.sh`, `verify-npm-resolution.sh`, and
@@ -141,14 +135,15 @@ checker after `pnpm build:packages`; publish runs it before publishing.
    user `~/.npmrc` (publish only; consumers do not need auth):
 
 ```
-@kolektiv:registry=https://repo.yuri.capital/repository/keel-npm/
-//repo.yuri.capital/repository/keel-npm/:_auth=<base64 of user:password>
-//repo.yuri.capital/repository/keel-npm/:always-auth=true
+@kolektiv:registry=https://repo.kolektiv.computer/repository/npm-public/
+//repo.kolektiv.computer/repository/npm-public/:_auth=<base64 of user:password>
+//repo.kolektiv.computer/repository/npm-public/:always-auth=true
 ```
 
-Consumers add exactly **one** Maven repository — `maven-releases`,
-`maven-snapshots`, or `keel-maven` — never more than one. npm consumers
-point the `@kolektiv` scope at hosted `keel-npm`.
+Consumers add exactly **one** Maven repository — `maven-releases` or
+`maven-snapshots` — never both. npm consumers point the `@kolektiv` scope at
+`npm-public`.
+
 
 ## Changelog and releases
 

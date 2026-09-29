@@ -6,7 +6,7 @@
 # that declares a publishConfig.registry. Each must match the conventions in
 # AGENTS.md "Publishing": name scope, version lockstep with packages/core,
 # `files` including CHANGELOG.md, a prepack script copying the root
-# CHANGELOG.md, and publishConfig.registry pointing at hosted keel-npm.
+# CHANGELOG.md, and publishConfig.registry pointing at npm-public.
 # A package opts out with "private": true.
 #
 # Usage: check-publishable-packages.sh [packages-dir]
@@ -14,7 +14,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(CDPATH= cd -- "${SCRIPT_DIR}/../.." && pwd)"
-REGISTRY="https://repo.yuri.capital/repository/keel-npm/"
+REGISTRY="https://repo.kolektiv.computer/repository/npm-public/"
 PKG_DIR="${1:-${ROOT_DIR}/packages}"
 
 CORE_MANIFEST="${PKG_DIR}/core/package.json"
