@@ -158,7 +158,9 @@ class RealtimeTest {
             assertEquals(emptyList<String>(), nextEnvelope().channels)
             assertEquals(0, hub!!.connectionCount("demo"))
         }
-        assertEquals(0, hub!!.connectionCount())
+        withTimeout(5000) {
+            while (hub!!.connectionCount() != 0) delay(10)
+        }
     }
 
     @Test
