@@ -91,6 +91,32 @@ the same behaviors however it likes.
 | `watchPacks` | `false` | Poll file/directory packs and swap on change |
 | `packWatchIntervalMs` | `500` | Watcher poll interval (minimum 50 ms); see <a href={path("/docs/advanced/pack-hot-reload")}>Pack hot reload</a> |
 
+## Realtime
+
+Realtime is off until `keel { realtime { … } }` is present and the host
+installed Ktor's `SSE` and/or `WebSockets` plugin. The same `/__keel/events`
+path serves the SSE stream, the WebSocket upgrade, and the `POST` sends SSE
+clients use. `call.keelRealtime` (or `application.keelRealtime`) publishes
+typed events and invalidations; the client rehydrates through normal visits,
+so a non-Ktor host only has to speak the envelope in
+<a href={path("/docs/implementing/protocol")}>Wire protocol</a>.
+
+```kotlin
+install(WebSockets)
+install(SSE)
+
+keel {
+  realtime {
+    event<FeedItem>("harbor.message", EventDirection.OUT)
+    on<TypingNotice>("harbor.typing") { input -> call.keelRealtime.publish("page:harbor.home", "harbor.typing", input) }
+    authorize = { call, channel -> channel.startsWith("page:") || Board.viewer(call) != null }
+    heartbeatSeconds = 25
+  }
+}
+```
+
+Guides and knobs: <a href={path("/docs/advanced/realtime")}>Realtime</a>.
+
 ## CSRF
 
 Apply the

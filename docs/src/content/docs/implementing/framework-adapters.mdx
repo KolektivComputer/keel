@@ -18,15 +18,15 @@ how each framework expresses reactivity, forms, and DOM access.
 Svelte is the docs default. Sections for the other frameworks still apply when you pick them in the navbar. Scroll to that heading, or keep this page as the full matrix.
 </FrameworkPanel>
 
-| Framework | Package | Page state | Action / query | Components / directives | Guards | Mount |
-| --- | --- | --- | --- | --- | --- | --- |
-| Svelte 5 | `@kolektiv/keel-svelte` | `page()` store | `@tanstack/svelte-query` | `Link`, `Form`, `Head`, `use:keel` | `useNavigationGuard`, `useUnloadGuard` | `createPage` |
-| React 18/19 | `@kolektiv/keel-react` | `usePage()` | `@tanstack/react-query`: `useAction`, `useKeelPageQuery` | `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `createPage` (`createRoot`, `flushSync`) |
-| Vue 3 | `@kolektiv/keel-vue` | `usePage()` shallow ref | `@tanstack/vue-query` | SFC `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `createPage` (`createApp().mount`) |
-| Solid 1.9 | `@kolektiv/keel-solid` | `usePage()` accessor | `@tanstack/solid-query` | JSX `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `createPage` (`render` + dispose) |
-| Preact 10 | `@kolektiv/keel-preact` | `usePage()` | `@tanstack/preact-query` | JSX `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `createPage` (`render` / `render(null)`) |
-| Lit 3 | `@kolektiv/keel-lit` | `KeelElement.page` / `usePage` controller | `@tanstack/query-core` controllers: `KeelActionController`, `KeelPageQueryController` | `<keel-link>`, `form()` helper, `<keel-head>`, `keelAnchor` | controllers | `createPage` (`render`) |
-| Angular 19 | `@kolektiv/keel-angular` | `injectKeelPage()` signal | `@tanstack/angular-query-experimental` | `[keelLink]`, `[keelAnchor]`, `[keelForm]`, `KeelHead` | `injectNavigationGuard`, `injectUnloadGuard` | `createPage` (`createApplication` + `createComponent`/`attachView`) |
+| Framework | Package | Page state | Action / query | Components / directives | Guards | Realtime | Mount |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Svelte 5 | `@kolektiv/keel-svelte` | `page()` store | `@tanstack/svelte-query` | `Link`, `Form`, `Head`, `use:keel` | `useNavigationGuard`, `useUnloadGuard` | `useKeelEvent`, `realtime` | `createPage` |
+| React 18/19 | `@kolektiv/keel-react` | `usePage()` | `@tanstack/react-query`: `useAction`, `useKeelPageQuery` | `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `useKeelEvent`, `realtime` | `createPage` (`createRoot`, `flushSync`) |
+| Vue 3 | `@kolektiv/keel-vue` | `usePage()` shallow ref | `@tanstack/vue-query` | SFC `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `useKeelEvent`, `realtime` | `createPage` (`createApp().mount`) |
+| Solid 1.9 | `@kolektiv/keel-solid` | `usePage()` accessor | `@tanstack/solid-query` | JSX `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `useKeelEvent`, `realtime` | `createPage` (`render` + dispose) |
+| Preact 10 | `@kolektiv/keel-preact` | `usePage()` | `@tanstack/preact-query` | JSX `Link`, `Form`, `Head`, `useKeelAnchor` | `useNavigationGuard`, `useUnloadGuard` | `useKeelEvent`, `realtime` | `createPage` (`render` / `render(null)`) |
+| Lit 3 | `@kolektiv/keel-lit` | `KeelElement.page` / `usePage` controller | `@tanstack/query-core` controllers: `KeelActionController`, `KeelPageQueryController` | `<keel-link>`, `form()` helper, `<keel-head>`, `keelAnchor` | controllers | `KeelEventController`, `useKeelEvent`, `realtime` | `createPage` (`render`) |
+| Angular 19 | `@kolektiv/keel-angular` | `injectKeelPage()` signal | `@tanstack/angular-query-experimental` | `[keelLink]`, `[keelAnchor]`, `[keelForm]`, `KeelHead` | `injectNavigationGuard`, `injectUnloadGuard` | `injectKeelEvent`, `realtime` | `createPage` (`createApplication` + `createComponent`/`attachView`) |
 
 The first adapter was Svelte 5. The other six bindings copy its contract
 rather than inventing a second one.
@@ -48,6 +48,8 @@ subscription, refs, signals, controllers).
 `KEEL_PAGE_QUERY_KEY` (`["keel", "page"]`); a path-scoped entry comes from
 `pageQueryKey(path)` (`["keel", "page", path]`). Actions invalidate the root
 key with `refetchType: "none"` because the follow-up visit rehydrates it.
+
+**Realtime.** `realtime` (the core client) is re-exported from every adapter; the lifecycle helper is `useKeelEvent` everywhere except Angular's `injectKeelEvent` (Lit also exposes the underlying `KeelEventController`). Each helper subscribes for the host/component lifetime, keeps the latest handler, and releases on unmount. See <a href={path("/docs/advanced/realtime")}>Realtime</a>.
 
 **Visit interception.** `Link` and the anchor helpers intercept unmodified
 left-clicks only. Modified clicks, non-left buttons, `defaultPrevented`, and

@@ -90,6 +90,12 @@ the same `keel/1` JSON Typegen writes offline:
       "out": "SetNameOut"
     }
   },
+  "events": {
+    "harbor.message": {
+      "direction": "out",
+      "type": "FeedItem"
+    }
+  },
   "types": {
     "HomePage": {
       "kind": "object",
@@ -108,6 +114,46 @@ See <a href={path("/docs/implementing/typegen")}>Typegen</a>.
 
 `POST /__keel/action/{id}` with a JSON body. Success: `{ "data": … }`.
 Validation: 422 `{ "errors": … }`. Unknown id: 404.
+
+## Realtime
+
+Opt-in. `GET /__keel/events` is an SSE stream when the host installed the
+`SSE` plugin, and the same path upgrades to a WebSocket when `WebSockets` is
+installed. `POST /__keel/events` carries the same envelope for SSE clients
+(WebSocket clients use frames). Writes use the action CSRF policy.
+
+The envelope is boring JSON, versioned with `v: 1`:
+
+```json
+{
+  "v": 1,
+  "type": "event",
+  "sid": "rt-…",
+  "channel": "page:harbor.home",
+  "event": "harbor.message",
+  "data": { "id": "…", "body": "ahoy" },
+  "id": "client-correlation"
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `type` | `ready`, `event`, `invalidate`, `error`, `ping` (host → client); `subscribe`, `unsubscribe`, `send`, `ping` (client → host) |
+| `sid` | Stream id from `ready`; SSE clients echo it on `POST` |
+| `channel` / `channels` | Routing unit / subscribe list |
+| `event` / `data` | Event id and payload from the typed registry |
+| `id` | Optional client correlation id |
+| `error` | Server-reported rejection (unknown event, denied channel) |
+
+- `ready` lists the accepted channels; `error` reports a denied one without
+  dropping the connection.
+- **Subscriptions are ephemeral.** Reconnect means resubscribe; events are
+  not replayed. `invalidate` tells the client to rehydrate the seed with a
+  normal visit, so no stream state is authoritative.
+- Channel ids are host-owned strings (`page:…`, `user:…`, or anything else).
+  Authorization happens at subscribe time with the caller's cookies.
+- Heartbeats are `ping` envelopes; hosts should keep them on so dead
+  connections are reaped.
 
 ## Path grammar
 

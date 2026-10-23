@@ -78,6 +78,12 @@ Angular). When a page id ends in `.notFound` (or is `not-found`/`notFound`)
 it also sets `notFound:`. Type names come from `schema.pagesName`, else
 PascalCase(id) + `Pages`.
 
+When the host's schema carries an `events` section (`@KeelEvent` payloads),
+`page-types.ts` also emits `<Prefix>Events` / `<Prefix>EventId` maps so a
+page can subscribe with `useKeelEvent<HarborEvents["harbor.message"]>(…)`
+instead of stringly-typed payloads; the direction (`in`/`out`/`both`) lives
+in `page-types.json`.
+
 Framework-specific DX notes:
 
 - **Lit** — `tsconfig.json` sets `experimentalDecorators: true` and

@@ -1,6 +1,8 @@
 package dev.kolektiv.keel.samples.harbor
 
+import dev.kolektiv.keel.KeelEvent
 import dev.kolektiv.keel.KeelType
+import dev.kolektiv.keel.event.EventDirection
 import kotlinx.serialization.Serializable
 
 @KeelType
@@ -10,6 +12,7 @@ data class UserRef(
     val displayName: String,
 )
 
+@KeelEvent("harbor.message", EventDirection.OUT)
 @KeelType
 @Serializable
 data class FeedItem(
@@ -56,3 +59,8 @@ data class PostMessageIn(val body: String)
 @KeelType
 @Serializable
 data class PostMessageOut(val message: FeedItem)
+
+/** Client-sent "someone is writing" notice, echoed to the same channel. */
+@KeelEvent("harbor.typing", EventDirection.BOTH)
+@Serializable
+data class TypingNotice(val displayName: String)

@@ -5,6 +5,8 @@ export const KEEL_SEED_ELEMENT_ID = "__keel_seed"
 export const KEEL_NAVIGATE_PATH = "/__keel/navigate"
 export const KEEL_ACTION_PATH = "/__keel/action"
 export const KEEL_SCHEMA_PATH = "/__keel/schema"
+export const KEEL_REALTIME_PATH = "/__keel/events"
+export const KEEL_REALTIME_VERSION = 1
 
 export const KEEL_HEADERS = {
   visit: "X-Keel-Visit",

@@ -3,6 +3,7 @@ export { injectKeelContext, KeelContext } from "./context.js"
 export { injectKeelPage, type KeelPage } from "./page.js"
 export { injectKeelForm, type FormState } from "./form.js"
 export { injectNavigationGuard, injectUnloadGuard } from "./guards.js"
+export { injectKeelEvent } from "./event.js"
 export { KeelHead } from "./head.js"
 export {
   applyHead,
@@ -12,7 +13,7 @@ export {
   syncHead,
   type HeadInput,
 } from "./head.js"
-export { router, ActionError } from "@kolektiv/keel"
+export { realtime, router, ActionError, type RealtimeMessage } from "@kolektiv/keel"
 export type { GuardResult, NavigationGuard, NavigationTarget } from "@kolektiv/keel"
 export {
   getQueryClient,

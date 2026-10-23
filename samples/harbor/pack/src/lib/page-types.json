@@ -34,6 +34,16 @@
             "out": "SetNameOut"
         }
     },
+    "events": {
+        "harbor.message": {
+            "direction": "out",
+            "type": "FeedItem"
+        },
+        "harbor.typing": {
+            "direction": "both",
+            "type": "TypingNotice"
+        }
+    },
     "types": {
         "UserRef": {
             "kind": "object",
@@ -95,6 +105,12 @@
             "kind": "object",
             "fields": {
                 "user": "UserRef"
+            }
+        },
+        "TypingNotice": {
+            "kind": "object",
+            "fields": {
+                "displayName": "string"
             }
         }
     }
