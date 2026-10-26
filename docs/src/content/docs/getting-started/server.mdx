@@ -12,7 +12,7 @@ import { path } from "../../../lib/paths"
 Host artifacts live on Nexus at `repo.kolektiv.computer`. Pick **one** Maven
 repository:
 
-- `maven-releases`, numbered releases such as `0.1.1`
+- `maven-releases`, numbered releases such as `0.1.2`
 - `maven-snapshots`, canonical `*-SNAPSHOT` builds
 
 Do not add both. Gradle will mix channels. `maven-public` is an optional
@@ -24,7 +24,7 @@ dependency. Protocol format `keel/1`. Seed version `1`.
 
 ## Releases (recommended)
 
-Current release: `0.1.1`.
+Current release: `0.1.2`.
 
 <CodeBlock
   title="repositories + core"
@@ -40,7 +40,7 @@ Current release: `0.1.1`.
 }
 
 dependencies {
-    implementation("computer.kolektiv.keel:core:0.1.1")
+    implementation("computer.kolektiv.keel:core:0.1.2")
 }`,
     },
     {
@@ -53,7 +53,7 @@ dependencies {
 }
 
 dependencies {
-    implementation "computer.kolektiv.keel:core:0.1.1"
+    implementation "computer.kolektiv.keel:core:0.1.2"
 }`,
     },
   ]}

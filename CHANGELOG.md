@@ -40,6 +40,16 @@ Ktor is bumped to 3.5.2.
   (`KeelRealtimeEnvelope`) both transports speak. Typegen and
   `keel-scaffold` emit the events section (`HarborEvents` /
   `HarborEventId`) next to pages and actions. (#72)
+## [0.1.2] - 2026-10-26
+
+### Changed
+
+- Republish on `repo.kolektiv.computer`; docs use `@kolektiv/common-docs-chrome` ^0.0.1 and `@kolektiv/themes` ^0.0.1.
+- Maven group is now `computer.kolektiv.keel`: `Keel.GROUP`, the docs
+  install cite, and the CI Maven check all moved. Kotlin packages are
+  unchanged (`dev.kolektiv.keel.*`). (#81)
+- Republish on `repo.kolektiv.computer`; docs use `@kolektiv/common-docs-chrome` ^0.0.1 and `@kolektiv/themes` ^0.0.1.
+
 
 ## [0.1.1] - 2026-09-27
 
@@ -48,7 +58,6 @@ Ktor is bumped to 3.5.2.
 - Publish Maven to `repo.kolektiv.computer` `maven-releases` / `maven-snapshots` only (dropped `keel-maven`).
 - Publish and consume npm via `npm-public` on `repo.kolektiv.computer` (dropped `keel-npm`).
 - Docs and consumer pins updated for the Kolektiv registry cut.
-
 ## [0.1.0] - 2026-09-14
 
 ### Added
@@ -125,7 +134,10 @@ Ktor is bumped to 3.5.2.
 
 ### Changed
 
-- Docs and homepage tell the pack-at-render-time story: call-site pack
+- Docs and homepage tell the pack-at-render-time story: c- Maven group is now `computer.kolektiv.keel`: `Keel.GROUP`, the docs
+  install cite, and the CI Maven check all moved. Kotlin packages are
+  unchanged (`dev.kolektiv.keel.*`). (#81)
+- Republish on `repo.kolektiv.computer`; docs use `@kolektiv/common-docs-chrome` ^0.0.1 and `@kolektiv/themes` ^0.0.1.all-site pack
   selection, "Choosing a pack" replaces the theme-chain page, no resolver
   language (#11).
 - Refreshed the agent skill suite (`keel-host`, `keel-pack`, `keel-scaffold`)
