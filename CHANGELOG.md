@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-26
+
+Realtime release: a typed event registry, SSE and WebSocket host transports
+at `/__keel/events`, and the client `realtime` / `useKeelEvent` helpers.
+Ktor is bumped to 3.5.2.
+
 ### Added
 
 - Docs: new Realtime guide (host opt-in, typed events, invalidate, reconnect,

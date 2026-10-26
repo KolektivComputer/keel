@@ -1,6 +1,6 @@
 {
   "name": "@kolektiv/keel-preact",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Keel Preact 10 bindings \u2014 Link, Form, Head, usePage, useForm, useAction.",
   "type": "module",
   "license": "Apache-2.0",
