@@ -1,7 +1,10 @@
 package dev.kolektiv.keel.samples.harbor
 
 import dev.kolektiv.keel.KeelAction
+import dev.kolektiv.keel.KeelEvent
+import dev.kolektiv.keel.event.EventDirection
 import dev.kolektiv.keel.ktor.PageValidationException
+import dev.kolektiv.keel.ktor.realtime.keelRealtime
 import io.ktor.server.application.ApplicationCall
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -74,6 +77,7 @@ object Board {
             )
             created
         }
+        notifyNameChanged(this, user)
         return SetNameOut(user.toRef())
     }
 
@@ -101,8 +105,35 @@ object Board {
             at = timestamp(),
         )
         messages.add(0, message)
-        return PostMessageOut(message.toFeedItem())
+        val item = message.toFeedItem()
+        keelRealtime.publish(HOME_CHANNEL, "harbor.message", item)
+        return PostMessageOut(item)
     }
+
+    /**
+     * Client-sent typing notice: echo it to everyone watching the board. The
+     * handler is an `ApplicationCall` extension so cookies identify the
+     * author; the payload is the same `OUT`/`IN` type.
+     */
+    @KeelEvent("harbor.typing", EventDirection.BOTH)
+    fun ApplicationCall.typing(input: TypingNotice) {
+        val author = viewer(this) ?: return
+        if (input.displayName.isNotBlank() && input.displayName != author.displayName) {
+            throw PageValidationException(
+                mapOf("displayName" to listOf("Not your display name.")),
+                Unit,
+            )
+        }
+        keelRealtime.publish(HOME_CHANNEL, "harbor.typing", TypingNotice(author.displayName))
+    }
+
+    fun notifyNameChanged(call: ApplicationCall, user: User) {
+        // Flavor (b): tell home viewers to rehydrate the seed; renamed authors
+        // are then consistent everywhere.
+        call.keelRealtime.invalidate(HOME_CHANNEL, path = "/")
+    }
+
+    const val HOME_CHANNEL: String = "page:harbor.home"
 
     private fun newId(): String = UUID.randomUUID().toString()
 

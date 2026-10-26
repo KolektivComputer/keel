@@ -26,6 +26,14 @@ pnpm --filter @kolektiv/harbor-pack build
 | `harbor.setName` | `{ displayName }` — cookie `harbor_uid` |
 | `harbor.postMessage` | `{ body }` — requires the cookie |
 
+Realtime is on for the testbench: the host installs `WebSockets` + `SSE` and
+`keel { realtime { … } }` declares the events. `harbor.postMessage` publishes
+`harbor.message` on `page:harbor.home`; `harbor.setName` sends an
+`invalidate` for the same channel. The pack subscribes with `useKeelEvent`
+and sends `harbor.typing` with `realtime.send`, which the host echoes back to
+the channel. Open two windows to watch posts and typing notices stream in.
+Transport is `/__keel/events` (WebSocket upgrade, or SSE + `POST` sends).
+
 Document GET writes `<title>` / description / `og:*` from `seed.head` so
 crawlers that do not run JS still see the board. Visits (`X-Keel-Visit`)
 return JSON; they are not the SEO unit. Pack files are ids, not URLs.

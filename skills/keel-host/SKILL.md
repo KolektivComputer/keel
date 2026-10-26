@@ -3,9 +3,11 @@ name: keel-host
 description: >
   Implement or extend a Keel host (server). Use when adding pages, actions,
   CSRF, the live schema, pack loading and render-time pack choice, document
-  head, CSP, or pack hot reload, or for a non-Ktor backend that speaks Keel.
+  head, CSP, pack hot reload, or realtime events over SSE/WebSocket, or for a
+  non-Ktor backend that speaks Keel.
   Triggers: "keel host", "KeelEngine", "respondPage", "route.keel",
-  "FrontendBundle", "/__keel/schema", "@KeelAction", "page registry".
+  "FrontendBundle", "/__keel/schema", "@KeelAction", "@KeelEvent",
+  "call.keelRealtime", "realtime", "page registry".
   Slash: /keel-host.
 ---
 
@@ -108,6 +110,44 @@ pack-declared `<script src>` / `<link>` tags. A pack-supplied `nonce` is
 stripped. Visits get no nonce and no header. Default policy:
 `script-src 'nonce-…' 'strict-dynamic'; style-src 'self'; object-src 'none';
 base-uri 'none'`.
+
+## Realtime
+
+Off by default. Enable by installing the Ktor transport plugins the host wants
+and adding a `realtime { }` block — endpoints exist only when both are true:
+
+```kotlin
+install(WebSockets)   // and/or install(SSE)
+keel {
+    realtime {
+        event<FeedItem>("harbor.message", EventDirection.OUT)   // typed payload
+        on<TypingNotice>("harbor.typing") { call.keelRealtime.publish("page:harbor.home", "harbor.typing", it) }
+        events(Board)                                            // @KeelEvent functions
+        authorize = { call, channel -> channel.startsWith("page:") || Board.viewer(call) != null }
+        heartbeatSeconds = 25
+    }
+}
+```
+
+- `@KeelEvent("id")` on a `@Serializable` class declares the payload (Typegen
+  emits `<Pack>Events`); on a host function it registers a client-sent
+  handler the way `@KeelAction` registers writes. Directions: `IN`, `OUT`,
+  `BOTH`.
+- One endpoint, `/__keel/events`: SSE stream, WebSocket upgrade, and `POST`
+  sends from SSE clients (`sid` addresses the stream). Same JSON envelope both
+  directions, `v: 1`. Writes use the action CSRF policy.
+- Publish from a call: `call.keelRealtime.publish(channel, eventId, data)`
+  (typed) / `publishJson`; `invalidate(channel, path, only, except)` sends the
+  visit-shaped hint. `send(sid, …)` targets one stream.
+- Channel ids are host-owned strings; `page:…`/`user:…` are conventions, not
+  built-ins. `authorize` runs per channel at subscribe time with the caller's
+  cookies.
+- **No replay.** Subscriptions are ephemeral; `invalidate` tells the client
+  to rehydrate with a normal visit, and the client resubscribes with backoff.
+  Keep heartbeats on so dead connections are reaped.
+- A non-Ktor host implements the envelope from
+  `docs/src/content/docs/implementing/protocol.mdx`; the reference is
+  `ktor/realtime/`.
 
 ## Pack hot reload
 

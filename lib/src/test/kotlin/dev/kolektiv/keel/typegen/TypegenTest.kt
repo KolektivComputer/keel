@@ -1,6 +1,8 @@
 package dev.kolektiv.keel.typegen
 
 import dev.kolektiv.keel.action.actions
+import dev.kolektiv.keel.event.EventDirection
+import dev.kolektiv.keel.event.events
 import dev.kolektiv.keel.page.pages
 import dev.kolektiv.keel.typegen.TypegenContract
 import kotlinx.serialization.Serializable
@@ -127,6 +129,30 @@ class TypegenTest {
         assertTrueContains(json, "\"out\": \"SetNameOut\"")
         assertTrueContains(json, "\"types\"")
         assertTrueContains(json, "\"kicker\": \"string\"")
+    }
+
+    @Serializable
+    data class BoardEvent(val text: String)
+
+    @Test
+    fun `emits event payloads and directions`() {
+        val registry = pages {
+            page<HomePage>("harbor.home", "/")
+        }
+        val events = events {
+            event<BoardEvent>("harbor.message", EventDirection.BOTH)
+        }
+        val ts = Typegen.emit(registry, events = events, pagesName = "HarborPages")
+        assertTrueContains(ts, "export interface BoardEvent {")
+        assertTrueContains(ts, "export interface HarborEvents {")
+        assertTrueContains(ts, "\"harbor.message\": BoardEvent")
+        assertTrueContains(ts, "export type HarborEventId = keyof HarborEvents")
+
+        val json = Typegen.emitJson(registry, events = events, pagesName = "HarborPages")
+        assertTrueContains(json, "\"events\"")
+        assertTrueContains(json, "\"harbor.message\"")
+        assertTrueContains(json, "\"direction\": \"both\"")
+        assertTrueContains(json, "\"type\": \"BoardEvent\"")
     }
 
     private fun assertTrueContains(haystack: String, needle: String) {

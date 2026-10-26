@@ -7,11 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-26
+
+Realtime release: a typed event registry, SSE and WebSocket host transports
+at `/__keel/events`, and the client `realtime` / `useKeelEvent` helpers.
+Ktor is bumped to 3.5.2.
+
+### Added
+
+- Docs: new Realtime guide (host opt-in, typed events, invalidate, reconnect,
+  client surface), the wire-protocol envelope section, Typegen and
+  framework-adapter updates, refreshed llms.txt and agent skills. (#74)
+- Harbor testbench now runs live: posts stream to `page:harbor.home` as
+  `harbor.message`, renames send an `invalidate`, and clients send
+  `harbor.typing` notices that the host echoes back. (#75)
+- Realtime client: `realtime` from `@kolektiv/keel` connects over WebSocket
+  (SSE fallback) to `/__keel/events`, auto-holds `page:<page id>`, dispatches
+  typed events to `realtime.on`, rehydrates the seed on `invalidate`,
+  `POST`s sends by `sid` when streaming SSE, and reconnects with backoff and
+  resubscribe. Every adapter gains a lifecycle-aware
+  `useKeelEvent` / `injectKeelEvent` helper. (#73)
+- Realtime host: opt-in `keel { realtime { } }` serves SSE and WebSocket
+  transports at `/__keel/events` when `install(SSE)` and/or
+  `install(WebSockets)` are present. Host-owned channels, session-cookie
+  auth via an `authorize` hook, typed `publish` / `invalidate` helpers on
+  `call.keelRealtime`, heartbeats, CSRF-protected HTTP sends, and a
+  documented no-replay reconnect story (resubscribe and rehydrate the
+  seed). (#71)
+- Typed realtime event registry: `@KeelEvent` (payload classes and host
+  handler functions), `dev.kolektiv.keel.event.EventRegistry` /
+  `EventDiscovery`, and the versioned JSON envelope
+  (`KeelRealtimeEnvelope`) both transports speak. Typegen and
+  `keel-scaffold` emit the events section (`HarborEvents` /
+  `HarborEventId`) next to pages and actions. (#72)
 ## [0.1.2] - 2026-10-26
 
 ### Changed
 
 - Republish on `repo.kolektiv.computer`; docs use `@kolektiv/common-docs-chrome` ^0.0.1 and `@kolektiv/themes` ^0.0.1.
+- Maven group is now `computer.kolektiv.keel`: `Keel.GROUP`, the docs
+  install cite, and the CI Maven check all moved. Kotlin packages are
+  unchanged (`dev.kolektiv.keel.*`). (#81)
+- Republish on `repo.kolektiv.computer`; docs use `@kolektiv/common-docs-chrome` ^0.0.1 and `@kolektiv/themes` ^0.0.1.
+
 
 ## [0.1.1] - 2026-09-27
 
@@ -20,14 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Publish Maven to `repo.kolektiv.computer` `maven-releases` / `maven-snapshots` only (dropped `keel-maven`).
 - Publish and consume npm via `npm-public` on `repo.kolektiv.computer` (dropped `keel-npm`).
 - Docs and consumer pins updated for the Kolektiv registry cut.
-
-
-### Fixed
-
-- npm publishing now targets the `keel-npm` registry for the `@kolektiv`
-  scope: the publish script swaps the committed repo-root `.npmrc`
-  (`npm-public`) for the publish config and restores it afterwards.
-
 ## [0.1.0] - 2026-09-14
 
 ### Added
@@ -104,7 +134,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Docs and homepage tell the pack-at-render-time story: call-site pack
+- Docs and homepage tell the pack-at-render-time story: c- Maven group is now `computer.kolektiv.keel`: `Keel.GROUP`, the docs
+  install cite, and the CI Maven check all moved. Kotlin packages are
+  unchanged (`dev.kolektiv.keel.*`). (#81)
+- Republish on `repo.kolektiv.computer`; docs use `@kolektiv/common-docs-chrome` ^0.0.1 and `@kolektiv/themes` ^0.0.1.all-site pack
   selection, "Choosing a pack" replaces the theme-chain page, no resolver
   language (#11).
 - Refreshed the agent skill suite (`keel-host`, `keel-pack`, `keel-scaffold`)

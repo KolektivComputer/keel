@@ -23,11 +23,15 @@ const schema = {
   actions: {
     "harbor.setName": { in: "SetNameIn", out: "SetNameOut" },
   },
+  events: {
+    "harbor.message": { direction: "out", type: "BoardEvent" },
+  },
   types: {
     HomePage: { kind: "object", fields: { greeting: "string" } },
     NotFoundPage: { kind: "object", fields: { path: "string" } },
     SetNameIn: { kind: "object", fields: { displayName: "string" } },
     SetNameOut: { kind: "object", fields: { ok: "boolean" } },
+    BoardEvent: { kind: "object", fields: { text: "string" } },
   },
 }
 
@@ -139,6 +143,14 @@ test("emitTypescript writes pages and actions", () => {
   assert.match(ts, /"harbor.home": HomePage/)
   assert.match(ts, /export interface HarborActions/)
   assert.match(ts, /"harbor.setName": \{ in: SetNameIn; out: SetNameOut \}/)
+})
+
+test("emitTypescript writes typed events", () => {
+  const ts = emitTypescript(schema, "HarborPages")
+  assert.match(ts, /export interface BoardEvent/)
+  assert.match(ts, /export interface HarborEvents/)
+  assert.match(ts, /"harbor.message": BoardEvent/)
+  assert.match(ts, /export type HarborEventId = keyof HarborEvents/)
 })
 
 test("scaffoldPack writes svelte pages from a schema file", async () => {

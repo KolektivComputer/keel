@@ -4,11 +4,15 @@ import dev.kolektiv.keel.Keel
 import dev.kolektiv.keel.action.ActionDiscovery
 import dev.kolektiv.keel.action.ActionRegistry
 import dev.kolektiv.keel.bundle.FrontendBundle
+import dev.kolektiv.keel.event.EventRegistry
+import dev.kolektiv.keel.ktor.realtime.RealtimeDsl
+import dev.kolektiv.keel.ktor.realtime.RealtimeRequest
 import dev.kolektiv.keel.page.PageMethod
 import dev.kolektiv.keel.page.PageRegistry
 import dev.kolektiv.keel.security.CsrfPolicy
 import io.ktor.http.Parameters
 import io.ktor.server.application.ApplicationCall
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
 fun interface SharedProvider {
@@ -92,6 +96,29 @@ class KeelConfig {
     internal val actionRegistry: ActionRegistry = ActionRegistry()
     @PublishedApi
     internal val actionHandlers: MutableMap<String, suspend ActionRequest.(Any) -> Any> = linkedMapOf()
+    @PublishedApi
+    internal val eventRegistry: EventRegistry = EventRegistry()
+    @PublishedApi
+    internal val eventHandlers: MutableMap<String, suspend RealtimeRequest.(JsonElement) -> Unit> = linkedMapOf()
+
+    @PublishedApi
+    internal var realtimeDsl: RealtimeDsl? = null
+
+    /**
+     * Realtime transports (`GET`/`POST /__keel/events`, WebSocket upgrade on
+     * the same path). Null — the default — means realtime is off: no
+     * endpoints and no event registry entries. Enabling requires the host to
+     * `install(SSE)` and/or `install(WebSockets)` before `keel { }`.
+     */
+    val realtime: RealtimeDsl? get() = realtimeDsl
+
+    /**
+     * Opt in to realtime: declare typed events and client-sent handlers,
+     * authorize channels, tune the keepalive.
+     */
+    fun realtime(block: RealtimeDsl.() -> Unit) {
+        realtimeDsl = RealtimeDsl(eventRegistry, eventHandlers).apply(block)
+    }
 
     fun pages(block: PagesDsl.() -> Unit) {
         PagesDsl(registry, handlers).block()

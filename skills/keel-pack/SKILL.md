@@ -4,9 +4,10 @@ description: >
   Author or adapt a Keel frontend pack for Svelte, React, Vue, Solid,
   Preact, Lit, or Angular. Use when writing pages and +head templates,
   keelPack Vite config and .feb builds, typed contracts, navigation guards,
-  action/effect patterns, or a RouterAdapter. Triggers: "keel pack",
-  "+page.svelte", "+page.tsx", "+page.ts", "+head.html", "keelPack",
-  "PageModule", ".feb", "supportedFrameworks", "beforeEach".
+  action/effect patterns, realtime events, or a RouterAdapter. Triggers:
+  "keel pack", "+page.svelte", "+page.tsx", "+page.ts", "+head.html",
+  "keelPack", "PageModule", ".feb", "supportedFrameworks", "beforeEach",
+  "useKeelEvent", "realtime", "invalidate".
   Slash: /keel-pack.
 ---
 
@@ -185,6 +186,43 @@ Prefer event handlers for user-initiated writes. `useAction` visits the page
 on success by default so `page()` and the query cache rehydrate; reads still
 come from the seed. `action(id, input)` is the same POST without the reactive
 wrapper.
+
+## Realtime
+
+Only use it when the host opted in (`keel { realtime { } }`). `realtime` and
+`useKeelEvent` come from the adapter package; payload types come from
+generated `<Pack>Events` (`@KeelEvent` classes on the host).
+
+```svelte
+import { realtime, useKeelEvent } from "@kolektiv/keel-svelte"
+import type { HarborEvents } from "../lib/page-types"
+
+let liveFeed = $state<FeedItem[]>([])
+
+useKeelEvent<HarborEvents["harbor.message"]>("harbor.message", (item) => {
+  liveFeed = [item, ...liveFeed]
+})
+
+// client → host; the host may echo or broadcast it back
+void realtime.send("harbor.typing", { displayName })
+```
+
+- `useKeelEvent(event, handler)` (Angular: `injectKeelEvent`; Lit:
+  `useKeelEvent(host, …)` or `KeelEventController`) subscribes for the
+  component lifetime and always calls the latest handler. Call it once
+  during component init; do not call it conditionally.
+- The client auto-holds `page:<page id>` and follows seed changes. Add
+  channels with `realtime.subscribe(channel)`; `realtime.configure({ ... })`
+  customizes `channels`, transport, and backoff.
+- An `invalidate` envelope reloads the current page by default
+  (`router.reload({ preserveState: true })`). `realtime.onInvalidate` takes
+  over when the page wants a merge instead of a visit.
+- The seed is still the only read model: use events to patch *view* state
+  (toasts, presence, appends) or let `invalidate` rehydrate. Never treat an
+  event as the source of truth — no replay, and a reconnect resyncs by
+  reloading.
+- `realtime.status()` / `realtime.onStatus` expose `idle`, `connecting`,
+  `open`, `reconnecting`, `closed` if a page wants a live indicator.
 
 ## Navigation guards
 
